@@ -8,7 +8,7 @@ patterns:
     description: Aadhaar number (12 digits)
     pattern: '\b[0-9]{4}-?[0-9]{4}-?[0-9]{4}\b'
     mask: "****-****-****"
-    verification: "aadhaar_checksum"
+    # verification: "aadhaar_checksum"  # TODO: Implement Aadhaar checksum validation
     examples:
       match:
         - "1234-5678-9012"

@@ -140,7 +140,7 @@ patterns:
     metadata:
       note: "Dutch BSN (Citizen Service Number). 8 or 9 digits with 11-proof check. High priority PII under GDPR."
     priority: 200
-    verification: eleven_proof
+    # verification: eleven_proof  # TODO: Implement eleven-proof validation
 
   - id: belgium_rrn_01
     location: eu

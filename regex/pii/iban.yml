@@ -32,6 +32,13 @@ patterns:
     pattern: '\bDE\d{2}[A-Z0-9]{18}\b'
     mask: "DE********************"
     verification: iban_mod97
+    examples:
+      match:
+        - "DE89370400440532013000"
+        - "DE12500105170648489890"
+      nomatch:
+        - "DE8937040044053201300"
+        - "FR1420041010050500013M02606"
     policy:
       store_raw: false
       action_on_match: redact
@@ -44,6 +51,13 @@ patterns:
     pattern: '\bFR\d{2}[A-Z0-9]{23}\b'
     mask: "FR***********************"
     verification: iban_mod97
+    examples:
+      match:
+        - "FR1420041010050500013M02606"
+        - "FR7630006000011234567890189"
+      nomatch:
+        - "FR142004101005050001"
+        - "DE89370400440532013000"
     policy:
       store_raw: false
       action_on_match: redact
@@ -56,6 +70,13 @@ patterns:
     pattern: '\bGB\d{2}[A-Z0-9]{18}\b'
     mask: "GB********************"
     verification: iban_mod97
+    examples:
+      match:
+        - "GB82WEST12345698765432"
+        - "GB29NWBK60161331926819"
+      nomatch:
+        - "GB82WEST1234569876543"
+        - "DE89370400440532013000"
     policy:
       store_raw: false
       action_on_match: redact
@@ -68,6 +89,13 @@ patterns:
     pattern: '\bIT\d{2}[A-Z0-9]{23}\b'
     mask: "IT***********************"
     verification: iban_mod97
+    examples:
+      match:
+        - "IT60X0542811101000000123456"
+        - "IT40S0542811101000000123456"
+      nomatch:
+        - "IT60X054281110100000012345"
+        - "GB82WEST12345698765432"
     policy:
       store_raw: false
       action_on_match: redact

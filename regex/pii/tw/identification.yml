@@ -1,0 +1,46 @@
+namespace: tw
+description: Taiwan identification documents
+
+patterns:
+  - id: national_id_01
+    location: tw
+    category: other
+    description: Taiwan National ID (1 letter + 9 digits)
+    pattern: '\b[A-Z][0-9]{9}\b'
+    flags: [IGNORECASE]
+    mask: "A*********"
+    examples:
+      match:
+        - "A123456789"
+        - "B987654321"
+        - "f234567890"
+      nomatch:
+        - "AB12345678"
+        - "A12345678"
+        - "1234567890"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "First letter indicates birth location, 2nd digit indicates gender"
+
+  - id: passport_01
+    location: tw
+    category: passport
+    description: Taiwan passport number (9 digits)
+    pattern: '\b[0-9]{9}\b'
+    mask: "*********"
+    examples:
+      match:
+        - "123456789"
+        - "987654321"
+      nomatch:
+        - "12345678"
+        - "1234567890"
+        - "A12345678"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    priority: 150

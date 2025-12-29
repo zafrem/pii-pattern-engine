@@ -1,0 +1,46 @@
+namespace: kr
+description: Korean identification documents (passport, driver license)
+
+patterns:
+  - id: passport_01
+    location: kr
+    category: passport
+    description: Korean passport number (M+8 digits or S+8 digits)
+    pattern: '\b[MS][0-9]{8}\b'
+    flags:
+      - IGNORECASE
+    mask: M********
+    examples:
+      match:
+        - M12345678
+        - S87654321
+        - m12345678
+      nomatch:
+        - A12345678
+        - M1234567
+        - M123456789
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+
+  - id: driver_license_01
+    location: kr
+    category: other
+    description: Korean driver's license number (XX-XXXXXX-XX)
+    pattern: '\b[0-9]{2}-[0-9]{6}-[0-9]{2}\b'
+    mask: '**-******-**'
+    examples:
+      match:
+        - 12-345678-90
+      nomatch:
+        - 123-45678-90
+        - 12-34567-890
+        - 123-456789-01
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: high
+    metadata:
+      note: 'Exactly 10 digits with hyphens: XX-XXXXXX-XX. Uses lookaheads to prevent matching when embedded.'
+    priority: 90

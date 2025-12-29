@@ -1,0 +1,328 @@
+namespace: eu
+description: EU national identification numbers for GDPR compliance
+
+patterns:
+  - id: germany_personalausweis_01
+    location: eu
+    category: other
+    description: German identity card number (Personalausweisnummer - 9 alphanumeric with at least 1 letter)
+    pattern: '\b[A-Z0-9]{9}\b'
+    verification: contains_letter
+    mask: "*********"
+    examples:
+      match:
+        - "L01X00T47"
+        - "T22000129"
+        - "C9Y1BTM58"
+      nomatch:
+        - "L01X00T4"
+        - "L01X00T471"
+        - "123456789"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "German Personalausweis number. Highly sensitive PII under GDPR. Must contain at least one letter."
+    priority: 200
+
+  - id: france_insee_01
+    location: eu
+    category: other
+    description: French INSEE number / NIR (15 digits - 1 + 2-digit year + 2-digit month + 5-digit place + 3-digit order + 2-digit key)
+    pattern: '\b[12]\s*\d{2}\s*(?:0[1-9]|1[0-2])\s*\d{5}\s*\d{3}\s*\d{2}\b'
+    mask: "***************"
+    examples:
+      match:
+        - "188057813579897"
+        - "2 88 05 78135 798 97"
+        - "195017535679812"
+      nomatch:
+        - "388057813579897"
+        - "18805781357989"
+        - "1880578135798971"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "French Social Security Number (Numéro de Sécurité Sociale). Format: sex(1) + year(2) + month(2) + department(2) + commune(3) + order(3) + key(2)."
+    priority: 200
+
+  - id: italy_codice_fiscale_01
+    location: eu
+    category: other
+    description: Italian fiscal code (16 alphanumeric - 6 letters + 2 digits + letter + 2 digits + letter + 3 digits + letter)
+    pattern: '\b[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]\b'
+    mask: "****************"
+    examples:
+      match:
+        - "RSSMRA85T10A562S"
+        - "VRDGPP65D15H501T"
+        - "MRORSS70A01F205X"
+      nomatch:
+        - "RSSMRA85T10A562"
+        - "RSSMRA85T10A5622"
+        - "123456789ABCDEF"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "Italian Codice Fiscale. Contains surname(3) + name(3) + birth year(2) + month(1) + day&gender(2) + municipality(4) + check(1)."
+    priority: 200
+
+  - id: spain_dni_01
+    location: eu
+    category: other
+    description: Spanish DNI (8 digits + letter)
+    pattern: '\b\d{8}\s*[A-Z]\b'
+    mask: "********-*"
+    examples:
+      match:
+        - "12345678Z"
+        - "12345678 Z"
+        - "87654321X"
+      nomatch:
+        - "1234567Z"
+        - "123456789Z"
+        - "12345678"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "Spanish DNI (Documento Nacional de Identidad). The letter is a check digit."
+    priority: 200
+
+  - id: spain_nie_01
+    location: eu
+    category: other
+    description: Spanish NIE (foreigner ID - letter + 7 digits + letter)
+    pattern: '\b[XYZ]\s*\d{7}\s*[A-Z]\b'
+    mask: "*-*******-*"
+    examples:
+      match:
+        - "X1234567L"
+        - "Y 1234567 M"
+        - "Z9876543A"
+      nomatch:
+        - "A1234567L"
+        - "X123456L"
+        - "X12345678L"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "Spanish NIE (Número de Identidad de Extranjero) for non-Spanish residents."
+    priority: 200
+
+  - id: netherlands_bsn_01
+    location: eu
+    category: other
+    description: Dutch BSN (Burgerservicenummer - 8 or 9 digits)
+    pattern: '\b\d{8,9}\b'
+    mask: "*********"
+    examples:
+      match:
+        - "123456782"
+        - "12345678"
+        - "999999999"
+      nomatch:
+        - "1234567"
+        - "1234567890"
+        - "ABC123456"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "Dutch BSN (Citizen Service Number). 8 or 9 digits with 11-proof check. High priority PII under GDPR."
+    priority: 200
+    verification: eleven_proof
+
+  - id: belgium_rrn_01
+    location: eu
+    category: other
+    description: Belgian National Register Number (11 digits - YYMMDD-XXX-CC)
+    pattern: '\b\d{2}\.?\d{2}\.?\d{2}[-\s]?\d{3}[-\s]?\d{2}\b'
+    mask: "**.**.**-***-**"
+    examples:
+      match:
+        - "85.07.30-123-45"
+        - "850730-123-45"
+        - "85073012345"
+      nomatch:
+        - "8507301234"
+        - "850730123456"
+        - "85.07.30-123"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "Belgian Rijksregisternummer. Format: birth date(6) + counter(3) + checksum(2)."
+    priority: 200
+
+  - id: poland_pesel_01
+    location: eu
+    category: other
+    description: Polish PESEL (11 digits - YYMMDDXXXXX)
+    pattern: '\b\d{11}\b'
+    mask: "***********"
+    examples:
+      match:
+        - "44051401359"
+        - "92090515836"
+        - "02261308540"
+      nomatch:
+        - "4405140135"
+        - "440514013590"
+        - "ABCD1234567"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "Polish PESEL (Powszechny Elektroniczny System Ewidencji Ludności). Format: birth date(6) + serial(3) + gender(1) + checksum(1)."
+    priority: 200
+
+  - id: sweden_personnummer_01
+    location: eu
+    category: other
+    description: Swedish personal identity number (YYYYMMDD-XXXX or YYMMDD-XXXX)
+    pattern: '\b(?:\d{8}|\d{6})[-\s]?\d{4}\b'
+    mask: "******-****"
+    examples:
+      match:
+        - "19900101-1234"
+        - "900101-1234"
+        - "199001011234"
+        - "9001011234"
+      nomatch:
+        - "19900101-123"
+        - "900101-123"
+        - "1990010112345"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "Swedish Personnummer. Format: birth date + serial(3) + checksum(1). Can be 10 or 12 digits total."
+    priority: 200
+
+  - id: denmark_cpr_01
+    location: eu
+    category: other
+    description: Danish CPR number (DDMMYY-XXXX)
+    pattern: '\b\d{6}[-\s]?\d{4}\b'
+    mask: "******-****"
+    examples:
+      match:
+        - "010190-1234"
+        - "0101901234"
+        - "311299-9999"
+      nomatch:
+        - "01019012"
+        - "0101901234567"
+        - "32019-1234"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "Danish CPR (Central Person Register) number. Format: birth date(6) + serial(4)."
+    priority: 200
+
+  - id: portugal_nif_01
+    location: eu
+    category: other
+    description: Portuguese NIF (9 digits)
+    pattern: '\b[1-3]\d{8}\b'
+    mask: "*********"
+    examples:
+      match:
+        - "123456789"
+        - "212345678"
+        - "312345678"
+      nomatch:
+        - "12345678"
+        - "1234567890"
+        - "412345678"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "Portuguese NIF (Número de Identificação Fiscal). First digit indicates type: 1=person, 2=company, 3=other."
+    priority: 200
+
+  - id: austria_sozialversicherungsnummer_01
+    location: eu
+    category: other
+    description: Austrian social security number (10 digits - XXXX DDMMYY)
+    pattern: '\b\d{4}\s?\d{6}\b'
+    mask: "****-******"
+    examples:
+      match:
+        - "1234 010190"
+        - "1234010190"
+        - "9999 311299"
+      nomatch:
+        - "123401019"
+        - "12340101900"
+        - "ABCD010190"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "Austrian Sozialversicherungsnummer (SVNR). Format: serial(4) + birth date(6)."
+    priority: 200
+
+  - id: finland_hetu_01
+    location: eu
+    category: other
+    description: Finnish personal identity code (DDMMYYCZZZQ)
+    pattern: '\b\d{6}[+\-A]\d{3}[0-9A-FHJ-NPR-Y]\b'
+    mask: "******-****"
+    examples:
+      match:
+        - "010190-123A"
+        - "311299A123P"
+        - "010100+123X"
+      nomatch:
+        - "010190-123"
+        - "010190-12A"
+        - "010190*123A"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "Finnish HETU (Henkilötunnus). Format: birth date(6) + century(+/-/A) + serial(3) + checksum(1). Checksum excludes G, I, O, Q, Z."
+    priority: 200
+
+  - id: uk_nino_01
+    location: eu
+    category: other
+    description: UK National Insurance Number (2 letters + 6 digits + letter)
+    pattern: '\b[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z]\s?\d{2}\s?\d{2}\s?\d{2}\s?[A-D]\b'
+    mask: "**-**-**-**-*"
+    examples:
+      match:
+        - "AB123456C"
+        - "AB 12 34 56 C"
+        - "JG103759A"
+      nomatch:
+        - "AB12345C"
+        - "AB1234567C"
+        - "OO123456C"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "UK National Insurance Number (NINO). Note: UK left EU but still relevant for GDPR transition. Certain letters are excluded (D, F, I, Q, U, V)."
+    priority: 200

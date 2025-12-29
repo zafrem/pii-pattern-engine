@@ -1,0 +1,119 @@
+category: contact
+description: Keywords related to contact information (email, phone, address)
+
+# This file contains keywords that commonly appear near contact PII in text.
+# These can be used for context-aware pattern detection to reduce false positives.
+
+categories:
+  email:
+    description: Email addresses
+    patterns:
+      - email
+      - e-mail
+      - email address
+      - contact email
+      - mail
+      - 이메일
+      - 메일
+      - メール
+      - 电子邮件
+      - 電子郵件
+      - 邮箱
+    contexts:
+      - "Email:"
+      - "E-mail:"
+      - "Contact:"
+      - "이메일:"
+      - "メールアドレス:"
+      - "电子邮箱:"
+
+  phone:
+    description: Phone numbers
+    patterns:
+      - phone
+      - telephone
+      - mobile
+      - cell
+      - tel
+      - fax
+      - phone number
+      - tel no
+      - contact number
+      - 전화
+      - 전화번호
+      - 휴대폰
+      - 핸드폰
+      - 携帯
+      - 電話
+      - 電話番号
+      - 电话
+      - 電話號碼
+      - 手机
+    contexts:
+      - "Phone:"
+      - "Tel:"
+      - "Mobile:"
+      - "Cell:"
+      - "전화번호:"
+      - "携帯番号:"
+      - "电话:"
+
+  address:
+    description: Physical addresses
+    patterns:
+      - address
+      - street
+      - city
+      - state
+      - province
+      - zip code
+      - postal code
+      - postcode
+      - country
+      - 주소
+      - 우편번호
+      - 住所
+      - 郵便番号
+      - 地址
+      - 邮编
+      - 郵遞區號
+    contexts:
+      - "Address:"
+      - "Street:"
+      - "City:"
+      - "Zip:"
+      - "주소:"
+      - "住所:"
+      - "地址:"
+
+  zipcode:
+    description: Postal/ZIP codes
+    patterns:
+      - zip
+      - zip code
+      - postal code
+      - postcode
+      - post code
+      - 우편번호
+      - 郵便番号
+      - 邮编
+      - 郵遞區號
+    contexts:
+      - "ZIP:"
+      - "Postal Code:"
+      - "우편번호:"
+      - "郵便番号:"
+      - "邮编:"
+
+metadata:
+  related_categories:
+    - email
+    - phone
+    - address
+  severity: medium
+  common_contexts:
+    - contact forms
+    - registration forms
+    - user profiles
+    - business cards
+    - customer records

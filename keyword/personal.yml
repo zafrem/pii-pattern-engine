@@ -1,0 +1,110 @@
+category: personal
+description: Keywords related to personal information (names, dates of birth, etc.)
+
+# This file contains keywords that commonly appear near personal PII in text.
+# These can be used for context-aware pattern detection.
+
+categories:
+  name:
+    description: Personal names
+    patterns:
+      - name
+      - full name
+      - first name
+      - last name
+      - given name
+      - family name
+      - surname
+      - middle name
+      - 이름
+      - 성명
+      - 名前
+      - 氏名
+      - 姓名
+      - 名字
+    contexts:
+      - "Name:"
+      - "Full Name:"
+      - "First Name:"
+      - "Last Name:"
+      - "이름:"
+      - "氏名:"
+      - "姓名:"
+
+  date_of_birth:
+    description: Date of birth
+    patterns:
+      - dob
+      - date of birth
+      - birth date
+      - birthday
+      - born
+      - 생년월일
+      - 生年月日
+      - 出生日期
+    contexts:
+      - "DOB:"
+      - "Date of Birth:"
+      - "Birthday:"
+      - "생년월일:"
+      - "生年月日:"
+      - "出生日期:"
+
+  age:
+    description: Age information
+    patterns:
+      - age
+      - years old
+      - 나이
+      - 年齢
+      - 年龄
+    contexts:
+      - "Age:"
+      - "Years old:"
+      - "나이:"
+      - "年齢:"
+
+  gender:
+    description: Gender information
+    patterns:
+      - gender
+      - sex
+      - male
+      - female
+      - 성별
+      - 性別
+    contexts:
+      - "Gender:"
+      - "Sex:"
+      - "성별:"
+      - "性別:"
+
+  nationality:
+    description: Nationality/citizenship
+    patterns:
+      - nationality
+      - citizenship
+      - citizen
+      - country of citizenship
+      - 국적
+      - 国籍
+    contexts:
+      - "Nationality:"
+      - "Citizenship:"
+      - "국적:"
+      - "国籍:"
+
+metadata:
+  related_categories:
+    - name
+    - date_of_birth
+    - age
+    - gender
+    - nationality
+  severity: medium
+  common_contexts:
+    - registration forms
+    - employment applications
+    - medical records
+    - personal profiles
+    - identity documents

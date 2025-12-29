@@ -1,0 +1,104 @@
+namespace: kr
+description: Korean other patterns (business registration, corporate registration, zipcode, names)
+
+patterns:
+  - id: business_registration_01
+    location: kr
+    category: other
+    description: Korean Business Registration Number (사업자등록번호)
+    pattern: '\b[0-9]{3}-[0-9]{2}-[0-9]{5}\b'
+    mask: '***-**-*****'
+    examples:
+      match:
+        - 123-45-67890
+      nomatch:
+        - 12-345-67890
+        - 123-456-7890
+        - 123-45-678901
+        - 123-45-678901-2
+    policy:
+      store_raw: false
+      action_on_match: report
+      severity: medium
+    metadata:
+      note: 'Exactly 10 digits with hyphens: XXX-XX-XXXXX. Uses lookaheads to prevent matching when embedded.'
+
+  - id: corporate_registration_01
+    location: kr
+    category: other
+    description: Korean Corporate Registration Number (법인등록번호)
+    pattern: '\b[0-9]{6}-?[0-9]{7}\b'
+    mask: '******-*******'
+    examples:
+      match:
+        - 123456-1234567
+        - '1234561234567'
+      nomatch:
+        - 12345-12345678
+        - 123456-123456
+    policy:
+      store_raw: false
+      action_on_match: report
+      severity: medium
+
+  - id: zipcode_01
+    location: kr
+    category: address
+    description: Korean postal code (5 digits)
+    pattern: '\b[0-9]{5}\b'
+    verification: korean_zipcode_valid
+    mask: '*****'
+    examples:
+      match:
+        - '06234'
+        - '48058'
+        - '63309'
+      nomatch:
+        - '1234'
+        - '123456'
+        - A1234
+        - 1234A
+        - '012345'
+        - '123456789'
+        - '12345'
+        - '11111'
+        - '50000'
+        - ABC12345
+        - 12345XYZ
+        - MODEL12345A
+    policy:
+      store_raw: false
+      action_on_match: report
+      severity: low
+    metadata:
+      note: Uses negative lookaheads to prevent matching when embedded in alphanumeric strings. Uses verification to reject sequential numbers, repeated digits, and timestamps.
+
+  - id: korean_name_01
+    location: kr
+    category: name
+    description: Korean full name (family name + given name)
+    pattern: \b[가-힣]{2,5}\b
+    mask: '***'
+    examples:
+      match:
+        - 김철수
+        - 이영희
+        - 박민수
+        - 최지은
+        - 정현우
+        - 강미영
+        - 조성민
+        - 윤서연
+      nomatch:
+        - 김
+        - abcd
+        - A김철수
+        - '123'
+        - 가
+        - 김철수박민수
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: high
+    metadata:
+      note: Matches 2-5 Hangul characters. Most Korean names are 3 characters (1 family + 2 given name).

@@ -1,0 +1,122 @@
+category: identification
+description: Keywords related to government-issued identification numbers (SSN, passport, national IDs)
+
+# This file contains keywords that commonly appear near identification PII in text.
+# These can be used for context-aware pattern detection to reduce false positives.
+
+categories:
+  ssn:
+    description: Social Security Number (US)
+    patterns:
+      - ssn
+      - social security
+      - social security number
+      - ss#
+      - ss no
+      - ss number
+      - itin
+      - tin
+      - taxpayer id
+    contexts:
+      - "SSN:"
+      - "Social Security Number:"
+      - "SS#:"
+      - "Tax ID:"
+
+  rrn:
+    description: Resident Registration Number (Korea)
+    patterns:
+      - rrn
+      - 주민등록번호
+      - 주민번호
+      - resident registration
+      - juminbunho
+      - 住民登録番号
+    contexts:
+      - "주민등록번호:"
+      - "RRN:"
+      - "Resident Registration Number:"
+
+  passport:
+    description: Passport numbers
+    patterns:
+      - passport
+      - passport number
+      - passport no
+      - travel document
+      - 여권
+      - 여권번호
+      - パスポート
+      - パスポート番号
+      - 护照
+      - 護照號碼
+    contexts:
+      - "Passport #:"
+      - "Passport Number:"
+      - "여권번호:"
+      - "パスポート番号:"
+      - "护照号码:"
+
+  national_id:
+    description: National identification numbers
+    patterns:
+      - national id
+      - id number
+      - id card
+      - identity card
+      - citizen id
+      - national identity
+      - 身份证
+      - 身分證
+      - 身份證號碼
+      - マイナンバー
+      - 個人番號
+      - aadhar
+      - aadhaar
+      - pan card
+      - nric
+      - ic number
+    contexts:
+      - "ID Number:"
+      - "National ID:"
+      - "Identity Card:"
+      - "身份证号:"
+      - "マイナンバー:"
+      - "Aadhaar:"
+
+  drivers_license:
+    description: Driver's license numbers
+    patterns:
+      - driver license
+      - drivers license
+      - driver's license
+      - dl
+      - dl number
+      - license number
+      - 운전면허
+      - 운전면허증
+      - 運転免許
+      - 運転免許証
+      - 驾驶证
+      - 駕駛執照
+    contexts:
+      - "Driver's License:"
+      - "DL#:"
+      - "License No:"
+      - "운전면허번호:"
+      - "運転免許証番号:"
+
+metadata:
+  related_categories:
+    - ssn
+    - rrn
+    - passport
+    - national_id
+    - drivers_license
+  severity: critical
+  common_contexts:
+    - government forms
+    - registration forms
+    - employment documents
+    - tax documents
+    - identity verification

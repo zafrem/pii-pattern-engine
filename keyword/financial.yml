@@ -1,0 +1,95 @@
+category: financial
+description: Keywords related to financial information detection (bank accounts, credit cards, IBAN)
+
+# This file contains keywords that commonly appear near financial PII in text.
+# These can be used for context-aware pattern detection to reduce false positives.
+
+categories:
+  bank:
+    description: Bank account numbers and related terms
+    patterns:
+      - bank
+      - account
+      - checking
+      - savings
+      - routing
+      - transit
+      - sort code
+      - account number
+      - acct
+      - 계좌
+      - 계좌번호
+      - 은행
+      - 口座
+      - 銀行
+      - 账号
+      - 銀行賬號
+    contexts:
+      - "bank account:"
+      - "account number:"
+      - "routing number:"
+      - "계좌번호:"
+      - "口座番号:"
+      - "银行账号:"
+
+  credit_card:
+    description: Credit card numbers and related terms
+    patterns:
+      - credit card
+      - debit card
+      - card number
+      - card no
+      - cc
+      - visa
+      - mastercard
+      - amex
+      - american express
+      - discover
+      - jcb
+      - unionpay
+      - diners
+      - cvv
+      - cvc
+      - expiry
+      - expiration
+      - 신용카드
+      - 카드번호
+      - クレジットカード
+      - カード番号
+      - 信用卡
+      - 卡号
+    contexts:
+      - "card number:"
+      - "credit card:"
+      - "cvv:"
+      - "exp:"
+      - "카드번호:"
+      - "カード番号:"
+      - "信用卡号:"
+
+  iban:
+    description: International Bank Account Number
+    patterns:
+      - iban
+      - international bank account
+      - sepa
+      - bic
+      - swift
+      - swift code
+    contexts:
+      - "IBAN:"
+      - "BIC/SWIFT:"
+      - "Account (IBAN):"
+
+metadata:
+  related_categories:
+    - bank
+    - credit_card
+    - iban
+  severity: critical
+  common_contexts:
+    - forms
+    - payment pages
+    - invoices
+    - bank statements
+    - financial documents

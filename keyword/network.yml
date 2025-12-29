@@ -1,0 +1,79 @@
+category: network
+description: Keywords related to network identifiers (IP addresses, URLs, domains)
+
+# This file contains keywords that commonly appear near network-related patterns in text.
+# These can be used for context-aware pattern detection.
+
+categories:
+  ip_address:
+    description: IP addresses (IPv4/IPv6)
+    patterns:
+      - ip
+      - ip address
+      - ip addr
+      - ipv4
+      - ipv6
+      - host
+      - server
+      - endpoint
+      - source ip
+      - destination ip
+      - client ip
+      - remote ip
+      - local ip
+      - private ip
+      - public ip
+    contexts:
+      - "IP:"
+      - "IP Address:"
+      - "Server:"
+      - "Host:"
+      - "Source:"
+      - "Destination:"
+      - "Client IP:"
+
+  url:
+    description: URLs and web addresses
+    patterns:
+      - url
+      - link
+      - website
+      - web address
+      - http
+      - https
+      - domain
+      - hostname
+      - endpoint
+      - api endpoint
+    contexts:
+      - "URL:"
+      - "Link:"
+      - "Website:"
+      - "Endpoint:"
+
+  mac_address:
+    description: MAC addresses
+    patterns:
+      - mac
+      - mac address
+      - hardware address
+      - physical address
+      - ethernet address
+      - network adapter
+    contexts:
+      - "MAC:"
+      - "MAC Address:"
+      - "Hardware Address:"
+
+metadata:
+  related_categories:
+    - ip
+    - url
+    - mac_address
+  severity: low
+  common_contexts:
+    - log files
+    - network configurations
+    - system diagnostics
+    - api documentation
+    - server settings

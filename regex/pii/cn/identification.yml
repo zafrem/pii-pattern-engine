@@ -1,0 +1,49 @@
+namespace: cn
+description: China identification documents
+
+patterns:
+  - id: national_id_01
+    location: cn
+    category: other
+    description: Chinese National ID (18 digits)
+    pattern: '\b[0-9]{17}[0-9X]\b'
+    flags: [IGNORECASE]
+    mask: "******************"
+    examples:
+      match:
+        - "110101199003077777"
+        - "32010219901010123X"
+        - "44030119850101456x"
+      nomatch:
+        - "11010119900307777"
+        - "1101011990030777777"
+        - "110101199003077A"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "18 digits: area(6) + birth date(8) + sequence(3) + check digit(1, can be X)"
+
+  - id: passport_01
+    location: cn
+    category: passport
+    description: Chinese passport number (1 letter + 8 digits)
+    pattern: '\b[EG][0-9]{8}\b'
+    flags: [IGNORECASE]
+    mask: "E********"
+    examples:
+      match:
+        - "E12345678"
+        - "G87654321"
+        - "e23456789"
+      nomatch:
+        - "A12345678"
+        - "E1234567"
+        - "E123456789"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: critical
+    metadata:
+      note: "E for regular passport, G for diplomatic/service passport"

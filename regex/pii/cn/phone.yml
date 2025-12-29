@@ -1,0 +1,45 @@
+namespace: cn
+description: China phone number patterns
+
+patterns:
+  - id: mobile_01
+    location: cn
+    category: phone
+    description: Chinese mobile phone number (1XX-XXXX-XXXX)
+    pattern: '\b1[3-9][0-9]-?[0-9]{4}-?[0-9]{4}\b'
+    mask: "1**-****-****"
+    examples:
+      match:
+        - "138-1234-5678"
+        - "13812345678"
+        - "186-9876-5432"
+        - "199-0000-1111"
+      nomatch:
+        - "128-1234-5678"
+        - "138-123-45678"
+        - "1381-234-5678"
+    policy:
+      store_raw: false
+      action_on_match: redact
+      severity: high
+
+  - id: landline_01
+    location: cn
+    category: phone
+    description: Chinese landline number (area code + number)
+    pattern: '\b0[1-9][0-9]{1,2}-?[0-9]{7,8}\b'
+    mask: "0***-********"
+    examples:
+      match:
+        - "010-12345678"
+        - "021-87654321"
+        - "0755-12345678"
+        - "02112345678"
+      nomatch:
+        - "00-12345678"
+        - "010-123456"
+        - "138-12345678"
+    policy:
+      store_raw: false
+      action_on_match: report
+      severity: low

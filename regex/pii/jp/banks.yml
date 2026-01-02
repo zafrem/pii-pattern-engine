@@ -140,6 +140,7 @@ patterns:
     description: Generic Japanese bank account (XXXX-XXX-XXXXXXX)
     pattern: '\b[0-9]{4}-?[0-9]{3}-?[0-9]{7}\b'
     mask: "****-***-*******"
+    verification: generic_number_not_timestamp
     examples:
       match:
         - "1234-567-8901234"

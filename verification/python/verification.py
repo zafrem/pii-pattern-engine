@@ -234,12 +234,14 @@ def not_timestamp(value: str) -> bool:
             second = int(digits_only[12:14])
 
             # Check if components are in valid ranges
-            if (1900 <= year <= 2099 and
-                1 <= month <= 12 and
-                1 <= day <= 31 and
-                0 <= hour <= 23 and
-                0 <= minute <= 59 and
-                0 <= second <= 59):
+            if (
+                1900 <= year <= 2099
+                and 1 <= month <= 12
+                and 1 <= day <= 31
+                and 0 <= hour <= 23
+                and 0 <= minute <= 59
+                and 0 <= second <= 59
+            ):
                 return False  # Likely a compact datetime
         except (ValueError, IndexError):
             pass
@@ -271,10 +273,12 @@ def korean_zipcode_valid(value: str) -> bool:
         return False
 
     # Reject sequential patterns (12345, 54321, etc.)
-    is_sequential_up = all(int(digits_only[i]) == int(digits_only[i-1]) + 1
-                          for i in range(1, len(digits_only)))
-    is_sequential_down = all(int(digits_only[i]) == int(digits_only[i-1]) - 1
-                            for i in range(1, len(digits_only)))
+    is_sequential_up = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) + 1 for i in range(1, len(digits_only))
+    )
+    is_sequential_down = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) - 1 for i in range(1, len(digits_only))
+    )
 
     if is_sequential_up or is_sequential_down:
         return False
@@ -323,10 +327,12 @@ def us_zipcode_valid(value: str) -> bool:
     base_zip = digits_only[:5]
 
     # Reject sequential patterns in base ZIP (12345, 54321, etc.)
-    is_sequential_up = all(int(base_zip[i]) == int(base_zip[i-1]) + 1
-                          for i in range(1, len(base_zip)))
-    is_sequential_down = all(int(base_zip[i]) == int(base_zip[i-1]) - 1
-                            for i in range(1, len(base_zip)))
+    is_sequential_up = all(
+        int(base_zip[i]) == int(base_zip[i - 1]) + 1 for i in range(1, len(base_zip))
+    )
+    is_sequential_down = all(
+        int(base_zip[i]) == int(base_zip[i - 1]) - 1 for i in range(1, len(base_zip))
+    )
 
     if is_sequential_up or is_sequential_down:
         return False
@@ -370,9 +376,10 @@ def korean_bank_account_valid(value: str) -> bool:
     length = len(digits_only)
 
     # Check if it starts with a known Korean bank prefix
-    # Common prefixes: 110, 120, 150, 190, 830 (Kookmin), 1002 (Woori), 301 (Nonghyup), 3333 (Kakao), 100 (K Bank/Toss)
+    # Common prefixes: 110, 120, 150, 190, 830 (Kookmin), 1002 (Woori),
+    # 301 (Nonghyup), 3333 (Kakao), 100 (K Bank/Toss)
     has_known_prefix = False
-    known_prefixes = ['110', '120', '150', '190', '830', '1002', '301', '3333', '100']
+    known_prefixes = ["110", "120", "150", "190", "830", "1002", "301", "3333", "100"]
     for prefix in known_prefixes:
         if digits_only.startswith(prefix):
             has_known_prefix = True
@@ -420,7 +427,7 @@ def korean_bank_account_valid(value: str) -> bool:
             day = int(digits_only[6:8])
 
             # Check if first 8 digits look like YYYYMMDD
-            if (1900 <= year <= 2099 and 1 <= month <= 12 and 1 <= day <= 31):
+            if 1900 <= year <= 2099 and 1 <= month <= 12 and 1 <= day <= 31:
                 return False  # Likely compact datetime
         except (ValueError, IndexError):
             pass
@@ -431,7 +438,7 @@ def korean_bank_account_valid(value: str) -> bool:
         sequential_count = 0
         max_sequential = 0
         for i in range(1, len(digits_only)):
-            if int(digits_only[i]) == int(digits_only[i-1]) + 1:
+            if int(digits_only[i]) == int(digits_only[i - 1]) + 1:
                 sequential_count += 1
                 max_sequential = max(max_sequential, sequential_count)
             else:
@@ -459,7 +466,7 @@ def generic_number_not_timestamp(value: str) -> bool:
     """
     # Check if value contains separators (hyphens, spaces)
     # If it has separators, it's more likely a formatted account number than a timestamp
-    has_separators = any(c in value for c in ['-', ' ', '/'])
+    has_separators = any(c in value for c in ["-", " ", "/"])
 
     # Remove common separators
     digits_only = "".join(c for c in value if c.isdigit())
@@ -480,7 +487,7 @@ def generic_number_not_timestamp(value: str) -> bool:
                 day = int(digits_only[6:8])
 
                 # Check if first 8 digits look like YYYYMMDD
-                if (1900 <= year <= 2099 and 1 <= month <= 12 and 1 <= day <= 31):
+                if 1900 <= year <= 2099 and 1 <= month <= 12 and 1 <= day <= 31:
                     return False  # Likely compact datetime even with separators
             except (ValueError, IndexError):
                 pass
@@ -513,7 +520,7 @@ def generic_number_not_timestamp(value: str) -> bool:
             day = int(digits_only[6:8])
 
             # Check if first 8 digits look like YYYYMMDD
-            if (1900 <= year <= 2099 and 1 <= month <= 12 and 1 <= day <= 31):
+            if 1900 <= year <= 2099 and 1 <= month <= 12 and 1 <= day <= 31:
                 return False  # Likely compact datetime
         except (ValueError, IndexError):
             pass

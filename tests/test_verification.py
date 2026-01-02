@@ -12,21 +12,22 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "verification" / "python"))
 
 import pytest
+
 from verification import (
-    iban_mod97,
-    luhn,
-    dms_coordinate,
-    high_entropy_token,
-    not_timestamp,
-    korean_zipcode_valid,
-    us_zipcode_valid,
-    korean_bank_account_valid,
-    generic_number_not_timestamp,
     contains_letter,
-    us_ssn_valid,
+    dms_coordinate,
+    generic_number_not_timestamp,
     get_verification_function,
+    high_entropy_token,
+    iban_mod97,
+    korean_bank_account_valid,
+    korean_zipcode_valid,
+    luhn,
+    not_timestamp,
     register_verification_function,
     unregister_verification_function,
+    us_ssn_valid,
+    us_zipcode_valid,
 )
 
 
@@ -76,7 +77,7 @@ class TestLuhn:
         valid_cards = [
             "4111111111111111",  # Visa test card
             "5500000000000004",  # MasterCard test card
-            "378282246310005",   # Amex test card
+            "378282246310005",  # Amex test card
             "6011111111111117",  # Discover test card
         ]
         for card in valid_cards:
@@ -167,7 +168,11 @@ class TestHighEntropyToken:
             "sk_test_4eC39HqLyjWDarjtT1zdp7dc",  # Stripe test key-like
             "xoxb-1234567890123-1234567890123-abcdefghijklmnopqrstuvwx",  # Slack-like
             "AIzaSyD-1234567890abcdefghijklmnopqrstuv",  # Google API key-like
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U",  # JWT
+            (
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
+                "eyJzdWIiOiIxMjM0NTY3ODkwIn0."
+                "dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U"
+            ),  # JWT
         ]
         for token in valid_tokens:
             assert high_entropy_token(token), f"Expected {token} to be high entropy"
@@ -230,8 +235,8 @@ class TestNotTimestamp:
     def test_valid_account_numbers(self):
         """Test valid account numbers (should return True)."""
         accounts = [
-            "123456789",     # 9 digits
-            "12345678",      # 8 digits
+            "123456789",  # 9 digits
+            "12345678",  # 8 digits
             "123456789012",  # 12 digits (not timestamp range)
         ]
         for account in accounts:
@@ -346,10 +351,10 @@ class TestKoreanBankAccountValid:
     def test_valid_with_known_prefix(self):
         """Test valid bank accounts with known prefixes."""
         valid_accounts = [
-            "110-123-456789",     # Kookmin Bank
-            "1002-123-456789",    # Woori Bank
-            "301-1234-5678",      # Nonghyup
-            "3333-12-3456789",    # Kakao Bank
+            "110-123-456789",  # Kookmin Bank
+            "1002-123-456789",  # Woori Bank
+            "301-1234-5678",  # Nonghyup
+            "3333-12-3456789",  # Kakao Bank
         ]
         for account in valid_accounts:
             assert korean_bank_account_valid(account), f"Expected {account} to be valid"
@@ -468,6 +473,7 @@ class TestVerificationRegistry:
 
     def test_register_verification_function(self):
         """Test registering custom verification function."""
+
         def custom_verify(value: str) -> bool:
             return value == "custom"
 
@@ -481,6 +487,7 @@ class TestVerificationRegistry:
 
     def test_unregister_verification_function(self):
         """Test unregistering verification function."""
+
         def temp_verify(value: str) -> bool:
             return True
 

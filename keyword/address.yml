@@ -171,6 +171,45 @@ categories:
       - "住所:"
       - "配送先:"
 
+  address_cn:
+    description: Chinese Address indicators
+    patterns:
+      - 省
+      - 市
+      - 区
+      - 县
+      - 镇
+      - 村
+      - 路
+      - 街
+      - 大道
+      - 弄
+      - 号
+      - 室
+      - 楼
+      - 单元
+      - 栋
+      - 座
+      # Major Cities/Provinces (Anchors)
+      - 北京
+      - 上海
+      - 广州
+      - 深圳
+      - 天津
+      - 重庆
+      - 杭州
+      - 成都
+      - 武汉
+      - 西安
+      - 苏州
+      - 南京
+    contexts:
+      - "地址:"
+      - "住址:"
+      - "省:"
+      - "市:"
+      - "区:"
+
 metadata:
   severity: medium
   common_contexts:

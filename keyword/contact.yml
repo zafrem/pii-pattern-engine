@@ -16,9 +16,11 @@ categories:
       - 이메일
       - 메일
       - メール
+      - Eメール
       - 电子邮件
       - 電子郵件
       - 邮箱
+      - 电邮
     contexts:
       - "Email:"
       - "E-mail:"
@@ -41,12 +43,14 @@ categories:
       - contact number
       - 전화
       - 전화번호
+      - 전번
       - 휴대폰
       - 핸드폰
       - 携帯
       - 電話
       - 電話番号
       - 电话
+      - 联系电话
       - 電話號碼
       - 手机
     contexts:
@@ -95,6 +99,7 @@ categories:
       - postcode
       - post code
       - 우편번호
+      - 우편
       - 郵便番号
       - 邮编
       - 郵遞區號

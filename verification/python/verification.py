@@ -339,15 +339,23 @@ def us_zipcode_valid(value: str) -> bool:
     
     Checks against us_zipcodes.csv if available, otherwise uses heuristics.
     """
+    # Remove any separators to get raw digits first
+    digits_only = "".join(c for c in value if c.isdigit())
+    
     # 1. Data-driven check if data exists
     valid_zips = _load_data_file("us_zipcodes.csv")
     if valid_zips:
-        return value in valid_zips or value.replace("-", "") in valid_zips
-
+        # If we have 5 digits, check exact match
+        if len(digits_only) == 5:
+            return digits_only in valid_zips
+        # If we have 9 digits (ZIP+4), check if the base 5-digit zip is valid
+        elif len(digits_only) == 9:
+            return digits_only[:5] in valid_zips
+            
+        # If length is weird but data is present, we might want to fail?
+        # But let's fall back to heuristics just in case regex matched something else
+    
     # 2. Heuristic fallback
-    # Remove any separators
-    digits_only = "".join(c for c in value if c.isdigit())
-
     # US ZIP can be 5 digits or 9 digits (ZIP+4)
     if len(digits_only) not in [5, 9]:
         return False

@@ -9,10 +9,48 @@ All verification functions follow the signature: (str) -> bool
 
 import logging
 import math
+import os
 from collections import Counter
-from typing import Callable, Dict, Optional
+from pathlib import Path
+from typing import Callable, Dict, Optional, Set
 
 logger = logging.getLogger(__name__)
+
+# Cache for data-driven verification
+_DATA_CACHE: Dict[str, Set[str]] = {}
+
+
+def _get_data_path() -> Path:
+    """Determine data directory path."""
+    # Current file is pattern-engine/verification/python/verification.py
+    # Data is in pattern-engine/datas/
+    return Path(__file__).parent.parent.parent / "datas"
+
+
+def _load_data_file(filename: str) -> Set[str]:
+    """Load values from a CSV data file."""
+    if filename in _DATA_CACHE:
+        return _DATA_CACHE[filename]
+
+    data_path = _get_data_path() / filename
+    values = set()
+
+    if data_path.exists():
+        try:
+            with open(data_path, "r", encoding="utf-8") as f:
+                # Skip header
+                lines = f.readlines()
+                if len(lines) > 1:
+                    for line in lines[1:]:
+                        val = line.strip()
+                        if val:
+                            values.add(val)
+            logger.info(f"Loaded {len(values)} entries from {filename}")
+        except Exception as e:
+            logger.error(f"Failed to load data file {filename}: {e}")
+
+    _DATA_CACHE[filename] = values
+    return values
 
 
 def iban_mod97(value: str) -> bool:
@@ -161,7 +199,7 @@ def high_entropy_token(value: str) -> bool:
 
     # Check character set (base64url: A-Za-z0-9_- or hex: A-Fa-f0-9)
     # Being permissive to catch various token formats including JWT (with dots)
-    allowed_chars = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-+/=.")
+    allowed_chars = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-+/.=")
     if not all(c in allowed_chars for c in value):
         return False
 
@@ -252,20 +290,16 @@ def not_timestamp(value: str) -> bool:
 
 def korean_zipcode_valid(value: str) -> bool:
     """
-    Verify Korean postal code is valid and not a timestamp component.
-
-    Korean postal codes are 5 digits (00000-99999).
-    This function rejects:
-    - Sequential numbers (12345, 11111, etc.)
-    - Timestamps components
-    - Error codes and other numeric IDs
-
-    Args:
-        value: 5-digit string to verify
-
-    Returns:
-        True if likely a valid Korean postal code, False otherwise
+    Verify Korean postal code is valid.
+    
+    Checks against kr_zipcodes.csv if available, otherwise uses heuristics.
     """
+    # 1. Data-driven check if data exists
+    valid_zips = _load_data_file("kr_zipcodes.csv")
+    if valid_zips:
+        return value in valid_zips or value.replace("-", "") in valid_zips
+
+    # 2. Heuristic fallback
     # Remove any separators
     digits_only = "".join(c for c in value if c.isdigit())
 
@@ -288,7 +322,6 @@ def korean_zipcode_valid(value: str) -> bool:
         return False
 
     # Reject numbers that are too round (multiples of 10000, like 50000, 60000)
-    # Real postal codes have more variation
     try:
         num = int(digits_only)
         if num % 10000 == 0:
@@ -302,20 +335,16 @@ def korean_zipcode_valid(value: str) -> bool:
 
 def us_zipcode_valid(value: str) -> bool:
     """
-    Verify US postal code is valid and not a timestamp component.
-
-    US postal codes are 5 digits (00000-99999) or ZIP+4 (00000-0000).
-    This function rejects:
-    - Sequential numbers in the base 5 digits (12345, 54321, etc.)
-    - Timestamps components
-    - Error codes and other numeric IDs
-
-    Args:
-        value: 5 or 9-digit string (with optional hyphen) to verify
-
-    Returns:
-        True if likely a valid US postal code, False otherwise
+    Verify US postal code is valid.
+    
+    Checks against us_zipcodes.csv if available, otherwise uses heuristics.
     """
+    # 1. Data-driven check if data exists
+    valid_zips = _load_data_file("us_zipcodes.csv")
+    if valid_zips:
+        return value in valid_zips or value.replace("-", "") in valid_zips
+
+    # 2. Heuristic fallback
     # Remove any separators
     digits_only = "".join(c for c in value if c.isdigit())
 
@@ -342,7 +371,6 @@ def us_zipcode_valid(value: str) -> bool:
         return False
 
     # Reject numbers that are too round (multiples of 10000, like 50000, 60000)
-    # Real postal codes have more variation
     try:
         num = int(base_zip)
         if num % 10000 == 0:
@@ -350,7 +378,6 @@ def us_zipcode_valid(value: str) -> bool:
     except ValueError:
         return False
 
-    # Accept as likely valid postal code
     return True
 
 

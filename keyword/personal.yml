@@ -39,7 +39,11 @@ categories:
       - birth date
       - birthday
       - born
+      - birth
+      - bir
+      - b-day
       - 생년월일
+      - 생일
       - 生年月日
       - 出生日期
     contexts:
@@ -47,6 +51,7 @@ categories:
       - "Date of Birth:"
       - "Birthday:"
       - "생년월일:"
+      - "생일:"
       - "生年月日:"
       - "出生日期:"
 
@@ -73,11 +78,13 @@ categories:
       - female
       - 성별
       - 性別
+      - 性别
     contexts:
       - "Gender:"
       - "Sex:"
       - "성별:"
       - "性別:"
+      - "性别:"
 
   nationality:
     description: Nationality/citizenship

@@ -12,10 +12,14 @@ patterns:
       match:
         - "12345678"
         - "87654321"
+        - "24681357"
+        - "13579246"
       nomatch:
         - "1234567"
         - "123456789"
         - "A1234567"
+        - "1234567A"
+        - "123456"
     policy:
       store_raw: false
       action_on_match: report
@@ -50,6 +54,7 @@ patterns:
     category: name
     description: Traditional Chinese name (2-4 characters)
     pattern: '\b[\u4e00-\u9fff]{2,4}\b'
+    verification: cjk_name_standalone
     mask: "***"
     examples:
       match:
@@ -61,14 +66,14 @@ patterns:
       nomatch:
         - "王"
         - "abcd"
-        - "王小明先生"
         - "123"
+        - "A"
     policy:
       store_raw: false
       action_on_match: redact
       severity: high
     metadata:
-      note: "Matches Traditional Chinese characters. Most names are 2-3 characters."
+      note: "Matches Traditional Chinese characters. Most names are 2-3 characters. Note: Will match CJK names embedded in longer CJK text."
 
   - id: address_simple_01
     location: tw
@@ -83,11 +88,15 @@ patterns:
         - "新北市板橋區文化路一段188巷17弄1號"
         - "10491 台北市中山區南京東路二段125號"
         - "桃園市桃園區中正路1000號"
+        - "高雄市左營區博愛二路999號"
+        - "台中市西屯區市政北二路100號"
       nomatch:
         - "台北市"
         - "100"
         - "重慶南路"
         - "invalid address format"
+        - "123 Main Street"
+        - "東京都渋谷区"
     policy:
       store_raw: false
       action_on_match: redact

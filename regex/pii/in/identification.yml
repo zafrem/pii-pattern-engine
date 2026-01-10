@@ -8,22 +8,27 @@ patterns:
     description: Aadhaar number (12 digits)
     pattern: '\b[0-9]{4}-?[0-9]{4}-?[0-9]{4}\b'
     mask: "****-****-****"
-    # verification: "aadhaar_checksum"  # TODO: Implement Aadhaar checksum validation
+    verification: india_aadhaar_valid
     examples:
       match:
-        - "1234-5678-9012"
-        - "123456789012"
-        - "9876-5432-1098"
+        - "2345-6789-0124"
+        - "499118665246"
+        - "8765-4321-0988"
       nomatch:
         - "123-456-789012"
         - "12345-6789-012"
         - "1234567890"
+        - "0234-5678-9012"
+        - "1234-5678-9012"
+        - "111111111111"
+        - "000000000000"
+        - "123456789012"
     policy:
       store_raw: false
       action_on_match: redact
       severity: critical
     metadata:
-      note: "India's unique identification number"
+      note: "India's unique identification number. Uses Verhoeff checksum. First digit cannot be 0 or 1."
     priority: 150
 
   - id: pan_01
@@ -32,22 +37,30 @@ patterns:
     description: PAN (Permanent Account Number) - 5 letters + 4 digits + 1 letter
     pattern: '\b[A-Z]{5}[0-9]{4}[A-Z]\b'
     flags: [IGNORECASE]
+    verification: india_pan_valid
     mask: "AAAAA****A"
     examples:
       match:
-        - "ABCDE1234F"
-        - "XYZKL9876M"
-        - "abcde1234f"
+        - "BNZPM2501F"
+        - "AFRPC1234M"
+        - "xyzkp9876m"
+        - "CDHPL5678K"
+        - "GHJPT9012N"
       nomatch:
         - "ABCD1234F"
         - "ABCDE12345"
         - "ABCDE1234FF"
+        - "AAAAA1234F"
+        - "ABCDE1234F"
+        - "ABXYZ1234F"
+        - "12345ABCDE"
+        - "BNZPM25012"
     policy:
       store_raw: false
       action_on_match: redact
       severity: critical
     metadata:
-      note: "Income Tax Department identification number"
+      note: "Income Tax Department identification number. 4th character indicates entity type (P=Person, C=Company, etc)."
 
   - id: passport_01
     location: in
@@ -61,10 +74,14 @@ patterns:
         - "A1234567"
         - "Z9876543"
         - "m2345678"
+        - "K5678901"
+        - "P9012345"
       nomatch:
         - "AB123456"
         - "A123456"
         - "A12345678"
+        - "1A234567"
+        - "AA123456"
     policy:
       store_raw: false
       action_on_match: redact
@@ -82,10 +99,14 @@ patterns:
         - "ABC1234567"
         - "XYZ9876543"
         - "def2345678"
+        - "MNO5678901"
+        - "PQR2468135"
       nomatch:
         - "AB1234567"
         - "ABC123456"
         - "ABC12345678"
+        - "ABCD123456"
+        - "1234567ABC"
     policy:
       store_raw: false
       action_on_match: redact
@@ -103,10 +124,14 @@ patterns:
         - "DL1420110012345"
         - "MH1220110098765"
         - "ka0320110054321"
+        - "TN0520150067890"
+        - "KA1020180012345"
       nomatch:
         - "DL142011001234"
         - "DL14201100123456"
         - "A142011001234567"
+        - "DL1A20110012345"
+        - "123420110012345"
     policy:
       store_raw: false
       action_on_match: redact

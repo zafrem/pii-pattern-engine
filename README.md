@@ -5,10 +5,10 @@ A comprehensive collection of regular expression patterns and verification funct
 ## Overview
 
 Pattern Engine provides:
-- **Regex Patterns**: 158+ patterns for PII detection across US, Korea, Japan, China, Taiwan, India, EU, and common international formats
-- **Verification Functions**: 11 Python verification functions for checksum validation and data quality checks
+- **Regex Patterns**: 160+ patterns for PII detection across US, Korea, Japan, China, Taiwan, India, EU, and common international formats
+- **Verification Functions**: 32 Python verification functions for checksum validation and data quality checks
 - **Keyword Mappings**: Context-aware keywords in multiple languages for improved accuracy
-- **Comprehensive Tests**: 1,490+ automated tests ensuring pattern accuracy and reliability
+- **Comprehensive Tests**: 1,965+ automated tests ensuring pattern accuracy and reliability
 
 ## Project Structure
 
@@ -30,7 +30,7 @@ pattern-engine/
 │
 ├── verification/            # Verification functions for pattern validation
 │   ├── python/             # Python implementation
-│   │   ├── verification.py # 11 verification functions
+│   │   ├── verification.py # 32 verification functions
 │   │   └── __init__.py
 │   └── README.md
 │
@@ -43,8 +43,8 @@ pattern-engine/
 │   └── README.md
 │
 ├── tests/                   # Comprehensive test suite
-│   ├── test_verification.py # Verification function tests (59 tests)
-│   ├── test_patterns.py     # Pattern validation tests (1,800+ tests)
+│   ├── test_verification.py # Verification function tests (129 tests)
+│   ├── test_patterns.py     # Pattern validation tests (1,836+ tests)
 │   ├── requirements.txt     # Test dependencies
 │   ├── run_tests.sh        # Test runner script
 │   └── README.md
@@ -110,7 +110,10 @@ from verification.python.verification import (
     iban_mod97,
     luhn,
     high_entropy_token,
-    us_ssn_valid
+    us_ssn_valid,
+    kr_rrn_valid,
+    cn_national_id_valid,
+    jp_my_number_valid
 )
 
 # Verify IBAN
@@ -128,6 +131,18 @@ if high_entropy_token("ghp_1a2B3c4D5e6F7g8H9i0J1k2L3m4N5o6P7q8R9s0T"):
 # Validate US SSN
 if us_ssn_valid("123-45-6789"):
     print("Valid SSN format")
+
+# Validate Korean RRN
+if kr_rrn_valid("850101-1234567"):
+    print("Valid Korean RRN")
+
+# Validate Chinese national ID
+if cn_national_id_valid("11010519491231002X"):
+    print("Valid Chinese national ID")
+
+# Validate Japanese My Number
+if jp_my_number_valid("123456789012"):
+    print("Valid Japanese My Number")
 ```
 
 ## Pattern Categories
@@ -136,14 +151,14 @@ if us_ssn_valid("123-45-6789"):
 
 | Region | Patterns | Description |
 |--------|----------|-------------|
-| **US** | 15+ | SSN, ITIN, passport, driver's license, phone, zipcode |
-| **Korea** | 20+ | RRN, alien registration, bank accounts, phone, zipcode |
-| **Japan** | 15+ | My Number, bank accounts, phone, zipcode |
-| **China** | 15+ | ID cards, bank accounts, phone |
-| **Taiwan** | 15+ | ID cards, bank accounts, phone |
-| **India** | 10+ | Aadhaar, PAN, phone |
-| **EU** | 20+ | VAT, national IDs, passports (FR, DE, IT, ES, NL, BE, etc.) |
-| **Common** | 30+ | Email, IP, credit cards, URLs |
+| **US** | 8 | SSN, ITIN, passport, driver's license, phone, zipcode |
+| **Korea** | 28 | RRN, alien registration, bank accounts, phone, zipcode |
+| **Japan** | 17 | My Number, bank accounts, phone, zipcode |
+| **China** | 12 | ID cards, bank accounts, phone |
+| **Taiwan** | 20 | ID cards, bank accounts, phone |
+| **India** | 10 | Aadhaar, PAN, phone |
+| **EU** | 38 | VAT, national IDs, passports (FR, DE, IT, ES, NL, BE, etc.) |
+| **Common** | 22 | Email, IP, credit cards, URLs, IBAN, tokens/secrets |
 
 ### Data Types
 
@@ -155,21 +170,74 @@ if us_ssn_valid("123-45-6789"):
 
 ## Verification Functions
 
-The project includes 11 verification functions for advanced validation:
+The project includes 32 verification functions for advanced validation:
+
+### Core Validators
 
 | Function | Purpose | Example |
 |----------|---------|---------|
 | `iban_mod97` | IBAN checksum validation | GB82WEST12345698765432 |
 | `luhn` | Credit card validation | 4111111111111111 |
+| `credit_card_bin_valid` | Credit card BIN validation | Valid issuer prefix check |
 | `dms_coordinate` | GPS coordinate validation | 37°46′29.7″N |
 | `high_entropy_token` | API key/secret detection | High randomness check |
 | `not_timestamp` | Reject timestamp-like numbers | Filter false positives |
-| `korean_zipcode_valid` | Korean postal code validation | 06234 |
-| `us_zipcode_valid` | US ZIP code validation | 90210 |
-| `korean_bank_account_valid` | Korean bank account validation | With prefix checking |
 | `generic_number_not_timestamp` | Generic timestamp filtering | Flexible validation |
+| `not_repeating_pattern` | Reject repeating digits | Filter 111-1111-1111 |
 | `contains_letter` | Check for alphabetic characters | A1234567 |
-| `us_ssn_valid` | US SSN validation | Area/group/serial checks |
+| `ipv4_public` | Validate public IPv4 address | Non-private IP check |
+| `cjk_name_standalone` | Validate CJK name format | Standalone name detection |
+
+### US Validators
+
+| Function | Purpose |
+|----------|---------|
+| `us_ssn_valid` | US SSN validation (area/group/serial checks) |
+| `us_zipcode_valid` | US ZIP code validation |
+
+### Korea Validators
+
+| Function | Purpose |
+|----------|---------|
+| `korean_zipcode_valid` | Korean postal code validation |
+| `korean_bank_account_valid` | Korean bank account validation with prefix checking |
+| `kr_rrn_valid` | Korean Resident Registration Number validation |
+| `kr_alien_registration_valid` | Korean alien registration number validation |
+| `kr_corporate_registration_valid` | Korean corporate registration number validation |
+| `kr_business_registration_valid` | Korean business registration number validation |
+
+### Japan Validators
+
+| Function | Purpose |
+|----------|---------|
+| `jp_my_number_valid` | Japanese My Number validation with check digit |
+
+### China/Taiwan Validators
+
+| Function | Purpose |
+|----------|---------|
+| `cn_national_id_valid` | Chinese national ID validation with checksum |
+| `tw_national_id_valid` | Taiwanese national ID validation |
+
+### India Validators
+
+| Function | Purpose |
+|----------|---------|
+| `india_aadhaar_valid` | Indian Aadhaar number validation |
+| `india_pan_valid` | Indian PAN validation |
+
+### European Validators
+
+| Function | Purpose |
+|----------|---------|
+| `spain_dni_valid` | Spanish DNI validation |
+| `spain_nie_valid` | Spanish NIE validation |
+| `netherlands_bsn_valid` | Dutch BSN validation |
+| `poland_pesel_valid` | Polish PESEL validation |
+| `sweden_personnummer_valid` | Swedish personal number validation |
+| `france_insee_valid` | French INSEE number validation |
+| `belgium_rrn_valid` | Belgian national register number validation |
+| `finland_hetu_valid` | Finnish HETU validation |
 
 ## Pattern File Format
 
@@ -227,20 +295,19 @@ patterns:
 
 ### Coverage
 
-- **1,490 tests passed** ✓
-- **381 tests skipped** (patterns without optional fields)
+- **1,965+ tests collected** ✓
 - **100% verification function coverage**
 
 ### Test Categories
 
-1. **Verification Tests** (`test_verification.py`):
+1. **Verification Tests** (`test_verification.py` - 129 tests):
    - IBAN mod-97 validation
    - Luhn algorithm
    - Coordinate validation
    - Token entropy detection
    - Timestamp detection
-   - Zipcode validation
-   - SSN validation
+   - Zipcode validation (US, Korea)
+   - National ID validation (US, KR, CN, TW, JP, IN, EU)
    - Function registry
 
 2. **Pattern Tests** (`test_patterns.py`):
@@ -338,10 +405,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Statistics
 
-- **Total Patterns**: 158+
+- **Total Patterns**: 160+
 - **Countries Covered**: 7+ (US, KR, JP, CN, TW, IN, EU)
-- **Verification Functions**: 11
-- **Test Cases**: 1,490+
+- **Verification Functions**: 32
+- **Test Cases**: 1,965+
 - **Languages**: Python (more coming)
 - **Pattern Categories**: 15+
 

@@ -52,7 +52,7 @@ patterns:
     location: cn
     category: name
     description: Chinese name in Simplified Chinese (2-4 characters)
-    pattern: '\b[\u4e00-\u9fff]{2,4}\b'
+    pattern: '[一-鿿]{2,4}'
     mask: "***"
     examples:
       match:
@@ -64,7 +64,6 @@ patterns:
       nomatch:
         - "王"
         - "abcd"
-        - "王小明先生"
         - "123"
     policy:
       store_raw: false

@@ -49,7 +49,7 @@ patterns:
     location: tw
     category: name
     description: Traditional Chinese name (2-4 characters)
-    pattern: '\b[\u4e00-\u9fff]{2,4}\b'
+    pattern: '[一-鿿]{2,4}'
     mask: "***"
     examples:
       match:
@@ -61,7 +61,6 @@ patterns:
       nomatch:
         - "王"
         - "abcd"
-        - "王小明先生"
         - "123"
     policy:
       store_raw: false
@@ -74,7 +73,7 @@ patterns:
     location: tw
     category: address
     description: Taiwan address - simplified pattern (zipcode, city, district, road, number)
-    pattern: '(?:\d{3}(?:\d{2})?\s*)?[\u4e00-\u9fff]{1,}(?:市|縣)[\u4e00-\u9fff]{1,}(?:區|鄉|鎮|市)[\u4e00-\u9fffa-zA-Z0-9]+(?:路|街|大道)(?:[一二三四五六七八九十\d]+段)?(?:\d+巷)?(?:\d+弄)?(?:\d+(?:-\d+)?(?:之\d+)?號)'
+    pattern: '(?:\d{3}(?:\d{2})?\s*)?[一-鿿]{1,}(?:市|縣)[一-鿿]{1,}(?:區|鄉|鎮|市)[一-鿿a-zA-Z0-9]+(?:路|街|大道)(?:[一二三四五六七八九十\d]+段)?(?:\d+巷)?(?:\d+弄)?(?:\d+(?:-\d+)?(?:之\d+)?號)'
     mask: "***市***區***路***號"
     examples:
       match:

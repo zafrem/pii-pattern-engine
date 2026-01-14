@@ -224,6 +224,7 @@ patterns:
     description: Generic Taiwan bank account (XXX-XXXXXXXXXXXX)
     pattern: '\b[0-9]{3}-?[0-9]{9,13}\b'
     mask: "***-*********"
+    verification: generic_number_not_timestamp
     examples:
       match:
         - "123-456789012345"

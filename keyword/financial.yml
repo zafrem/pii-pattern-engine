@@ -17,13 +17,33 @@ categories:
       - sort code
       - account number
       - acct
+      - acc
+      - bnk
+      - wire transfer
+      - depository
+      - account holder
+      - beneficiary
+      - payee
       - 계좌
       - 계좌번호
       - 은행
+      - 통장
+      - 송금
+      - 예금주
+      - 무통장
       - 口座
       - 銀行
+      - 振込
+      - 預金
+      - 通帳
+      - 名義
+      - 名義人
+      - 受取人
       - 账号
       - 銀行賬號
+      - 户名
+      - 收款人
+      - 账户名
     contexts:
       - "bank account:"
       - "account number:"
@@ -31,6 +51,7 @@ categories:
       - "계좌번호:"
       - "口座番号:"
       - "银行账号:"
+      - "예금주:"
 
   credit_card:
     description: Credit card numbers and related terms

@@ -23,6 +23,10 @@ categories:
       - local ip
       - private ip
       - public ip
+      - 아이피
+      - IP주소
+      - IPアドレス
+      - IP地址
     contexts:
       - "IP:"
       - "IP Address:"
@@ -31,6 +35,7 @@ categories:
       - "Source:"
       - "Destination:"
       - "Client IP:"
+      - "IP地址:"
 
   url:
     description: URLs and web addresses
@@ -45,11 +50,20 @@ categories:
       - hostname
       - endpoint
       - api endpoint
+      - 링크
+      - 웹사이트
+      - 주소
+      - リンク
+      - ウェブサイト
+      - 链接
+      - 网址
+      - 网页
     contexts:
       - "URL:"
       - "Link:"
       - "Website:"
       - "Endpoint:"
+      - "网址:"
 
   mac_address:
     description: MAC addresses
@@ -60,10 +74,15 @@ categories:
       - physical address
       - ethernet address
       - network adapter
+      - 맥주소
+      - MACアドレス
+      - MAC地址
+      - 物理地址
     contexts:
       - "MAC:"
       - "MAC Address:"
       - "Hardware Address:"
+      - "MAC地址:"
 
 metadata:
   related_categories:

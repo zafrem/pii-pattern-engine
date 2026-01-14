@@ -7,39 +7,54 @@ patterns:
     category: other
     description: Korean Business Registration Number (사업자등록번호)
     pattern: '\b[0-9]{3}-[0-9]{2}-[0-9]{5}\b'
+    verification: kr_business_registration_valid
     mask: '***-**-*****'
     examples:
       match:
-        - 123-45-67890
+        - 123-81-00995
+        - 220-81-04569
+        - 214-87-00139
       nomatch:
         - 12-345-67890
         - 123-456-7890
         - 123-45-678901
         - 123-45-678901-2
+        - 123-45-67890
+        - 111-11-11111
+        - 000-00-00000
+        - 123-81-009956
     policy:
       store_raw: false
       action_on_match: report
       severity: medium
     metadata:
-      note: 'Exactly 10 digits with hyphens: XXX-XX-XXXXX. Uses lookaheads to prevent matching when embedded.'
+      note: 'Exactly 10 digits with hyphens: XXX-XX-XXXXX. Uses checksum verification.'
 
   - id: corporate_registration_01
     location: kr
     category: other
     description: Korean Corporate Registration Number (법인등록번호)
     pattern: '\b[0-9]{6}-?[0-9]{7}\b'
+    verification: kr_corporate_registration_valid
     mask: '******-*******'
     examples:
       match:
-        - 123456-1234567
-        - '1234561234567'
+        - 110111-1234568
+        - 134511-2345671
+        - '1801115678906'
       nomatch:
         - 12345-12345678
         - 123456-123456
+        - 123456-1234567
+        - 111111-1111111
+        - 000000-0000000
+        - 110111-123456
     policy:
       store_raw: false
       action_on_match: report
       severity: medium
+    metadata:
+      note: 'Uses weighted checksum verification.'
 
   - id: zipcode_01
     location: kr
@@ -71,13 +86,13 @@ patterns:
       action_on_match: report
       severity: low
     metadata:
-      note: Uses negative lookaheads to prevent matching when embedded in alphanumeric strings. Uses verification to reject sequential numbers, repeated digits, and timestamps.
+      note: Uses word boundaries to prevent matching when embedded in alphanumeric strings. Uses verification to reject sequential numbers, repeated digits, and timestamps.
 
   - id: korean_name_01
     location: kr
     category: name
     description: Korean full name (family name + given name)
-    pattern: '[가-힣]{2,5}'
+    pattern: \b[가-힣]{2,5}\b
     mask: '***'
     examples:
       match:
@@ -94,9 +109,10 @@ patterns:
         - abcd
         - '123'
         - 가
+        - 김철수박민수
     policy:
       store_raw: false
       action_on_match: redact
       severity: high
     metadata:
-      note: Matches 2-5 Hangul characters. Most Korean names are 3 characters (1 family + 2 given name).
+      note: "Matches 2-5 Hangul characters. Most Korean names are 3 characters (1 family + 2 given name). Will match names embedded in longer Hangul text."

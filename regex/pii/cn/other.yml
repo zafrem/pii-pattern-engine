@@ -57,6 +57,7 @@ patterns:
     category: name
     description: Chinese name in Simplified Chinese (2-4 characters)
     pattern: '[一-鿿]{2,4}'
+    verification: chinese_name_valid
     mask: "***"
     examples:
       match:
@@ -73,11 +74,11 @@ patterns:
         - "abcd"
         - "123"
         - "A"
-        - "王小明abc"
-        - "张三李四王五"
+        - "好好学习"
+        - "天天向上"
     policy:
       store_raw: false
       action_on_match: redact
       severity: high
     metadata:
-      note: "Matches Simplified Chinese characters. Most names are 2-3 characters. Note: Will match CJK names embedded in longer CJK text."
+      note: "Matches Chinese names with known surname prefixes. Uses surname verification to reduce false positives."

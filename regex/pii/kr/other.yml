@@ -92,7 +92,8 @@ patterns:
     location: kr
     category: name
     description: Korean full name (family name + given name)
-    pattern: \b[가-힣]{2,5}\b
+    pattern: '[가-힣]{2,5}'
+    verification: korean_name_valid
     mask: '***'
     examples:
       match:
@@ -109,10 +110,11 @@ patterns:
         - abcd
         - '123'
         - 가
-        - 김철수박민수
+        - 맛있어요
+        - 감사해요
     policy:
       store_raw: false
       action_on_match: redact
       severity: high
     metadata:
-      note: "Matches 2-5 Hangul characters. Most Korean names are 3 characters (1 family + 2 given name). Will match names embedded in longer Hangul text."
+      note: "Matches Korean names with known surname prefixes. Uses surname verification to reduce false positives."

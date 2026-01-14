@@ -33,7 +33,7 @@ patterns:
     location: us
     category: ssn
     description: Individual Taxpayer Identification Number (9XX-XX-XXXX)
-    pattern: \b9[0-9]{2}-?[0-9]{2}-?[0-9]{4}\b
+    pattern: \b9[0-9]{2}(?:-[0-9]{2}-[0-9]{4}|[0-9]{6})\b
     mask: '***-**-****'
     examples:
       match:
@@ -42,6 +42,7 @@ patterns:
       nomatch:
         - 800-12-3456
         - 123-45-6789
+        - 90210-1234
     policy:
       store_raw: false
       action_on_match: redact

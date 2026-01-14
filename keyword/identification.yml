@@ -69,8 +69,11 @@ categories:
       - 身份证
       - 身分證
       - 身份證號碼
+      - 居民身份证
+      - 주민증
       - マイナンバー
       - 個人番號
+      - 個人番号カード
       - aadhar
       - aadhaar
       - pan card
@@ -95,8 +98,10 @@ categories:
       - license number
       - 운전면허
       - 운전면허증
+      - 면허증
       - 運転免許
       - 運転免許証
+      - 免許証
       - 驾驶证
       - 駕駛執照
     contexts:

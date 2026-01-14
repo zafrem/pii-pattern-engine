@@ -1,0 +1,218 @@
+category: address
+description: Keywords related to physical addresses (US and KR)
+
+categories:
+  address_us:
+    description: US Address indicators
+    patterns:
+      - zip
+      - zip code
+      - postal code
+      - st
+      - street
+      - ave
+      - avenue
+      - blvd
+      - boulevard
+      - rd
+      - road
+      - dr
+      - drive
+      - ln
+      - lane
+      - ct
+      - court
+      - pl
+      - place
+      - apt
+      - apartment
+      - suite
+      - bldg
+      - floor
+      # State abbreviations
+      - AL
+      - AK
+      - AZ
+      - AR
+      - CA
+      - CO
+      - CT
+      - DE
+      - FL
+      - GA
+      - HI
+      - ID
+      - IL
+      - IN
+      - IA
+      - KS
+      - KY
+      - LA
+      - ME
+      - MD
+      - MA
+      - MI
+      - MN
+      - MS
+      - MO
+      - MT
+      - NE
+      - NV
+      - NH
+      - NJ
+      - NM
+      - NY
+      - NC
+      - ND
+      - OH
+      - OK
+      - OR
+      - PA
+      - RI
+      - SC
+      - SD
+      - TN
+      - TX
+      - UT
+      - VT
+      - VA
+      - WA
+      - WV
+      - WI
+      - WY
+    contexts:
+      - "Zip:"
+      - "Zip Code:"
+      - "State:"
+      - "Address:"
+
+  address_kr:
+    description: Korean Address indicators
+    patterns:
+      - 우편번호
+      - 도
+      - 시
+      - 군
+      - 구
+      - 읍
+      - 면
+      - 동
+      - 리
+      - 로
+      - 길
+      - 번지
+      - 아파트
+      - 빌라
+      - 오피스텔
+      # Major Cities/Provinces (Anchors)
+      - 서울
+      - 경기
+      - 부산
+      - 대구
+      - 인천
+      - 광주
+      - 대전
+      - 울산
+      - 세종
+      - 강원
+      - 충북
+      - 충남
+      - 전북
+      - 전남
+      - 경북
+      - 경남
+      - 제주
+      - 수원
+      - 성남
+      - 고양
+      - 용인
+    contexts:
+      - "우편번호:"
+      - "주소:"
+      - "배송지:"
+
+  address_jp:
+    description: Japanese Address indicators
+    patterns:
+      - 〒
+      - 郵便番号
+      - 住所
+      - 配送先
+      - お届け先
+      - 都
+      - 道
+      - 府
+      - 県
+      - 市
+      - 区
+      - 町
+      - 村
+      - 丁目
+      - 番地
+      - 号
+      - ビル
+      - マンション
+      - アパート
+      # Major Prefectures/Cities (Anchors)
+      - 東京
+      - 大阪
+      - 京都
+      - 北海道
+      - 愛知
+      - 神奈川
+      - 福岡
+      - 札幌
+      - 横浜
+      - 名古屋
+      - 神戸
+    contexts:
+      - "〒"
+      - "郵便番号:"
+      - "住所:"
+      - "配送先:"
+
+  address_cn:
+    description: Chinese Address indicators
+    patterns:
+      - 省
+      - 市
+      - 区
+      - 县
+      - 镇
+      - 村
+      - 路
+      - 街
+      - 大道
+      - 弄
+      - 号
+      - 室
+      - 楼
+      - 单元
+      - 栋
+      - 座
+      # Major Cities/Provinces (Anchors)
+      - 北京
+      - 上海
+      - 广州
+      - 深圳
+      - 天津
+      - 重庆
+      - 杭州
+      - 成都
+      - 武汉
+      - 西安
+      - 苏州
+      - 南京
+    contexts:
+      - "地址:"
+      - "住址:"
+      - "省:"
+      - "市:"
+      - "区:"
+
+metadata:
+  severity: medium
+  common_contexts:
+    - shipping labels
+    - user profiles
+    - invoices

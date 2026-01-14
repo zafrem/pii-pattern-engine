@@ -8,22 +8,29 @@ patterns:
     description: Taiwan National ID (1 letter + 9 digits)
     pattern: '\b[A-Z][0-9]{9}\b'
     flags: [IGNORECASE]
+    verification: tw_national_id_valid
     mask: "A*********"
     examples:
       match:
         - "A123456789"
-        - "B987654321"
-        - "f234567890"
+        - "B123456780"
+        - "F131104093"
       nomatch:
         - "AB12345678"
         - "A12345678"
         - "1234567890"
+        - "I123456789"
+        - "O123456789"
+        - "W123456789"
+        - "A023456789"
+        - "A1234567890"
+        - "123456789A"
     policy:
       store_raw: false
       action_on_match: redact
       severity: critical
     metadata:
-      note: "First letter indicates birth location, 2nd digit indicates gender"
+      note: "First letter indicates birth location (A-Z except I,O,W), 2nd digit indicates gender (1=male, 2=female). Uses checksum verification."
 
   - id: passport_01
     location: tw
@@ -35,10 +42,14 @@ patterns:
       match:
         - "123456789"
         - "987654321"
+        - "246813579"
+        - "135792468"
       nomatch:
         - "12345678"
         - "1234567890"
         - "A12345678"
+        - "1234567A9"
+        - "12345"
     policy:
       store_raw: false
       action_on_match: redact

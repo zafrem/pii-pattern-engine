@@ -7,22 +7,27 @@ patterns:
     category: other
     description: Japanese My Number (12 digits)
     pattern: '\b[0-9]{4}-?[0-9]{4}-?[0-9]{4}\b'
+    verification: jp_my_number_valid
     mask: "****-****-****"
     examples:
       match:
-        - "1234-5678-9012"
-        - "123456789012"
-        - "9876-5432-1098"
+        - "1234-5678-9018"
+        - "987654321093"
+        - "5555-5555-5557"
       nomatch:
         - "123-456-789012"
         - "12345-6789-012"
         - "1234567890"
+        - "123456789012"
+        - "111111111111"
+        - "000000000000"
+        - "1234567890123"
     policy:
       store_raw: false
       action_on_match: redact
       severity: critical
     metadata:
-      note: "Japan's individual number system introduced in 2015"
+      note: "Japan's individual number system introduced in 2015. Uses checksum verification."
     priority: 150
 
   - id: passport_01
@@ -37,10 +42,14 @@ patterns:
         - "AB1234567"
         - "XY9876543"
         - "cd2345678"
+        - "MN5678901"
+        - "TK2468135"
       nomatch:
         - "A1234567"
         - "ABC123456"
         - "AB12345678"
+        - "1A1234567"
+        - "A12345678"
     policy:
       store_raw: false
       action_on_match: redact
@@ -57,10 +66,14 @@ patterns:
         - "1234-56-789012"
         - "123456789012"
         - "9876-54-321098"
+        - "5678-90-123456"
+        - "111122334455"
       nomatch:
         - "123-456-789012"
         - "12345-6-789012"
         - "1234567890"
+        - "1234-567-89012"
+        - "12345678901"
     policy:
       store_raw: false
       action_on_match: redact

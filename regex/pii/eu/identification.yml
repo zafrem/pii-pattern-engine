@@ -14,10 +14,14 @@ patterns:
         - "L01X00T47"
         - "T22000129"
         - "C9Y1BTM58"
+        - "ABC123456"
+        - "1A2B3C4D5"
       nomatch:
         - "L01X00T4"
         - "L01X00T471"
         - "123456789"
+        - "L01X00T47A"
+        - "12345678"
     policy:
       store_raw: false
       action_on_match: redact
@@ -31,22 +35,23 @@ patterns:
     category: other
     description: French INSEE number / NIR (15 digits - 1 + 2-digit year + 2-digit month + 5-digit place + 3-digit order + 2-digit key)
     pattern: '\b[12]\s*\d{2}\s*(?:0[1-9]|1[0-2])\s*\d{5}\s*\d{3}\s*\d{2}\b'
+    verification: france_insee_valid
     mask: "***************"
     examples:
       match:
-        - "188057813579897"
-        - "2 88 05 78135 798 97"
-        - "195017535679812"
+        - "188057813579816"
+        - "295017535679891"
       nomatch:
         - "388057813579897"
         - "18805781357989"
         - "1880578135798971"
+        - "188057813579897"
     policy:
       store_raw: false
       action_on_match: redact
       severity: critical
     metadata:
-      note: "French Social Security Number (Numéro de Sécurité Sociale). Format: sex(1) + year(2) + month(2) + department(2) + commune(3) + order(3) + key(2)."
+      note: "French Social Security Number (Numéro de Sécurité Sociale). Uses mod-97 checksum."
     priority: 200
 
   - id: italy_codice_fiscale_01
@@ -60,10 +65,14 @@ patterns:
         - "RSSMRA85T10A562S"
         - "VRDGPP65D15H501T"
         - "MRORSS70A01F205X"
+        - "BNCLCU80B01F839K"
+        - "SRTGRL75C15H501Z"
       nomatch:
         - "RSSMRA85T10A562"
         - "RSSMRA85T10A5622"
         - "123456789ABCDEF"
+        - "RSSMRA85T10A56SS"
+        - "12SMRA85T10A562S"
     policy:
       store_raw: false
       action_on_match: redact
@@ -77,22 +86,24 @@ patterns:
     category: other
     description: Spanish DNI (8 digits + letter)
     pattern: '\b\d{8}\s*[A-Z]\b'
+    verification: spain_dni_valid
     mask: "********-*"
     examples:
       match:
         - "12345678Z"
-        - "12345678 Z"
         - "87654321X"
+        - "44444444A"
       nomatch:
         - "1234567Z"
         - "123456789Z"
         - "12345678"
+        - "12345678A"
     policy:
       store_raw: false
       action_on_match: redact
       severity: critical
     metadata:
-      note: "Spanish DNI (Documento Nacional de Identidad). The letter is a check digit."
+      note: "Spanish DNI (Documento Nacional de Identidad). Uses mod-23 checksum for the letter."
     priority: 200
 
   - id: spain_nie_01
@@ -100,22 +111,24 @@ patterns:
     category: other
     description: Spanish NIE (foreigner ID - letter + 7 digits + letter)
     pattern: '\b[XYZ]\s*\d{7}\s*[A-Z]\b'
+    verification: spain_nie_valid
     mask: "*-*******-*"
     examples:
       match:
         - "X1234567L"
-        - "Y 1234567 M"
-        - "Z9876543A"
+        - "Y1234567X"
+        - "Z1234567R"
       nomatch:
         - "A1234567L"
         - "X123456L"
         - "X12345678L"
+        - "X1234567A"
     policy:
       store_raw: false
       action_on_match: redact
       severity: critical
     metadata:
-      note: "Spanish NIE (Número de Identidad de Extranjero) for non-Spanish residents."
+      note: "Spanish NIE (Número de Identidad de Extranjero) for non-Spanish residents. Uses mod-23 checksum."
     priority: 200
 
   - id: netherlands_bsn_01
@@ -123,46 +136,49 @@ patterns:
     category: other
     description: Dutch BSN (Burgerservicenummer - 8 or 9 digits)
     pattern: '\b\d{8,9}\b'
+    verification: netherlands_bsn_valid
     mask: "*********"
     examples:
       match:
-        - "123456782"
-        - "12345678"
-        - "999999999"
+        - "111111110"
+        - "234567892"
       nomatch:
         - "1234567"
         - "1234567890"
         - "ABC123456"
+        - "123456789"
+        - "111111111"
     policy:
       store_raw: false
       action_on_match: redact
       severity: critical
     metadata:
-      note: "Dutch BSN (Citizen Service Number). 8 or 9 digits with 11-proof check. High priority PII under GDPR."
+      note: "Dutch BSN (Citizen Service Number). Uses 11-proof validation algorithm."
     priority: 200
-    # verification: eleven_proof  # TODO: Implement eleven-proof validation
 
   - id: belgium_rrn_01
     location: eu
     category: other
     description: Belgian National Register Number (11 digits - YYMMDD-XXX-CC)
     pattern: '\b\d{2}\.?\d{2}\.?\d{2}[-\s]?\d{3}[-\s]?\d{2}\b'
+    verification: belgium_rrn_valid
     mask: "**.**.**-***-**"
     examples:
       match:
-        - "85.07.30-123-45"
-        - "850730-123-45"
-        - "85073012345"
+        - "85.07.30-123-35"
+        - "850730-123-35"
+        - "85073012335"
       nomatch:
         - "8507301234"
         - "850730123456"
         - "85.07.30-123"
+        - "85.07.30-123-45"
     policy:
       store_raw: false
       action_on_match: redact
       severity: critical
     metadata:
-      note: "Belgian Rijksregisternummer. Format: birth date(6) + counter(3) + checksum(2)."
+      note: "Belgian Rijksregisternummer. Uses mod-97 checksum."
     priority: 200
 
   - id: poland_pesel_01
@@ -170,22 +186,28 @@ patterns:
     category: other
     description: Polish PESEL (11 digits - YYMMDDXXXXX)
     pattern: '\b\d{11}\b'
+    verification: poland_pesel_valid
     mask: "***********"
     examples:
       match:
         - "44051401359"
-        - "92090515836"
-        - "02261308540"
+        - "02261308547"
+        - "55030101230"
+        - "83010512349"
       nomatch:
         - "4405140135"
         - "440514013590"
         - "ABCD1234567"
+        - "44051401350"
+        - "11111111111"
+        - "00000000000"
+        - "12345678901"
     policy:
       store_raw: false
       action_on_match: redact
       severity: critical
     metadata:
-      note: "Polish PESEL (Powszechny Elektroniczny System Ewidencji Ludności). Format: birth date(6) + serial(3) + gender(1) + checksum(1)."
+      note: "Polish PESEL. Validates birth date and weighted checksum."
     priority: 200
 
   - id: sweden_personnummer_01
@@ -193,23 +215,24 @@ patterns:
     category: other
     description: Swedish personal identity number (YYYYMMDD-XXXX or YYMMDD-XXXX)
     pattern: '\b(?:\d{8}|\d{6})[-\s]?\d{4}\b'
+    verification: sweden_personnummer_valid
     mask: "******-****"
     examples:
       match:
-        - "19900101-1234"
-        - "900101-1234"
-        - "199001011234"
-        - "9001011234"
+        - "900101-1239"
+        - "850315-2343"
+        - "199001011239"
       nomatch:
         - "19900101-123"
         - "900101-123"
         - "1990010112345"
+        - "900101-1230"
     policy:
       store_raw: false
       action_on_match: redact
       severity: critical
     metadata:
-      note: "Swedish Personnummer. Format: birth date + serial(3) + checksum(1). Can be 10 or 12 digits total."
+      note: "Swedish Personnummer. Uses Luhn algorithm for checksum."
     priority: 200
 
   - id: denmark_cpr_01
@@ -223,10 +246,14 @@ patterns:
         - "010190-1234"
         - "0101901234"
         - "311299-9999"
+        - "150685-5678"
+        - "2506751234"
       nomatch:
         - "01019012"
         - "0101901234567"
         - "32019-1234"
+        - "010190-123"
+        - "010190-12345"
     policy:
       store_raw: false
       action_on_match: redact
@@ -286,22 +313,24 @@ patterns:
     category: other
     description: Finnish personal identity code (DDMMYYCZZZQ)
     pattern: '\b\d{6}[+\-A]\d{3}[0-9A-FHJ-NPR-Y]\b'
+    verification: finland_hetu_valid
     mask: "******-****"
     examples:
       match:
-        - "010190-123A"
-        - "311299A123P"
-        - "010100+123X"
+        - "010190-123M"
+        - "311285-456A"
       nomatch:
         - "010190-123"
         - "010190-12A"
         - "010190*123A"
+        - "010190-123A"
+        - "321285-456A"
     policy:
       store_raw: false
       action_on_match: redact
       severity: critical
     metadata:
-      note: "Finnish HETU (Henkilötunnus). Format: birth date(6) + century(+/-/A) + serial(3) + checksum(1). Checksum excludes G, I, O, Q, Z."
+      note: "Finnish HETU (Henkilötunnus). Validates birth date and check character."
     priority: 200
 
   - id: uk_nino_01
@@ -315,10 +344,15 @@ patterns:
         - "AB123456C"
         - "AB 12 34 56 C"
         - "JG103759A"
+        - "SH987654D"
+        - "PE 00 11 22 B"
       nomatch:
         - "AB12345C"
         - "AB1234567C"
         - "OO123456C"
+        - "DA123456C"
+        - "QQ123456C"
+        - "AB123456E"
     policy:
       store_raw: false
       action_on_match: redact

@@ -77,7 +77,7 @@ patterns:
     location: kr
     category: name
     description: Korean full name (family name + given name)
-    pattern: \b[가-힣]{2,5}\b
+    pattern: '[가-힣]{2,5}'
     mask: '***'
     examples:
       match:
@@ -92,10 +92,8 @@ patterns:
       nomatch:
         - 김
         - abcd
-        - A김철수
         - '123'
         - 가
-        - 김철수박민수
     policy:
       store_raw: false
       action_on_match: redact

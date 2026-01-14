@@ -13,6 +13,7 @@ from typing import Dict, List, Any
 
 import pytest
 import yaml
+import re2
 
 # Add verification module to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "verification" / "python"))
@@ -48,6 +49,37 @@ def compile_pattern_with_flags(pattern_dict: Dict[str, Any]) -> re.Pattern:
                     flags |= re.VERBOSE
 
     return re.compile(pattern_str, flags)
+
+
+def compile_pattern_with_flags_re2(pattern_dict: Dict[str, Any]):
+    """
+    Compile a regex pattern with google-re2 and appropriate flags.
+
+    Args:
+        pattern_dict: Pattern dictionary from YAML file
+
+    Returns:
+        Compiled re2 pattern
+    """
+    pattern_str = pattern_dict.get('pattern', '')
+
+    # Build options for re2
+    options = re2.Options()
+
+    # Handle flags if specified
+    if 'flags' in pattern_dict:
+        flag_list = pattern_dict['flags']
+        if isinstance(flag_list, list):
+            for flag_name in flag_list:
+                if flag_name == 'IGNORECASE' or flag_name == 'I':
+                    options.case_sensitive = False
+                elif flag_name == 'MULTILINE' or flag_name == 'M':
+                    # RE2's one_line=False allows ^ and $ to match line boundaries
+                    options.one_line = False
+                elif flag_name == 'DOTALL' or flag_name == 'S':
+                    options.dot_nl = True
+
+    return re2.compile(pattern_str, options)
 
 
 def find_all_pattern_files() -> List[Path]:
@@ -126,6 +158,77 @@ class TestPatternStructure:
             compile_pattern_with_flags(pattern)
         except re.error as e:
             pytest.fail(f"{file_path} pattern {pattern_id} has invalid regex: {e}")
+
+
+class TestPatternRE2:
+    """Tests for pattern compatibility with google-re2.
+
+    RE2 is a safe regex engine that guarantees linear time matching,
+    preventing ReDoS (Regular Expression Denial of Service) attacks.
+    All patterns must be compatible with RE2 for production safety.
+    """
+
+    @pytest.mark.parametrize("file_path,pattern", PATTERN_TEST_DATA)
+    def test_pattern_compiles_with_re2(self, file_path, pattern):
+        """Test that all pattern regexes compile successfully with google-re2."""
+        pattern_id = pattern.get('id', 'unknown')
+        try:
+            compile_pattern_with_flags_re2(pattern)
+        except re2.error as e:
+            pytest.fail(f"{file_path} pattern {pattern_id} is not RE2 compatible: {e}")
+
+    @pytest.mark.parametrize("file_path,pattern", PATTERN_TEST_DATA)
+    def test_match_examples_with_re2(self, file_path, pattern):
+        """Test that patterns match their positive examples using google-re2."""
+        if 'examples' not in pattern or 'match' not in pattern['examples']:
+            pytest.skip(f"Pattern {pattern.get('id')} has no match examples")
+
+        pattern_id = pattern['id']
+        regex = compile_pattern_with_flags_re2(pattern)
+
+        for example in pattern['examples']['match']:
+            example_str = str(example)
+            assert regex.search(example_str), \
+                f"{file_path} pattern {pattern_id} should match '{example_str}' with RE2"
+
+    @pytest.mark.parametrize("file_path,pattern", PATTERN_TEST_DATA)
+    def test_nomatch_examples_with_re2(self, file_path, pattern):
+        """Test that patterns don't match their negative examples using google-re2.
+
+        For patterns with verification functions, examples may match the regex
+        but should fail verification.
+        """
+        if 'examples' not in pattern or 'nomatch' not in pattern['examples']:
+            pytest.skip(f"Pattern {pattern.get('id')} has no nomatch examples")
+
+        pattern_id = pattern['id']
+        regex = compile_pattern_with_flags_re2(pattern)
+        has_verification = 'verification' in pattern
+        verification_func = None
+
+        if has_verification:
+            verification_func = get_verification_function(pattern['verification'])
+
+        for example in pattern['examples']['nomatch']:
+            example_str = str(example)
+            match = regex.search(example_str)
+
+            if not match:
+                # Regex doesn't match - this is expected for nomatch examples
+                continue
+
+            # If regex matches but pattern has verification, check that verification fails
+            if has_verification and verification_func:
+                matched_text = match.group(0)
+                assert not verification_func(matched_text), \
+                    f"{file_path} pattern {pattern_id} matched '{example_str}' with RE2 but verification " \
+                    f"should have rejected it"
+            else:
+                # No verification function, so regex should not have matched
+                pytest.fail(
+                    f"{file_path} pattern {pattern_id} should NOT match '{example_str}' with RE2 " \
+                    f"(matched: '{match.group(0)}')"
+                )
 
 
 class TestPatternMatching:

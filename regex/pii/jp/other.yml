@@ -100,6 +100,7 @@ patterns:
     category: name
     description: Japanese name in Kanji (2-4 characters)
     pattern: '[一-鿿]{2,4}'
+    verification: japanese_name_kanji_valid
     mask: "***"
     examples:
       match:
@@ -107,14 +108,18 @@ patterns:
         - "山田太郎"
         - "佐藤花子"
         - "鈴木"
+        - "高橋"
+        - "渡辺"
       nomatch:
         - "田"
         - "abcd"
         - "たなか"
         - "123"
+        - "東京都"
+        - "日本語"
     policy:
       store_raw: false
       action_on_match: redact
       severity: high
     metadata:
-      note: "Matches Kanji characters. Most common format for Japanese names."
+      note: "Matches Japanese names in Kanji with known surname prefixes. Uses surname verification to reduce false positives."

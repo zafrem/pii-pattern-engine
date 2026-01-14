@@ -617,6 +617,146 @@ def us_ssn_valid(value: str) -> bool:
     return True
 
 
+# Common surnames for CJK name verification
+# Chinese surnames - covers ~85% of population (simplified + traditional)
+CHINESE_SURNAMES = {
+    # Single-character surnames (most common)
+    '王', '李', '张', '刘', '陈', '杨', '黄', '赵', '吴', '周',
+    '徐', '孙', '马', '朱', '胡', '郭', '何', '林', '高', '罗',
+    '郑', '梁', '谢', '宋', '唐', '许', '邓', '冯', '韩', '曹',
+    '曾', '彭', '萧', '蔡', '潘', '田', '董', '袁', '于', '余',
+    '叶', '蒋', '杜', '苏', '魏', '程', '吕', '丁', '沈', '任',
+    '姚', '卢', '傅', '钟', '姜', '崔', '谭', '廖', '范', '汪',
+    '陆', '金', '石', '戴', '贾', '韦', '夏', '邱', '方', '侯',
+    '邹', '熊', '孟', '秦', '白', '江', '阎', '薛', '尹', '段',
+    '雷', '黎', '史', '龙', '陶', '贺', '顾', '毛', '郝', '龚',
+    '邵', '万', '钱', '严', '赖', '覃', '洪', '武', '莫', '孔',
+    # Traditional variants
+    '張', '劉', '陳', '楊', '黃', '趙', '吳', '許', '鄭', '謝',
+    '鄧', '馮', '韓', '蕭', '葉', '蔣', '蘇', '魏', '呂', '瀋',
+    '盧', '傅', '鐘', '薑', '譚', '廖', '範', '陸', '賈', '鄒',
+    '閻', '龍', '陶', '賀', '顧', '郝', '龔', '萬', '錢', '嚴',
+    '賴', '覃',
+    # Compound surnames (2 characters)
+    '欧阳', '歐陽', '司马', '司馬', '上官', '诸葛', '諸葛',
+    '东方', '東方', '皇甫', '尉迟', '尉遲', '公孙', '公孫',
+    '令狐', '慕容', '轩辕', '軒轅', '夏侯', '司徒', '独孤', '獨孤',
+}
+
+# Korean surnames - covers ~95% of population
+KOREAN_SURNAMES = {
+    # Most common (covers ~45%)
+    '김', '이', '박', '최', '정',
+    # Very common (covers another ~30%)
+    '강', '조', '윤', '장', '임', '한', '오', '서', '신', '권',
+    '황', '안', '송', '류', '유', '홍', '전', '고', '문', '양',
+    # Common
+    '손', '배', '백', '허', '남', '심', '노', '하', '곽', '성',
+    '차', '주', '우', '구', '민', '진', '나', '지', '엄', '변',
+    '채', '원', '천', '방', '공', '현', '함', '염', '여', '추',
+    # Less common but still notable
+    '도', '소', '석', '선', '설', '마', '길', '연', '위', '표',
+    '명', '기', '반', '왕', '금', '옥', '육', '인', '맹', '제',
+    '모', '탁', '국', '어', '은', '편', '용', '예', '경', '봉',
+    '사', '부', '황보', '남궁', '독고', '사공', '제갈', '선우',
+}
+
+# Japanese surnames (kanji) - most common
+JAPANESE_SURNAMES = {
+    # Top 50 most common
+    '佐藤', '鈴木', '高橋', '田中', '伊藤', '渡辺', '山本', '中村', '小林', '加藤',
+    '吉田', '山田', '佐々木', '山口', '松本', '井上', '木村', '林', '斎藤', '清水',
+    '山崎', '森', '阿部', '池田', '橋本', '山下', '石川', '中島', '前田', '藤田',
+    '小川', '後藤', '岡田', '長谷川', '村上', '近藤', '石井', '斉藤', '坂本', '遠藤',
+    '青木', '藤井', '西村', '福田', '太田', '三浦', '藤原', '岡本', '松田', '中川',
+    # Additional common surnames
+    '原田', '小野', '竹内', '金子', '和田', '中野', '原', '田村', '安藤', '河野',
+    '上田', '大野', '高木', '工藤', '内田', '丸山', '今井', '酒井', '宮崎', '横山',
+    # Single character surnames (less common but valid)
+    '森', '林', '原', '関', '堀', '島', '谷', '浜', '沢', '杉',
+}
+
+
+def chinese_name_valid(value: str) -> bool:
+    """
+    Verify Chinese name has a valid surname prefix.
+
+    Checks if the first 1-2 characters match known Chinese surnames.
+    Most Chinese names are 2-4 characters (1 surname + 1-3 given name).
+
+    Args:
+        value: Chinese name string
+
+    Returns:
+        True if name has known surname, False otherwise
+    """
+    if not value or len(value) < 2 or len(value) > 4:
+        return False
+
+    # Check compound surnames first (2 chars)
+    if len(value) >= 3 and value[:2] in CHINESE_SURNAMES:
+        return True
+
+    # Check single-character surnames
+    return value[0] in CHINESE_SURNAMES
+
+
+def korean_name_valid(value: str) -> bool:
+    """
+    Verify Korean name has a valid surname prefix.
+
+    Checks if the first 1-2 characters match known Korean surnames.
+    Most Korean names are 2-4 characters (1 surname + 1-3 given name).
+
+    Args:
+        value: Korean name string
+
+    Returns:
+        True if name has known surname, False otherwise
+    """
+    if not value or len(value) < 2 or len(value) > 5:
+        return False
+
+    # Check compound surnames first (2 chars)
+    if len(value) >= 3 and value[:2] in KOREAN_SURNAMES:
+        return True
+
+    # Check single-character surnames
+    return value[0] in KOREAN_SURNAMES
+
+
+def japanese_name_kanji_valid(value: str) -> bool:
+    """
+    Verify Japanese name (kanji) matches known surname patterns.
+
+    Japanese names in kanji typically have surname + given name.
+    Surnames are usually 1-3 kanji characters.
+
+    Args:
+        value: Japanese name string in kanji
+
+    Returns:
+        True if name matches known surname pattern, False otherwise
+    """
+    if not value or len(value) < 2 or len(value) > 6:
+        return False
+
+    # For 2-char strings, check if it's a 2-char surname (like 田中, 鈴木)
+    if len(value) == 2:
+        return value in JAPANESE_SURNAMES
+
+    # Check 3-char surnames first (e.g., 佐々木, 長谷川)
+    if len(value) >= 4 and value[:3] in JAPANESE_SURNAMES:
+        return True
+
+    # Check 2-char surnames (most common)
+    if value[:2] in JAPANESE_SURNAMES:
+        return True
+
+    # Check 1-char surnames (e.g., 森, 林)
+    return value[0] in JAPANESE_SURNAMES
+
+
 def cjk_name_standalone(value: str) -> bool:
     """
     Verify that a CJK name match is standalone (expected length for a name).
@@ -1848,6 +1988,10 @@ VERIFICATION_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
     "contains_letter": contains_letter,
     "us_ssn_valid": us_ssn_valid,
     "cjk_name_standalone": cjk_name_standalone,
+    # CJK name verification with surname checking
+    "chinese_name_valid": chinese_name_valid,
+    "korean_name_valid": korean_name_valid,
+    "japanese_name_kanji_valid": japanese_name_kanji_valid,
     # National ID verification functions
     "cn_national_id_valid": cn_national_id_valid,
     "tw_national_id_valid": tw_national_id_valid,

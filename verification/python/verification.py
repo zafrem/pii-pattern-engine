@@ -10,11 +10,12 @@ All verification functions follow the signature: (str) -> bool
 import logging
 import math
 import os
-import numpy as np
-from scipy.spatial.distance import cosine
 from collections import Counter
 from pathlib import Path
 from typing import Callable, Dict, Optional, Set
+
+import numpy as np
+from scipy.spatial.distance import cosine
 
 logger = logging.getLogger(__name__)
 

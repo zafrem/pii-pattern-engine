@@ -112,6 +112,11 @@ patterns:
         - 가
         - 맛있어요
         - 감사해요
+        - 전화번호는
+        - 이메일은
+        - 성명은
+        - 연락처
+        - 주소는
     policy:
       store_raw: false
       action_on_match: redact

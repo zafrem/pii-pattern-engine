@@ -10,19 +10,85 @@ All verification functions follow the signature: (str) -> bool
 import logging
 import math
 import os
+import numpy as np
+from scipy.spatial.distance import cosine
 from collections import Counter
 from pathlib import Path
 from typing import Callable, Dict, Optional, Set
 
 logger = logging.getLogger(__name__)
 
+# --- Configuration for ML/Vector Based Verification ---
+# Default to false to avoid performance/dependency overhead
+USE_VECTOR_MODEL = os.getenv("ENABLE_KOREAN_VECTOR_VERIFICATION", "false").lower() == "true"
+VECTOR_MODEL_PATH = os.getenv("KOREAN_VECTOR_MODEL_PATH", "datas/ko_w2v.vec")
+_VECTOR_MODEL_CACHE: Dict[str, np.ndarray] = {}
+_KEYWORDS_CENTROID: Optional[np.ndarray] = None
+
+
+def _load_vector_model():
+    """Load a lightweight vector model (Word2Vec .vec format)."""
+    global _VECTOR_MODEL_CACHE, _KEYWORDS_CENTROID
+    if _VECTOR_MODEL_CACHE:
+        return _VECTOR_MODEL_CACHE
+
+    model_path = Path(VECTOR_MODEL_PATH)
+    if not model_path.exists():
+        # Only log if specifically enabled
+        if USE_VECTOR_MODEL:
+            logger.warning(f"Vector model not found at {VECTOR_MODEL_PATH}. Skipping vector verification.")
+        return None
+
+    try:
+        # Simple parser for .vec (word dim1 dim2 ...)
+        with open(model_path, "r", encoding="utf-8") as f:
+            header = f.readline().split()
+            if len(header) < 2: return None
+            
+            for line in f:
+                parts = line.strip().split()
+                if not parts: continue
+                word = parts[0]
+                vector = np.array([float(x) for x in parts[1:]], dtype=np.float32)
+                _VECTOR_MODEL_CACHE[word] = vector
+        
+        # Calculate a "Keyword Centroid" to represent common contact-related words
+        keyword_vectors = []
+        for kw in KOREAN_NON_NAME_KEYWORDS:
+            if kw in _VECTOR_MODEL_CACHE:
+                keyword_vectors.append(_VECTOR_MODEL_CACHE[kw])
+        
+        if keyword_vectors:
+            _KEYWORDS_CENTROID = np.mean(keyword_vectors, axis=0)
+            
+        logger.info(f"Loaded {len(_VECTOR_MODEL_CACHE)} vectors for similarity check.")
+    except Exception as e:
+        logger.error(f"Failed to load vector model: {e}")
+    
+    return _VECTOR_MODEL_CACHE
+
+
+def get_vector_similarity_score(value: str) -> float:
+    """
+    Calculate similarity score between a word and the contact-keyword centroid.
+    A higher score (closer to 1.0) means it's likely a keyword (not a name).
+    """
+    model = _load_vector_model()
+    if not model or _KEYWORDS_CENTROID is None or value not in model:
+        return 0.0
+    
+    # 1.0 - cosine_distance = cosine_similarity
+    sim = 1.0 - cosine(model[value], _KEYWORDS_CENTROID)
+    return float(sim)
+
+
+# --- Existing Data Loading Logic ---
 # Cache for data-driven verification
 _DATA_CACHE: Dict[str, Set[str]] = {}
 
 
 def _get_data_path() -> Path:
     """Determine data directory path."""
-    # Current file is pattern-engine/verification/python/verification.py
     # Data is in pattern-engine/datas/
     return Path(__file__).parent.parent.parent / "datas"
 
@@ -701,28 +767,83 @@ def chinese_name_valid(value: str) -> bool:
     return value[0] in CHINESE_SURNAMES
 
 
+# Common Korean words that are not names but frequently appear in contact info
+# and start with common surnames (e.g., "전", "이", "정"), leading to false positives.
+# This list is used by korean_name_valid to filter matches.
+KOREAN_NON_NAME_KEYWORDS = {
+    "전화번호", "이메일", "연락처", "주소", "이름", "성명", "휴대폰", "핸드폰",
+    "번호", "전화", "메일", "팩스", "모바일", "정보", "문의", "확인", "성별",
+    "생년", "월일", "생일", "성별", "직업", "나이", "회사", "부서", "직책",
+    "전화번", "메일주", "이메일주", "연락처는", "주소는", "이름은", "성명은",
+}
+
+
 def korean_name_valid(value: str) -> bool:
     """
-    Verify Korean name has a valid surname prefix.
+    Verify Korean name has a valid surname prefix and is not a common keyword.
 
     Checks if the first 1-2 characters match known Korean surnames.
     Most Korean names are 2-4 characters (1 surname + 1-3 given name).
+    This function also filters out common non-name words (like "이메일은")
+    and uses a given name dictionary for higher confidence.
 
     Args:
         value: Korean name string
 
     Returns:
-        True if name has known surname, False otherwise
+        True if name has known surname and isn't a known keyword, False otherwise
     """
     if not value or len(value) < 2 or len(value) > 5:
         return False
 
-    # Check compound surnames first (2 chars)
+    # 1. Filter out common non-name keywords (exact match or with common particles)
+    if value in KOREAN_NON_NAME_KEYWORDS:
+        return False
+
+    # Check for keyword + Korean particles (은/는/이/가/을/를/의)
+    if len(value) >= 3 and value[-1] in ("은", "는", "이", "가", "을", "를", "의"):
+        if value[:-1] in KOREAN_NON_NAME_KEYWORDS:
+            return False
+
+    # 2. Extract potential surname and given name
+    surname = None
+    given_name = None
+
     if len(value) >= 3 and value[:2] in KOREAN_SURNAMES:
+        surname = value[:2]
+        given_name = value[2:]
+    elif value[0] in KOREAN_SURNAMES:
+        surname = value[0]
+        given_name = value[1:]
+
+    if not surname:
+        return False
+
+    # 3. Hybrid Dictionary-Heuristic Check
+    valid_given_names = _load_data_file("kr_given_names.csv")
+    
+    # If the given name part is in our common dictionary, it's very likely a name (High Confidence)
+    if valid_given_names and given_name in valid_given_names:
         return True
 
-    # Check single-character surnames
-    return value[0] in KOREAN_SURNAMES
+    # If NOT in the dictionary, we apply stricter length heuristics:
+    # Most false positives (전화, 정보, 전화번호) are length 2, 4, or 5.
+    # We reject these unless they were found in the dictionary above.
+    if len(value) != 3:
+        return False
+
+    # 4. (Optional) Vector Similarity Check
+    # If the user has enabled ML-based filtering, we check if the word 
+    # has high similarity to our "Contact Keyword Centroid".
+    # Similarity > 0.8 usually means it's conceptually a keyword, not a proper noun.
+    if USE_VECTOR_MODEL:
+        sim_score = get_vector_similarity_score(value)
+        if sim_score > 0.8:
+            return False
+
+    # For 3-character matches (the most common Korean name format), we allow them 
+    # to avoid missing rare names, provided they aren't in the blacklist.
+    return True
 
 
 def japanese_name_kanji_valid(value: str) -> bool:

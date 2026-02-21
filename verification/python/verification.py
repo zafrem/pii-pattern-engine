@@ -12,10 +12,16 @@ import math
 import os
 from collections import Counter
 from pathlib import Path
-from typing import Callable, Dict, Optional, Set
+from typing import Any, Callable, Dict, Optional, Set
 
-import numpy as np
-from scipy.spatial.distance import cosine
+try:
+    import numpy as np
+    from scipy.spatial.distance import cosine
+    HAS_VECTOR_DEPS = True
+except ImportError:
+    HAS_VECTOR_DEPS = False
+    np = None  # type: ignore
+    cosine = None  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +29,8 @@ logger = logging.getLogger(__name__)
 # Default to false to avoid performance/dependency overhead
 USE_VECTOR_MODEL = os.getenv("ENABLE_KOREAN_VECTOR_VERIFICATION", "false").lower() == "true"
 VECTOR_MODEL_PATH = os.getenv("KOREAN_VECTOR_MODEL_PATH", "datas/ko_w2v.vec")
-_VECTOR_MODEL_CACHE: Dict[str, np.ndarray] = {}
-_KEYWORDS_CENTROID: Optional[np.ndarray] = None
+_VECTOR_MODEL_CACHE: Dict[str, Any] = {}
+_KEYWORDS_CENTROID: Optional[Any] = None
 
 
 def _load_vector_model():
@@ -32,6 +38,11 @@ def _load_vector_model():
     global _VECTOR_MODEL_CACHE, _KEYWORDS_CENTROID
     if _VECTOR_MODEL_CACHE:
         return _VECTOR_MODEL_CACHE
+
+    if not HAS_VECTOR_DEPS:
+        if USE_VECTOR_MODEL:
+            logger.error("Vector verification enabled but numpy/scipy not installed.")
+        return None
 
     model_path = Path(VECTOR_MODEL_PATH)
     if not model_path.exists():
@@ -74,6 +85,9 @@ def get_vector_similarity_score(value: str) -> float:
     Calculate similarity score between a word and the contact-keyword centroid.
     A higher score (closer to 1.0) means it's likely a keyword (not a name).
     """
+    if not HAS_VECTOR_DEPS:
+        return 0.0
+
     model = _load_vector_model()
     if not model or _KEYWORDS_CENTROID is None or value not in model:
         return 0.0

@@ -44,7 +44,6 @@ patterns:
         - "1234"
         - "123456"
         - "A123"
-        - "123"
         - "000"
     policy:
       store_raw: false

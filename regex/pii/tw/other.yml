@@ -31,6 +31,7 @@ patterns:
     category: address
     description: Taiwan postal code (3 or 5 digits)
     pattern: '\b[0-9]{3}(?:[0-9]{2})?\b'
+    verification: tw_zipcode_valid
     mask: "***"
     examples:
       match:
@@ -43,6 +44,8 @@ patterns:
         - "1234"
         - "123456"
         - "A123"
+        - "123"
+        - "000"
     policy:
       store_raw: false
       action_on_match: report

@@ -470,6 +470,193 @@ def us_zipcode_valid(value: str) -> bool:
     return True
 
 
+def jp_zipcode_valid(value: str) -> bool:
+    """
+    Verify Japanese postal code is valid.
+
+    Checks against jp_zipcodes.csv if available, otherwise uses heuristics.
+    Japanese postal codes are 7 digits, often formatted as XXX-XXXX.
+    """
+    # Normalize: remove hyphen
+    digits_only = value.replace("-", "").replace("−", "").replace("‐", "")
+    digits_only = "".join(c for c in digits_only if c.isdigit())
+
+    if len(digits_only) != 7:
+        return False
+
+    # 1. Data-driven check if data exists
+    valid_zips = _load_data_file("jp_zipcodes.csv")
+    if valid_zips:
+        # Try with hyphen format (stored format)
+        hyphen_format = f"{digits_only[:3]}-{digits_only[3:]}"
+        return hyphen_format in valid_zips or digits_only in valid_zips
+
+    # 2. Heuristic fallback
+    # Reject all same digit (0000000, 1111111, etc.)
+    if len(set(digits_only)) == 1:
+        return False
+
+    # Reject sequential patterns (1234567, 7654321)
+    is_sequential_up = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) + 1 for i in range(1, len(digits_only))
+    )
+    is_sequential_down = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) - 1 for i in range(1, len(digits_only))
+    )
+    if is_sequential_up or is_sequential_down:
+        return False
+
+    # Reject numbers that are too round (multiples of 100000)
+    try:
+        num = int(digits_only)
+        if num % 100000 == 0:
+            return False
+    except ValueError:
+        return False
+
+    return True
+
+
+def cn_zipcode_valid(value: str) -> bool:
+    """
+    Verify Chinese postal code is valid.
+
+    Checks against cn_zipcodes.csv if available, otherwise uses heuristics.
+    Chinese postal codes are 6 digits (e.g., 100000).
+    """
+    digits_only = "".join(c for c in value if c.isdigit())
+
+    if len(digits_only) != 6:
+        return False
+
+    # 1. Data-driven check if data exists
+    valid_zips = _load_data_file("cn_zipcodes.csv")
+    if valid_zips:
+        return digits_only in valid_zips
+
+    # 2. Heuristic fallback
+    # Reject all same digit (000000, 111111, etc.)
+    if len(set(digits_only)) == 1:
+        return False
+
+    # Reject sequential patterns (123456, 654321)
+    is_sequential_up = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) + 1 for i in range(1, len(digits_only))
+    )
+    is_sequential_down = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) - 1 for i in range(1, len(digits_only))
+    )
+    if is_sequential_up or is_sequential_down:
+        return False
+
+    # Chinese postal codes: first 2 digits range 01-86
+    first_two = int(digits_only[:2])
+    if first_two < 1 or first_two > 86:
+        return False
+
+    # Reject numbers that are too round (multiples of 100000)
+    try:
+        num = int(digits_only)
+        if num % 100000 == 0:
+            return False
+    except ValueError:
+        return False
+
+    return True
+
+
+def tw_zipcode_valid(value: str) -> bool:
+    """
+    Verify Taiwan postal code is valid.
+
+    Checks against tw_zipcodes.csv if available, otherwise uses heuristics.
+    Taiwan postal codes are 3 or 5 digits (e.g., 100 or 10041).
+    """
+    digits_only = "".join(c for c in value if c.isdigit())
+
+    if len(digits_only) not in [3, 5]:
+        return False
+
+    # 1. Data-driven check if data exists
+    valid_zips = _load_data_file("tw_zipcodes.csv")
+    if valid_zips:
+        # Check exact match, or for 5-digit check if first 3 digits are valid
+        if digits_only in valid_zips:
+            return True
+        if len(digits_only) == 5 and digits_only[:3] in valid_zips:
+            return True
+        return False
+
+    # 2. Heuristic fallback
+    # Reject all same digit
+    if len(set(digits_only)) == 1:
+        return False
+
+    # Reject sequential patterns
+    is_sequential_up = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) + 1 for i in range(1, len(digits_only))
+    )
+    is_sequential_down = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) - 1 for i in range(1, len(digits_only))
+    )
+    if is_sequential_up or is_sequential_down:
+        return False
+
+    # Taiwan postal codes: first digit 1-9, valid range roughly 100-983
+    first_digit = int(digits_only[0])
+    if first_digit == 0:
+        return False
+
+    return True
+
+
+def in_pincode_valid(value: str) -> bool:
+    """
+    Verify Indian PIN code is valid.
+
+    Checks against in_pincodes.csv if available, otherwise uses heuristics.
+    Indian PIN codes are 6 digits starting with 1-9 (e.g., 110001).
+    """
+    digits_only = "".join(c for c in value if c.isdigit())
+
+    if len(digits_only) != 6:
+        return False
+
+    # First digit must be 1-9
+    if digits_only[0] == "0":
+        return False
+
+    # 1. Data-driven check if data exists
+    valid_pins = _load_data_file("in_pincodes.csv")
+    if valid_pins:
+        return digits_only in valid_pins
+
+    # 2. Heuristic fallback
+    # Reject all same digit (111111, 222222, etc.)
+    if len(set(digits_only)) == 1:
+        return False
+
+    # Reject sequential patterns (123456, 654321)
+    is_sequential_up = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) + 1 for i in range(1, len(digits_only))
+    )
+    is_sequential_down = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) - 1 for i in range(1, len(digits_only))
+    )
+    if is_sequential_up or is_sequential_down:
+        return False
+
+    # Reject numbers that are too round (multiples of 100000)
+    try:
+        num = int(digits_only)
+        if num % 100000 == 0:
+            return False
+    except ValueError:
+        return False
+
+    return True
+
+
 def korean_bank_account_valid(value: str) -> bool:
     """
     Verify Korean bank account is valid and not a timestamp.
@@ -758,28 +945,85 @@ JAPANESE_SURNAMES = {
 }
 
 
+# Common Chinese words that start with surname characters but aren't names.
+# Used by chinese_name_valid to filter false positives.
+CHINESE_NON_NAME_KEYWORDS = {
+    # Common words starting with surname characters
+    "王国", "王朝", "王牌", "王者",
+    "李子",
+    "张开", "张力", "张贴",
+    "黄金", "黄色", "黄油", "黄土", "黄瓜", "黄河", "黄昏",
+    "高度", "高级", "高中", "高速", "高考", "高峰", "高手", "高端",
+    "周围", "周期", "周末", "周年", "周边", "周到",
+    "马上", "马路", "马力",
+    "朱红",
+    "曹操",
+    "白色", "白天", "白云", "白金", "白菜",
+    "金属", "金融", "金额", "金钱", "金牌",
+    "田地", "田野", "田园",
+    "石头", "石油", "石材",
+    "方法", "方案", "方向", "方式", "方面", "方便",
+    "任务", "任何", "任意", "任命",
+    "程度", "程序",
+    "江山", "江南", "江河",
+    "余额", "余下",
+    "于是",
+    "何时", "何处", "何必",
+    # Contact/form keywords (simplified + traditional)
+    "电话", "電話", "邮箱", "郵箱", "地址", "姓名", "信息", "資訊",
+    "联系", "聯繫", "手机", "手機", "号码", "號碼", "传真", "傳真",
+    "邮件", "郵件", "密码", "密碼", "账号", "帳號", "注册", "註冊",
+    "登录", "登錄", "确认", "確認", "验证", "驗證", "性别", "性別",
+    "生日", "职业", "職業", "公司", "部门", "部門",
+}
+
+
 def chinese_name_valid(value: str) -> bool:
     """
-    Verify Chinese name has a valid surname prefix.
+    Verify Chinese name has a valid surname prefix and given name.
 
-    Checks if the first 1-2 characters match known Chinese surnames.
-    Most Chinese names are 2-4 characters (1 surname + 1-3 given name).
+    Uses multi-tier verification: keyword filtering, surname extraction,
+    given name dictionary lookup, and length heuristics.
 
     Args:
         value: Chinese name string
 
     Returns:
-        True if name has known surname, False otherwise
+        True if name is a plausible Chinese name, False otherwise
     """
     if not value or len(value) < 2 or len(value) > 4:
         return False
 
+    # 1. Filter out non-name keywords (exact match)
+    if value in CHINESE_NON_NAME_KEYWORDS:
+        return False
+
+    # 2. Extract surname and given name
+    surname = None
+    given_name = None
+
     # Check compound surnames first (2 chars)
     if len(value) >= 3 and value[:2] in CHINESE_SURNAMES:
+        surname = value[:2]
+        given_name = value[2:]
+    elif value[0] in CHINESE_SURNAMES:
+        surname = value[0]
+        given_name = value[1:]
+
+    if not surname:
+        return False
+
+    # 3. Given name dictionary lookup
+    valid_given_names = _load_data_file("cn_given_names.csv")
+    if valid_given_names and given_name in valid_given_names:
         return True
 
-    # Check single-character surnames
-    return value[0] in CHINESE_SURNAMES
+    # 4. Length heuristic: for names not in dictionary, only accept 3-char names
+    # (most common Chinese name format: 1 surname + 2 given name chars)
+    if len(value) != 3:
+        return False
+
+    return True
 
 
 # Common Korean words that are not names but frequently appear in contact info
@@ -861,36 +1105,92 @@ def korean_name_valid(value: str) -> bool:
     return True
 
 
+# Common Japanese words that could false-positive as names.
+# Used by japanese_name_kanji_valid to filter false positives.
+JAPANESE_NON_NAME_KEYWORDS = {
+    # Common kanji compounds that start with surname characters
+    "田園", "田畑", "田舎",
+    "中心", "中央", "中間", "中古", "中止", "中国", "中学",
+    "山脈", "山岳", "山林", "山地", "山頂",
+    "高速", "高校", "高層", "高価", "高原", "高齢",
+    "林業", "林道",
+    "森林",
+    "石油", "石材", "石炭", "石器",
+    "金属", "金融", "金額", "金銭", "金庫",
+    "上記", "上昇", "上手", "上司",
+    "大学", "大会", "大臣", "大量", "大型", "大切", "大変",
+    "小学", "小説", "小型", "小売",
+    "原因", "原則", "原料", "原発",
+    "内容", "内部", "内閣",
+    "前回", "前者", "前提", "前日",
+    "後半", "後者", "後日",
+    "西洋", "西側",
+    "青年", "青春",
+    "近代", "近年", "近所",
+    "遠方", "遠足",
+    "池袋",
+    # Contact/form keywords
+    "電話", "住所", "名前", "情報", "連絡", "番号", "携帯",
+    "確認", "登録", "氏名", "性別", "生年", "職業", "会社",
+    "部署", "郵便", "暗号", "認証", "口座",
+}
+
+
 def japanese_name_kanji_valid(value: str) -> bool:
     """
-    Verify Japanese name (kanji) matches known surname patterns.
+    Verify Japanese name (kanji) matches known surname patterns and given name.
 
-    Japanese names in kanji typically have surname + given name.
-    Surnames are usually 1-3 kanji characters.
+    Uses multi-tier verification: keyword filtering, surname extraction,
+    given name dictionary lookup, and length heuristics.
 
     Args:
         value: Japanese name string in kanji
 
     Returns:
-        True if name matches known surname pattern, False otherwise
+        True if name is a plausible Japanese name, False otherwise
     """
     if not value or len(value) < 2 or len(value) > 6:
         return False
 
-    # For 2-char strings, check if it's a 2-char surname (like 田中, 鈴木)
+    # 1. Filter out non-name keywords (exact match)
+    if value in JAPANESE_NON_NAME_KEYWORDS:
+        return False
+
+    # 2. For 2-char strings, check if it's a 2-char surname (like 田中, 鈴木)
     if len(value) == 2:
         return value in JAPANESE_SURNAMES
 
+    # 3. Extract surname and given name
+    surname = None
+    given_name = None
+
     # Check 3-char surnames first (e.g., 佐々木, 長谷川)
     if len(value) >= 4 and value[:3] in JAPANESE_SURNAMES:
-        return True
-
+        surname = value[:3]
+        given_name = value[3:]
     # Check 2-char surnames (most common)
-    if value[:2] in JAPANESE_SURNAMES:
+    elif value[:2] in JAPANESE_SURNAMES:
+        surname = value[:2]
+        given_name = value[2:]
+    # Check 1-char surnames (e.g., 森, 林)
+    elif value[0] in JAPANESE_SURNAMES:
+        surname = value[0]
+        given_name = value[1:]
+
+    if not surname:
+        return False
+
+    # 4. Given name dictionary lookup
+    valid_given_names = _load_data_file("jp_given_names.csv")
+    if valid_given_names and given_name in valid_given_names:
         return True
 
-    # Check 1-char surnames (e.g., 森, 林)
-    return value[0] in JAPANESE_SURNAMES
+    # 5. Length heuristic: for names not in dictionary, accept 3-4 char names
+    # (most common: 2 surname + 1-2 given name chars)
+    if len(value) not in (3, 4):
+        return False
+
+    return True
 
 
 def cjk_name_standalone(value: str) -> bool:
@@ -2141,6 +2441,11 @@ VERIFICATION_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
     "kr_rrn_valid": kr_rrn_valid,
     "kr_alien_registration_valid": kr_alien_registration_valid,
     "kr_corporate_registration_valid": kr_corporate_registration_valid,
+    # Zipcode verification (JP, CN, TW, IN)
+    "jp_zipcode_valid": jp_zipcode_valid,
+    "cn_zipcode_valid": cn_zipcode_valid,
+    "tw_zipcode_valid": tw_zipcode_valid,
+    "in_pincode_valid": in_pincode_valid,
     # Japanese
     "jp_my_number_valid": jp_my_number_valid,
     # European IDs

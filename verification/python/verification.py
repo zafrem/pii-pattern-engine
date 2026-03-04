@@ -17,6 +17,7 @@ from typing import Any, Callable, Dict, Optional, Set
 try:
     import numpy as np
     from scipy.spatial.distance import cosine
+
     HAS_VECTOR_DEPS = True
 except ImportError:
     HAS_VECTOR_DEPS = False
@@ -27,7 +28,9 @@ logger = logging.getLogger(__name__)
 
 # --- Configuration for ML/Vector Based Verification ---
 # Default to false to avoid performance/dependency overhead
-USE_VECTOR_MODEL = os.getenv("ENABLE_KOREAN_VECTOR_VERIFICATION", "false").lower() == "true"
+USE_VECTOR_MODEL = (
+    os.getenv("ENABLE_KOREAN_VECTOR_VERIFICATION", "false").lower() == "true"
+)
 VECTOR_MODEL_PATH = os.getenv("KOREAN_VECTOR_MODEL_PATH", "datas/ko_w2v.vec")
 _VECTOR_MODEL_CACHE: Dict[str, Any] = {}
 _KEYWORDS_CENTROID: Optional[Any] = None
@@ -48,35 +51,39 @@ def _load_vector_model():
     if not model_path.exists():
         # Only log if specifically enabled
         if USE_VECTOR_MODEL:
-            logger.warning(f"Vector model not found at {VECTOR_MODEL_PATH}. Skipping vector verification.")
+            logger.warning(
+                f"Vector model not found at {VECTOR_MODEL_PATH}. Skipping vector verification."
+            )
         return None
 
     try:
         # Simple parser for .vec (word dim1 dim2 ...)
-        with open(model_path, "r", encoding="utf-8") as f:
+        with open(model_path, encoding="utf-8") as f:
             header = f.readline().split()
-            if len(header) < 2: return None
-            
+            if len(header) < 2:
+                return None
+
             for line in f:
                 parts = line.strip().split()
-                if not parts: continue
+                if not parts:
+                    continue
                 word = parts[0]
                 vector = np.array([float(x) for x in parts[1:]], dtype=np.float32)
                 _VECTOR_MODEL_CACHE[word] = vector
-        
+
         # Calculate a "Keyword Centroid" to represent common contact-related words
         keyword_vectors = []
         for kw in KOREAN_NON_NAME_KEYWORDS:
             if kw in _VECTOR_MODEL_CACHE:
                 keyword_vectors.append(_VECTOR_MODEL_CACHE[kw])
-        
+
         if keyword_vectors:
             _KEYWORDS_CENTROID = np.mean(keyword_vectors, axis=0)
-            
+
         logger.info(f"Loaded {len(_VECTOR_MODEL_CACHE)} vectors for similarity check.")
     except Exception as e:
         logger.error(f"Failed to load vector model: {e}")
-    
+
     return _VECTOR_MODEL_CACHE
 
 
@@ -91,7 +98,7 @@ def get_vector_similarity_score(value: str) -> float:
     model = _load_vector_model()
     if not model or _KEYWORDS_CENTROID is None or value not in model:
         return 0.0
-    
+
     # 1.0 - cosine_distance = cosine_similarity
     sim = 1.0 - cosine(model[value], _KEYWORDS_CENTROID)
     return float(sim)
@@ -118,7 +125,7 @@ def _load_data_file(filename: str) -> Set[str]:
 
     if data_path.exists():
         try:
-            with open(data_path, "r", encoding="utf-8") as f:
+            with open(data_path, encoding="utf-8") as f:
                 # Skip header
                 lines = f.readlines()
                 if len(lines) > 1:
@@ -280,14 +287,18 @@ def high_entropy_token(value: str) -> bool:
 
     # Check character set (base64url: A-Za-z0-9_- or hex: A-Fa-f0-9)
     # Being permissive to catch various token formats including JWT (with dots)
-    allowed_chars = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-+/.=")
+    allowed_chars = set(
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-+/.="
+    )
     if not all(c in allowed_chars for c in value):
         return False
 
     # Calculate Shannon entropy
     char_counts = Counter(value)
     length = len(value)
-    entropy = -sum((count / length) * math.log2(count / length) for count in char_counts.values())
+    entropy = -sum(
+        (count / length) * math.log2(count / length) for count in char_counts.values()
+    )
 
     # High entropy threshold
     # Base64: theoretical max ~6 bits/char, practical ~5-5.5 for random data
@@ -372,7 +383,7 @@ def not_timestamp(value: str) -> bool:
 def korean_zipcode_valid(value: str) -> bool:
     """
     Verify Korean postal code is valid.
-    
+
     Checks against kr_zipcodes.csv if available, otherwise uses heuristics.
     """
     # 1. Data-driven check if data exists
@@ -389,10 +400,12 @@ def korean_zipcode_valid(value: str) -> bool:
 
     # Reject sequential patterns (12345, 54321, etc.)
     is_sequential_up = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) + 1 for i in range(1, len(digits_only))
+        int(digits_only[i]) == int(digits_only[i - 1]) + 1
+        for i in range(1, len(digits_only))
     )
     is_sequential_down = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) - 1 for i in range(1, len(digits_only))
+        int(digits_only[i]) == int(digits_only[i - 1]) - 1
+        for i in range(1, len(digits_only))
     )
 
     if is_sequential_up or is_sequential_down:
@@ -402,14 +415,6 @@ def korean_zipcode_valid(value: str) -> bool:
     if len(set(digits_only)) == 1:
         return False
 
-    # Reject numbers that are too round (multiples of 10000, like 50000, 60000)
-    try:
-        num = int(digits_only)
-        if num % 10000 == 0:
-            return False
-    except ValueError:
-        return False
-
     # Accept as likely valid postal code
     return True
 
@@ -417,12 +422,12 @@ def korean_zipcode_valid(value: str) -> bool:
 def us_zipcode_valid(value: str) -> bool:
     """
     Verify US postal code is valid.
-    
+
     Checks against us_zipcodes.csv if available, otherwise uses heuristics.
     """
     # Remove any separators to get raw digits first
     digits_only = "".join(c for c in value if c.isdigit())
-    
+
     # 1. Data-driven check if data exists
     valid_zips = _load_data_file("us_zipcodes.csv")
     if valid_zips:
@@ -432,10 +437,10 @@ def us_zipcode_valid(value: str) -> bool:
         # If we have 9 digits (ZIP+4), check if the base 5-digit zip is valid
         elif len(digits_only) == 9:
             return digits_only[:5] in valid_zips
-            
+
         # If length is weird but data is present, we might want to fail?
         # But let's fall back to heuristics just in case regex matched something else
-    
+
     # 2. Heuristic fallback
     # US ZIP can be 5 digits or 9 digits (ZIP+4)
     if len(digits_only) not in [5, 9]:
@@ -457,14 +462,6 @@ def us_zipcode_valid(value: str) -> bool:
 
     # Reject all same digit in base ZIP (00000, 11111, etc.)
     if len(set(base_zip)) == 1:
-        return False
-
-    # Reject numbers that are too round (multiples of 10000, like 50000, 60000)
-    try:
-        num = int(base_zip)
-        if num % 10000 == 0:
-            return False
-    except ValueError:
         return False
 
     return True
@@ -498,20 +495,14 @@ def jp_zipcode_valid(value: str) -> bool:
 
     # Reject sequential patterns (1234567, 7654321)
     is_sequential_up = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) + 1 for i in range(1, len(digits_only))
+        int(digits_only[i]) == int(digits_only[i - 1]) + 1
+        for i in range(1, len(digits_only))
     )
     is_sequential_down = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) - 1 for i in range(1, len(digits_only))
+        int(digits_only[i]) == int(digits_only[i - 1]) - 1
+        for i in range(1, len(digits_only))
     )
     if is_sequential_up or is_sequential_down:
-        return False
-
-    # Reject numbers that are too round (multiples of 100000)
-    try:
-        num = int(digits_only)
-        if num % 100000 == 0:
-            return False
-    except ValueError:
         return False
 
     return True
@@ -541,10 +532,12 @@ def cn_zipcode_valid(value: str) -> bool:
 
     # Reject sequential patterns (123456, 654321)
     is_sequential_up = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) + 1 for i in range(1, len(digits_only))
+        int(digits_only[i]) == int(digits_only[i - 1]) + 1
+        for i in range(1, len(digits_only))
     )
     is_sequential_down = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) - 1 for i in range(1, len(digits_only))
+        int(digits_only[i]) == int(digits_only[i - 1]) - 1
+        for i in range(1, len(digits_only))
     )
     if is_sequential_up or is_sequential_down:
         return False
@@ -552,14 +545,6 @@ def cn_zipcode_valid(value: str) -> bool:
     # Chinese postal codes: first 2 digits range 01-86
     first_two = int(digits_only[:2])
     if first_two < 1 or first_two > 86:
-        return False
-
-    # Reject numbers that are too round (multiples of 100000)
-    try:
-        num = int(digits_only)
-        if num % 100000 == 0:
-            return False
-    except ValueError:
         return False
 
     return True
@@ -590,16 +575,6 @@ def tw_zipcode_valid(value: str) -> bool:
     # 2. Heuristic fallback
     # Reject all same digit
     if len(set(digits_only)) == 1:
-        return False
-
-    # Reject sequential patterns
-    is_sequential_up = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) + 1 for i in range(1, len(digits_only))
-    )
-    is_sequential_down = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) - 1 for i in range(1, len(digits_only))
-    )
-    if is_sequential_up or is_sequential_down:
         return False
 
     # Taiwan postal codes: first digit 1-9, valid range roughly 100-983
@@ -638,20 +613,14 @@ def in_pincode_valid(value: str) -> bool:
 
     # Reject sequential patterns (123456, 654321)
     is_sequential_up = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) + 1 for i in range(1, len(digits_only))
+        int(digits_only[i]) == int(digits_only[i - 1]) + 1
+        for i in range(1, len(digits_only))
     )
     is_sequential_down = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) - 1 for i in range(1, len(digits_only))
+        int(digits_only[i]) == int(digits_only[i - 1]) - 1
+        for i in range(1, len(digits_only))
     )
     if is_sequential_up or is_sequential_down:
-        return False
-
-    # Reject numbers that are too round (multiples of 100000)
-    try:
-        num = int(digits_only)
-        if num % 100000 == 0:
-            return False
-    except ValueError:
         return False
 
     return True
@@ -889,59 +858,360 @@ def us_ssn_valid(value: str) -> bool:
 # Chinese surnames - covers ~85% of population (simplified + traditional)
 CHINESE_SURNAMES = {
     # Single-character surnames (most common)
-    '王', '李', '张', '刘', '陈', '杨', '黄', '赵', '吴', '周',
-    '徐', '孙', '马', '朱', '胡', '郭', '何', '林', '高', '罗',
-    '郑', '梁', '谢', '宋', '唐', '许', '邓', '冯', '韩', '曹',
-    '曾', '彭', '萧', '蔡', '潘', '田', '董', '袁', '于', '余',
-    '叶', '蒋', '杜', '苏', '魏', '程', '吕', '丁', '沈', '任',
-    '姚', '卢', '傅', '钟', '姜', '崔', '谭', '廖', '范', '汪',
-    '陆', '金', '石', '戴', '贾', '韦', '夏', '邱', '方', '侯',
-    '邹', '熊', '孟', '秦', '白', '江', '阎', '薛', '尹', '段',
-    '雷', '黎', '史', '龙', '陶', '贺', '顾', '毛', '郝', '龚',
-    '邵', '万', '钱', '严', '赖', '覃', '洪', '武', '莫', '孔',
+    "王",
+    "李",
+    "张",
+    "刘",
+    "陈",
+    "杨",
+    "黄",
+    "赵",
+    "吴",
+    "周",
+    "徐",
+    "孙",
+    "马",
+    "朱",
+    "胡",
+    "郭",
+    "何",
+    "林",
+    "高",
+    "罗",
+    "郑",
+    "梁",
+    "谢",
+    "宋",
+    "唐",
+    "许",
+    "邓",
+    "冯",
+    "韩",
+    "曹",
+    "曾",
+    "彭",
+    "萧",
+    "蔡",
+    "潘",
+    "田",
+    "董",
+    "袁",
+    "于",
+    "余",
+    "叶",
+    "蒋",
+    "杜",
+    "苏",
+    "魏",
+    "程",
+    "吕",
+    "丁",
+    "沈",
+    "任",
+    "姚",
+    "卢",
+    "傅",
+    "钟",
+    "姜",
+    "崔",
+    "谭",
+    "廖",
+    "范",
+    "汪",
+    "陆",
+    "金",
+    "石",
+    "戴",
+    "贾",
+    "韦",
+    "夏",
+    "邱",
+    "方",
+    "侯",
+    "邹",
+    "熊",
+    "孟",
+    "秦",
+    "白",
+    "江",
+    "阎",
+    "薛",
+    "尹",
+    "段",
+    "雷",
+    "黎",
+    "史",
+    "龙",
+    "陶",
+    "贺",
+    "顾",
+    "毛",
+    "郝",
+    "龚",
+    "邵",
+    "万",
+    "钱",
+    "严",
+    "赖",
+    "覃",
+    "洪",
+    "武",
+    "莫",
+    "孔",
     # Traditional variants
-    '張', '劉', '陳', '楊', '黃', '趙', '吳', '許', '鄭', '謝',
-    '鄧', '馮', '韓', '蕭', '葉', '蔣', '蘇', '魏', '呂', '瀋',
-    '盧', '傅', '鐘', '薑', '譚', '廖', '範', '陸', '賈', '鄒',
-    '閻', '龍', '陶', '賀', '顧', '郝', '龔', '萬', '錢', '嚴',
-    '賴', '覃',
+    "張",
+    "劉",
+    "陳",
+    "楊",
+    "黃",
+    "趙",
+    "吳",
+    "許",
+    "鄭",
+    "謝",
+    "鄧",
+    "馮",
+    "韓",
+    "蕭",
+    "葉",
+    "蔣",
+    "蘇",
+    "魏",
+    "呂",
+    "瀋",
+    "盧",
+    "傅",
+    "鐘",
+    "薑",
+    "譚",
+    "廖",
+    "範",
+    "陸",
+    "賈",
+    "鄒",
+    "閻",
+    "龍",
+    "陶",
+    "賀",
+    "顧",
+    "郝",
+    "龔",
+    "萬",
+    "錢",
+    "嚴",
+    "賴",
+    "覃",
     # Compound surnames (2 characters)
-    '欧阳', '歐陽', '司马', '司馬', '上官', '诸葛', '諸葛',
-    '东方', '東方', '皇甫', '尉迟', '尉遲', '公孙', '公孫',
-    '令狐', '慕容', '轩辕', '軒轅', '夏侯', '司徒', '独孤', '獨孤',
+    "欧阳",
+    "歐陽",
+    "司马",
+    "司馬",
+    "上官",
+    "诸葛",
+    "諸葛",
+    "东方",
+    "東方",
+    "皇甫",
+    "尉迟",
+    "尉遲",
+    "公孙",
+    "公孫",
+    "令狐",
+    "慕容",
+    "轩辕",
+    "軒轅",
+    "夏侯",
+    "司徒",
+    "独孤",
+    "獨孤",
 }
 
 # Korean surnames - covers ~95% of population
 KOREAN_SURNAMES = {
     # Most common (covers ~45%)
-    '김', '이', '박', '최', '정',
+    "김",
+    "이",
+    "박",
+    "최",
+    "정",
     # Very common (covers another ~30%)
-    '강', '조', '윤', '장', '임', '한', '오', '서', '신', '권',
-    '황', '안', '송', '류', '유', '홍', '전', '고', '문', '양',
+    "강",
+    "조",
+    "윤",
+    "장",
+    "임",
+    "한",
+    "오",
+    "서",
+    "신",
+    "권",
+    "황",
+    "안",
+    "송",
+    "류",
+    "유",
+    "홍",
+    "전",
+    "고",
+    "문",
+    "양",
     # Common
-    '손', '배', '백', '허', '남', '심', '노', '하', '곽', '성',
-    '차', '주', '우', '구', '민', '진', '나', '지', '엄', '변',
-    '채', '원', '천', '방', '공', '현', '함', '염', '여', '추',
+    "손",
+    "배",
+    "백",
+    "허",
+    "남",
+    "심",
+    "노",
+    "하",
+    "곽",
+    "성",
+    "차",
+    "주",
+    "우",
+    "구",
+    "민",
+    "진",
+    "나",
+    "지",
+    "엄",
+    "변",
+    "채",
+    "원",
+    "천",
+    "방",
+    "공",
+    "현",
+    "함",
+    "염",
+    "여",
+    "추",
     # Less common but still notable
-    '도', '소', '석', '선', '설', '마', '길', '연', '위', '표',
-    '명', '기', '반', '왕', '금', '옥', '육', '인', '맹', '제',
-    '모', '탁', '국', '어', '은', '편', '용', '예', '경', '봉',
-    '사', '부', '황보', '남궁', '독고', '사공', '제갈', '선우',
+    "도",
+    "소",
+    "석",
+    "선",
+    "설",
+    "마",
+    "길",
+    "연",
+    "위",
+    "표",
+    "명",
+    "기",
+    "반",
+    "왕",
+    "금",
+    "옥",
+    "육",
+    "인",
+    "맹",
+    "제",
+    "모",
+    "탁",
+    "국",
+    "어",
+    "은",
+    "편",
+    "용",
+    "예",
+    "경",
+    "봉",
+    "사",
+    "부",
+    "황보",
+    "남궁",
+    "독고",
+    "사공",
+    "제갈",
+    "선우",
 }
 
 # Japanese surnames (kanji) - most common
 JAPANESE_SURNAMES = {
     # Top 50 most common
-    '佐藤', '鈴木', '高橋', '田中', '伊藤', '渡辺', '山本', '中村', '小林', '加藤',
-    '吉田', '山田', '佐々木', '山口', '松本', '井上', '木村', '林', '斎藤', '清水',
-    '山崎', '森', '阿部', '池田', '橋本', '山下', '石川', '中島', '前田', '藤田',
-    '小川', '後藤', '岡田', '長谷川', '村上', '近藤', '石井', '斉藤', '坂本', '遠藤',
-    '青木', '藤井', '西村', '福田', '太田', '三浦', '藤原', '岡本', '松田', '中川',
+    "佐藤",
+    "鈴木",
+    "高橋",
+    "田中",
+    "伊藤",
+    "渡辺",
+    "山本",
+    "中村",
+    "小林",
+    "加藤",
+    "吉田",
+    "山田",
+    "佐々木",
+    "山口",
+    "松本",
+    "井上",
+    "木村",
+    "林",
+    "斎藤",
+    "清水",
+    "山崎",
+    "森",
+    "阿部",
+    "池田",
+    "橋本",
+    "山下",
+    "石川",
+    "中島",
+    "前田",
+    "藤田",
+    "小川",
+    "後藤",
+    "岡田",
+    "長谷川",
+    "村上",
+    "近藤",
+    "石井",
+    "斉藤",
+    "坂本",
+    "遠藤",
+    "青木",
+    "藤井",
+    "西村",
+    "福田",
+    "太田",
+    "三浦",
+    "藤原",
+    "岡本",
+    "松田",
+    "中川",
     # Additional common surnames
-    '原田', '小野', '竹内', '金子', '和田', '中野', '原', '田村', '安藤', '河野',
-    '上田', '大野', '高木', '工藤', '内田', '丸山', '今井', '酒井', '宮崎', '横山',
+    "原田",
+    "小野",
+    "竹内",
+    "金子",
+    "和田",
+    "中野",
+    "原",
+    "田村",
+    "安藤",
+    "河野",
+    "上田",
+    "大野",
+    "高木",
+    "工藤",
+    "内田",
+    "丸山",
+    "今井",
+    "酒井",
+    "宮崎",
+    "横山",
     # Single character surnames (less common but valid)
-    '森', '林', '原', '関', '堀', '島', '谷', '浜', '沢', '杉',
+    "森",
+    "林",
+    "原",
+    "関",
+    "堀",
+    "島",
+    "谷",
+    "浜",
+    "沢",
+    "杉",
 }
 
 
@@ -949,32 +1219,116 @@ JAPANESE_SURNAMES = {
 # Used by chinese_name_valid to filter false positives.
 CHINESE_NON_NAME_KEYWORDS = {
     # Common words starting with surname characters
-    "王国", "王朝", "王牌", "王者",
+    "王国",
+    "王朝",
+    "王牌",
+    "王者",
     "李子",
-    "张开", "张力", "张贴",
-    "黄金", "黄色", "黄油", "黄土", "黄瓜", "黄河", "黄昏",
-    "高度", "高级", "高中", "高速", "高考", "高峰", "高手", "高端",
-    "周围", "周期", "周末", "周年", "周边", "周到",
-    "马上", "马路", "马力",
+    "张开",
+    "张力",
+    "张贴",
+    "黄金",
+    "黄色",
+    "黄油",
+    "黄土",
+    "黄瓜",
+    "黄河",
+    "黄昏",
+    "高度",
+    "高级",
+    "高中",
+    "高速",
+    "高考",
+    "高峰",
+    "高手",
+    "高端",
+    "周围",
+    "周期",
+    "周末",
+    "周年",
+    "周边",
+    "周到",
+    "马上",
+    "马路",
+    "马力",
     "朱红",
     "曹操",
-    "白色", "白天", "白云", "白金", "白菜",
-    "金属", "金融", "金额", "金钱", "金牌",
-    "田地", "田野", "田园",
-    "石头", "石油", "石材",
-    "方法", "方案", "方向", "方式", "方面", "方便",
-    "任务", "任何", "任意", "任命",
-    "程度", "程序",
-    "江山", "江南", "江河",
-    "余额", "余下",
+    "白色",
+    "白天",
+    "白云",
+    "白金",
+    "白菜",
+    "金属",
+    "金融",
+    "金额",
+    "金钱",
+    "金牌",
+    "田地",
+    "田野",
+    "田园",
+    "石头",
+    "石油",
+    "石材",
+    "方法",
+    "方案",
+    "方向",
+    "方式",
+    "方面",
+    "方便",
+    "任务",
+    "任何",
+    "任意",
+    "任命",
+    "程度",
+    "程序",
+    "江山",
+    "江南",
+    "江河",
+    "余额",
+    "余下",
     "于是",
-    "何时", "何处", "何必",
+    "何时",
+    "何处",
+    "何必",
     # Contact/form keywords (simplified + traditional)
-    "电话", "電話", "邮箱", "郵箱", "地址", "姓名", "信息", "資訊",
-    "联系", "聯繫", "手机", "手機", "号码", "號碼", "传真", "傳真",
-    "邮件", "郵件", "密码", "密碼", "账号", "帳號", "注册", "註冊",
-    "登录", "登錄", "确认", "確認", "验证", "驗證", "性别", "性別",
-    "生日", "职业", "職業", "公司", "部门", "部門",
+    "电话",
+    "電話",
+    "邮箱",
+    "郵箱",
+    "地址",
+    "姓名",
+    "信息",
+    "資訊",
+    "联系",
+    "聯繫",
+    "手机",
+    "手機",
+    "号码",
+    "號碼",
+    "传真",
+    "傳真",
+    "邮件",
+    "郵件",
+    "密码",
+    "密碼",
+    "账号",
+    "帳號",
+    "注册",
+    "註冊",
+    "登录",
+    "登錄",
+    "确认",
+    "確認",
+    "验证",
+    "驗證",
+    "性别",
+    "性別",
+    "生日",
+    "职业",
+    "職業",
+    "公司",
+    "部门",
+    "部門",
 }
 
 
@@ -1018,9 +1372,10 @@ def chinese_name_valid(value: str) -> bool:
     if valid_given_names and given_name in valid_given_names:
         return True
 
-    # 4. Length heuristic: for names not in dictionary, only accept 3-char names
-    # (most common Chinese name format: 1 surname + 2 given name chars)
-    if len(value) != 3:
+    # 4. Length heuristic: for names not in dictionary, only accept 2-4 char names
+    # (Chinese names: 1-2 surname chars + 1-3 given name chars)
+    # Most common: 1 surname + 1-2 given (2-3 total) or 2 surname + 1-2 given (3-4 total)
+    if not (2 <= len(value) <= 4):
         return False
 
     return True
@@ -1030,10 +1385,39 @@ def chinese_name_valid(value: str) -> bool:
 # and start with common surnames (e.g., "전", "이", "정"), leading to false positives.
 # This list is used by korean_name_valid to filter matches.
 KOREAN_NON_NAME_KEYWORDS = {
-    "전화번호", "이메일", "연락처", "주소", "이름", "성명", "휴대폰", "핸드폰",
-    "번호", "전화", "메일", "팩스", "모바일", "정보", "문의", "확인", "성별",
-    "생년", "월일", "생일", "성별", "직업", "나이", "회사", "부서", "직책",
-    "전화번", "메일주", "이메일주", "연락처는", "주소는", "이름은", "성명은",
+    "전화번호",
+    "이메일",
+    "연락처",
+    "주소",
+    "이름",
+    "성명",
+    "휴대폰",
+    "핸드폰",
+    "번호",
+    "전화",
+    "메일",
+    "팩스",
+    "모바일",
+    "정보",
+    "문의",
+    "확인",
+    "성별",
+    "생년",
+    "월일",
+    "생일",
+    "성별",
+    "직업",
+    "나이",
+    "회사",
+    "부서",
+    "직책",
+    "전화번",
+    "메일주",
+    "이메일주",
+    "연락처는",
+    "주소는",
+    "이름은",
+    "성명은",
 }
 
 
@@ -1080,7 +1464,7 @@ def korean_name_valid(value: str) -> bool:
 
     # 3. Hybrid Dictionary-Heuristic Check
     valid_given_names = _load_data_file("kr_given_names.csv")
-    
+
     # If the given name part is in our common dictionary, it's very likely a name (High Confidence)
     if valid_given_names and given_name in valid_given_names:
         return True
@@ -1092,7 +1476,7 @@ def korean_name_valid(value: str) -> bool:
         return False
 
     # 4. (Optional) Vector Similarity Check
-    # If the user has enabled ML-based filtering, we check if the word 
+    # If the user has enabled ML-based filtering, we check if the word
     # has high similarity to our "Contact Keyword Centroid".
     # Similarity > 0.8 usually means it's conceptually a keyword, not a proper noun.
     if USE_VECTOR_MODEL:
@@ -1100,7 +1484,7 @@ def korean_name_valid(value: str) -> bool:
         if sim_score > 0.8:
             return False
 
-    # For 3-character matches (the most common Korean name format), we allow them 
+    # For 3-character matches (the most common Korean name format), we allow them
     # to avoid missing rare names, provided they aren't in the blacklist.
     return True
 
@@ -1109,30 +1493,98 @@ def korean_name_valid(value: str) -> bool:
 # Used by japanese_name_kanji_valid to filter false positives.
 JAPANESE_NON_NAME_KEYWORDS = {
     # Common kanji compounds that start with surname characters
-    "田園", "田畑", "田舎",
-    "中心", "中央", "中間", "中古", "中止", "中国", "中学",
-    "山脈", "山岳", "山林", "山地", "山頂",
-    "高速", "高校", "高層", "高価", "高原", "高齢",
-    "林業", "林道",
+    "田園",
+    "田畑",
+    "田舎",
+    "中心",
+    "中央",
+    "中間",
+    "中古",
+    "中止",
+    "中国",
+    "中学",
+    "山脈",
+    "山岳",
+    "山林",
+    "山地",
+    "山頂",
+    "高速",
+    "高校",
+    "高層",
+    "高価",
+    "高原",
+    "高齢",
+    "林業",
+    "林道",
     "森林",
-    "石油", "石材", "石炭", "石器",
-    "金属", "金融", "金額", "金銭", "金庫",
-    "上記", "上昇", "上手", "上司",
-    "大学", "大会", "大臣", "大量", "大型", "大切", "大変",
-    "小学", "小説", "小型", "小売",
-    "原因", "原則", "原料", "原発",
-    "内容", "内部", "内閣",
-    "前回", "前者", "前提", "前日",
-    "後半", "後者", "後日",
-    "西洋", "西側",
-    "青年", "青春",
-    "近代", "近年", "近所",
-    "遠方", "遠足",
+    "石油",
+    "石材",
+    "石炭",
+    "石器",
+    "金属",
+    "金融",
+    "金額",
+    "金銭",
+    "金庫",
+    "上記",
+    "上昇",
+    "上手",
+    "上司",
+    "大学",
+    "大会",
+    "大臣",
+    "大量",
+    "大型",
+    "大切",
+    "大変",
+    "小学",
+    "小説",
+    "小型",
+    "小売",
+    "原因",
+    "原則",
+    "原料",
+    "原発",
+    "内容",
+    "内部",
+    "内閣",
+    "前回",
+    "前者",
+    "前提",
+    "前日",
+    "後半",
+    "後者",
+    "後日",
+    "西洋",
+    "西側",
+    "青年",
+    "青春",
+    "近代",
+    "近年",
+    "近所",
+    "遠方",
+    "遠足",
     "池袋",
     # Contact/form keywords
-    "電話", "住所", "名前", "情報", "連絡", "番号", "携帯",
-    "確認", "登録", "氏名", "性別", "生年", "職業", "会社",
-    "部署", "郵便", "暗号", "認証", "口座",
+    "電話",
+    "住所",
+    "名前",
+    "情報",
+    "連絡",
+    "番号",
+    "携帯",
+    "確認",
+    "登録",
+    "氏名",
+    "性別",
+    "生年",
+    "職業",
+    "会社",
+    "部署",
+    "郵便",
+    "暗号",
+    "認証",
+    "口座",
 }
 
 
@@ -1227,10 +1679,10 @@ def cjk_name_standalone(value: str) -> bool:
         # CJK ranges: Chinese (4E00-9FFF), Korean Hangul (AC00-D7AF),
         # Japanese Hiragana (3040-309F), Katakana (30A0-30FF), CJK (4E00-9FFF)
         is_cjk = (
-            0x4E00 <= code <= 0x9FFF or  # CJK Unified Ideographs
-            0xAC00 <= code <= 0xD7AF or  # Korean Hangul
-            0x3040 <= code <= 0x309F or  # Hiragana
-            0x30A0 <= code <= 0x30FF     # Katakana
+            0x4E00 <= code <= 0x9FFF  # CJK Unified Ideographs
+            or 0xAC00 <= code <= 0xD7AF  # Korean Hangul
+            or 0x3040 <= code <= 0x309F  # Hiragana
+            or 0x30A0 <= code <= 0x30FF  # Katakana
         )
         if not is_cjk:
             return False
@@ -1264,15 +1716,41 @@ def cn_national_id_valid(value: str) -> bool:
 
     # Valid province codes (first 2 digits)
     valid_provinces = {
-        "11", "12", "13", "14", "15",  # Beijing, Tianjin, Hebei, Shanxi, Inner Mongolia
-        "21", "22", "23",              # Liaoning, Jilin, Heilongjiang
-        "31", "32", "33", "34", "35", "36", "37",  # Shanghai, Jiangsu, Zhejiang, Anhui, Fujian, Jiangxi, Shandong
-        "41", "42", "43", "44", "45", "46",  # Henan, Hubei, Hunan, Guangdong, Guangxi, Hainan
-        "50", "51", "52", "53", "54",  # Chongqing, Sichuan, Guizhou, Yunnan, Tibet
-        "61", "62", "63", "64", "65",  # Shaanxi, Gansu, Qinghai, Ningxia, Xinjiang
-        "71",                          # Taiwan (ROC)
-        "81", "82",                    # Hong Kong, Macau
-        "91",                          # Foreign nationals
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",  # Beijing, Tianjin, Hebei, Shanxi, Inner Mongolia
+        "21",
+        "22",
+        "23",  # Liaoning, Jilin, Heilongjiang
+        "31",
+        "32",
+        "33",
+        "34",
+        "35",
+        "36",
+        "37",  # Shanghai, Jiangsu, Zhejiang, Anhui, Fujian, Jiangxi, Shandong
+        "41",
+        "42",
+        "43",
+        "44",
+        "45",
+        "46",  # Henan, Hubei, Hunan, Guangdong, Guangxi, Hainan
+        "50",
+        "51",
+        "52",
+        "53",
+        "54",  # Chongqing, Sichuan, Guizhou, Yunnan, Tibet
+        "61",
+        "62",
+        "63",
+        "64",
+        "65",  # Shaanxi, Gansu, Qinghai, Ningxia, Xinjiang
+        "71",  # Taiwan (ROC)
+        "81",
+        "82",  # Hong Kong, Macau
+        "91",  # Foreign nationals
     }
 
     if id_str[:2] not in valid_provinces:
@@ -1301,7 +1779,7 @@ def cn_national_id_valid(value: str) -> bool:
 
     # Calculate checksum
     weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
-    check_digits = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2']
+    check_digits = ["1", "0", "X", "9", "8", "7", "6", "5", "4", "3", "2"]
 
     try:
         total = sum(int(id_str[i]) * weights[i] for i in range(17))
@@ -1346,10 +1824,10 @@ def tw_national_id_valid(value: str) -> bool:
         return False
 
     # Convert letter to 2-digit number (A=10, B=11, ..., Z=35)
-    letter_code = ord(id_str[0]) - ord('A') + 10
+    letter_code = ord(id_str[0]) - ord("A") + 10
 
     # Invalid letters: I=18, O=24, W=32 are not used
-    if id_str[0] in ('I', 'O', 'W'):
+    if id_str[0] in ("I", "O", "W"):
         return False
 
     # Gender digit (position 1) should be 1 or 2
@@ -1399,7 +1877,7 @@ def india_aadhaar_valid(value: str) -> bool:
         return False
 
     # First digit cannot be 0 or 1
-    if digits_only[0] in ('0', '1'):
+    if digits_only[0] in ("0", "1"):
         return False
 
     # Reject all same digits
@@ -1478,12 +1956,12 @@ def india_pan_valid(value: str) -> bool:
         return False
 
     # Valid 4th character (entity type)
-    valid_entity_types = {'A', 'B', 'C', 'F', 'G', 'H', 'J', 'K', 'L', 'P', 'T'}
+    valid_entity_types = {"A", "B", "C", "F", "G", "H", "J", "K", "L", "P", "T"}
     if pan[3] not in valid_entity_types:
         return False
 
     # Reject obvious test patterns
-    if pan[:5] in ('AAAAA', 'ABCDE', 'XXXXX', 'ZZZZZ'):
+    if pan[:5] in ("AAAAA", "ABCDE", "XXXXX", "ZZZZZ"):
         return False
 
     return True
@@ -1552,7 +2030,7 @@ def ipv4_public(value: str) -> bool:
         True if public IP, False if private/reserved
     """
     try:
-        parts = value.split('.')
+        parts = value.split(".")
         if len(parts) != 4:
             return False
 
@@ -1654,15 +2132,21 @@ def not_repeating_pattern(value: str) -> bool:
     # Check for 2-char repeating pattern
     if len(value) >= 4:
         pattern2 = value[:2]
-        if pattern2 * (len(value) // 2) == value[:len(pattern2) * (len(value) // 2)]:
-            if len(value) % 2 == 0 or value[-(len(value) % 2):] == pattern2[:len(value) % 2]:
+        if pattern2 * (len(value) // 2) == value[: len(pattern2) * (len(value) // 2)]:
+            if (
+                len(value) % 2 == 0
+                or value[-(len(value) % 2) :] == pattern2[: len(value) % 2]
+            ):
                 return False
 
     # Check for 3-char repeating pattern
     if len(value) >= 6:
         pattern3 = value[:3]
-        if pattern3 * (len(value) // 3) == value[:len(pattern3) * (len(value) // 3)]:
-            if len(value) % 3 == 0 or value[-(len(value) % 3):] == pattern3[:len(value) % 3]:
+        if pattern3 * (len(value) // 3) == value[: len(pattern3) * (len(value) // 3)]:
+            if (
+                len(value) % 3 == 0
+                or value[-(len(value) % 3) :] == pattern3[: len(value) % 3]
+            ):
                 return False
 
     return True
@@ -1699,7 +2183,7 @@ def credit_card_bin_valid(value: str) -> bool:
     valid_bin = False
 
     # Visa: starts with 4
-    if digits[0] == '4':
+    if digits[0] == "4":
         valid_bin = True
 
     # Mastercard: 51-55 or 2221-2720
@@ -1720,9 +2204,9 @@ def credit_card_bin_valid(value: str) -> bool:
 
     # Discover: 6011, 622126-622925, 644-649, 65
     if not valid_bin:
-        if digits.startswith('6011'):
+        if digits.startswith("6011"):
             valid_bin = True
-        elif digits.startswith('65'):
+        elif digits.startswith("65"):
             valid_bin = True
         elif len(digits) >= 3:
             prefix3 = int(digits[:3])
@@ -1740,7 +2224,7 @@ def credit_card_bin_valid(value: str) -> bool:
             valid_bin = True
 
     # UnionPay: 62
-    if not valid_bin and digits.startswith('62'):
+    if not valid_bin and digits.startswith("62"):
         valid_bin = True
 
     # Diners Club: 36, 38, 300-305
@@ -2057,7 +2541,7 @@ def spain_nie_valid(value: str) -> bool:
         return False
 
     # First char must be X, Y, or Z
-    if nie[0] not in ('X', 'Y', 'Z'):
+    if nie[0] not in ("X", "Y", "Z"):
         return False
 
     # Middle 7 must be digits
@@ -2069,7 +2553,7 @@ def spain_nie_valid(value: str) -> bool:
         return False
 
     # Replace first letter with number
-    replacements = {'X': '0', 'Y': '1', 'Z': '2'}
+    replacements = {"X": "0", "Y": "1", "Z": "2"}
     number_str = replacements[nie[0]] + nie[1:8]
 
     # Letter sequence for checksum (same as DNI)
@@ -2217,7 +2701,6 @@ def sweden_personnummer_valid(value: str) -> bool:
 
     # Parse and validate date
     try:
-        yy = int(digits[0:2])
         mm = int(digits[2:4])
         dd = int(digits[4:6])
     except ValueError:
@@ -2315,7 +2798,6 @@ def belgium_rrn_valid(value: str) -> bool:
 
     # Parse date
     try:
-        yy = int(digits[0:2])
         mm = int(digits[2:4])
         dd = int(digits[4:6])
     except ValueError:
@@ -2380,7 +2862,7 @@ def finland_hetu_valid(value: str) -> bool:
         return False
 
     # Validate century sign
-    if century_sign not in ('+', '-', 'A'):
+    if century_sign not in ("+", "-", "A"):
         return False
 
     # Validate individual number is digits
@@ -2388,9 +2870,9 @@ def finland_hetu_valid(value: str) -> bool:
         return False
 
     # Determine year
-    if century_sign == '+':
+    if century_sign == "+":
         year = 1800 + yy
-    elif century_sign == '-':
+    elif century_sign == "-":
         year = 1900 + yy
     else:  # 'A'
         year = 2000 + yy

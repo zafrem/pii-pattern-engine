@@ -7,6 +7,7 @@ patterns:
     category: address
     description: Indian PIN code (6 digits)
     pattern: '\b[1-9][0-9]{5}\b'
+    verification: in_pincode_valid
     mask: "******"
     examples:
       match:
@@ -18,6 +19,8 @@ patterns:
         - "1100011"
         - "A10001"
         - "000001"
+        - "123456"
+        - "111111"
     policy:
       store_raw: false
       action_on_match: report

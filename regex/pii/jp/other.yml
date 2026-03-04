@@ -7,6 +7,7 @@ patterns:
     category: address
     description: Japanese postal code (XXX-XXXX)
     pattern: '\b[0-9]{3}-?[0-9]{4}\b'
+    verification: jp_zipcode_valid
     mask: "***-****"
     examples:
       match:
@@ -17,6 +18,8 @@ patterns:
         - "12-34567"
         - "1234-567"
         - "12345678"
+        - "1111111"
+        - "0000000"
     policy:
       store_raw: false
       action_on_match: report
@@ -117,6 +120,12 @@ patterns:
         - "123"
         - "東京都"
         - "日本語"
+        - "電話"
+        - "金属"
+        - "中心"
+        - "大学"
+        - "高速"
+        - "情報"
     policy:
       store_raw: false
       action_on_match: redact

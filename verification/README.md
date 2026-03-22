@@ -5,11 +5,17 @@ This directory contains reusable verification functions for pattern validation a
 ## Structure
 
 ```
-_verification/
+verification/
 ├── README.md           # This file
-└── python/             # Python implementation
-    ├── __init__.py     # Module exports
-    └── verification.py # Verification functions
+├── python/             # Python implementation
+│   ├── __init__.py     # Module exports
+│   └── verification.py # Verification functions
+├── javascript/         # JavaScript implementation
+│   └── verification.js # Verification functions
+├── golang/             # Go implementation
+│   └── verification.go # Verification functions
+└── java/               # Java implementation
+    └── src/main/java/com/patternengine/verification/Verification.java
 ```
 
 ## Python Verification Functions
@@ -67,22 +73,36 @@ register_verification_function("custom", custom_verify)
 
 ## Using in Other Languages
 
-For implementations in other languages (Go, JavaScript, etc.):
+The following language implementations are currently supported:
 
-1. Create a subdirectory for your language (e.g., `go/`, `javascript/`)
-2. Implement the same verification functions with equivalent logic
-3. Maintain the same function signatures and behavior
-4. Update this README with usage examples
+### JavaScript
 
-### Example for Go
+```javascript
+const { high_entropy_token, luhn } = require("./javascript/verification");
 
+if (high_entropy_token("ghp_1a2B3c4D5e6F7g8H9i0J1k2L3m4N5o6P7q8R9s0T")) {
+    console.log("Valid high-entropy token");
+}
 ```
-_verification/
-├── README.md
-├── python/
-│   └── verification.py
-└── go/
-    └── verification.go
+
+### Go
+
+```go
+import "verification/golang/verification"
+
+if verification.HighEntropyToken("ghp_1a2B3c4D5e6F7g8H9i0J1k2L3m4N5o6P7q8R9s0T") {
+    fmt.Println("Valid high-entropy token")
+}
+```
+
+### Java
+
+```java
+import com.patternengine.verification.Verification;
+
+if (Verification.highEntropyToken("ghp_1a2B3c4D5e6F7g8H9i0J1k2L3m4N5o6P7q8R9s0T")) {
+    System.out.println("Valid high-entropy token");
+}
 ```
 
 ## Function Signature

@@ -1,0 +1,51 @@
+namespace: sox
+description: SOX Compliance and Financial Data patterns
+
+patterns:
+  - id: sox_gl_account
+    location: sox
+    category: financial
+    description: General Ledger Account Number (Common 4-6 digit format)
+    pattern: '[1-9][0-9]{3,5}'
+    mask: "****"
+    examples:
+      match:
+        - "1001"
+        - "400010"
+      nomatch:
+        - "0123"
+        - "123"
+    policy:
+      store_raw: false
+      action_on_match: report
+      severity: medium
+    match_type: exactly_matches
+    langs:
+      python: '[1-9][0-9]{3,5}'
+      go: '[1-9][0-9]{3,5}'
+      java: '[1-9][0-9]{3,5}'
+      javascript: '[1-9][0-9]{3,5}'
+
+  - id: sox_revenue_transaction
+    location: sox
+    category: financial
+    description: Revenue Transaction Reference (prefix REV- followed by digits)
+    pattern: 'REV-[0-9]{6,12}'
+    mask: "REV-***"
+    examples:
+      match:
+        - "REV-123456"
+        - "REV-987654321012"
+      nomatch:
+        - "REV-12345"
+        - "RE-123456"
+    policy:
+      store_raw: true
+      action_on_match: report
+      severity: high
+    match_type: exactly_matches
+    langs:
+      python: 'REV-[0-9]{6,12}'
+      go: 'REV-[0-9]{6,12}'
+      java: 'REV-[0-9]{6,12}'
+      javascript: 'REV-[0-9]{6,12}'

@@ -2892,6 +2892,158 @@ def finland_hetu_valid(value: str) -> bool:
     return check_char == expected_check
 
 
+def jp_corporate_number_valid(value: str) -> bool:
+    """
+    Verify Japanese Corporate Number (法人番号) checksum.
+    13 digits, the 1st digit is the check digit.
+    Weights 1-2-1-2... for positions 1-12 of the base number.
+    Check digit = 9 - (sum % 9).
+    """
+    digits = "".join(c for c in value if c.isdigit())
+    if len(digits) != 13:
+        return False
+
+    check_digit = int(digits[0])
+    base_digits = [int(d) for d in digits[1:]]
+
+    # Weights: leftmost of base is weight 2, then 1, 2, 1...
+    # index 11 (rightmost) weight 1, index 10 weight 2...
+    total = 0
+    for i in range(12):
+        weight = 2 if (12 - i) % 2 == 0 else 1
+        total += base_digits[i] * weight
+
+    remainder = total % 9
+    expected_check = 9 - remainder
+    return check_digit == expected_check
+
+
+def tw_ubn_valid(value: str) -> bool:
+    """
+    Verify Taiwan Unified Business Number (UBN).
+    8 digits, checksum weights: 1,2,1,2,1,2,4,1.
+    """
+    digits = "".join(c for c in value if c.isdigit())
+    if len(digits) != 8:
+        return False
+
+    weights = [1, 2, 1, 2, 1, 2, 4, 1]
+    total = 0
+    for i in range(8):
+        prod = int(digits[i]) * weights[i]
+        total += (prod // 10) + (prod % 10)
+
+    if total % 10 == 0:
+        return True
+
+    # Special case: if 7th digit is 7 and check fails
+    if digits[6] == "7" and (total + 1) % 10 == 0:
+        return True
+
+    return False
+
+
+def us_npi_valid(value: str) -> bool:
+    """
+    Verify US National Provider Identifier (NPI).
+    10 digits, Luhn check on '80840' + first 9 digits.
+    """
+    digits = "".join(c for c in value if c.isdigit())
+    if len(digits) != 10:
+        return False
+
+    # Prefix 80840 + first 9 digits
+    full_str = "80840" + digits[:9]
+
+    # Luhn calculation for first 14 digits (80840 + 9 digits)
+    luhn_total = 0
+    rev_digits = [int(d) for d in full_str[::-1]]
+    for i, d in enumerate(rev_digits):
+        # Even positions from right (0-indexed) are doubled because
+        # the check digit at position -1 would be the first.
+        if i % 2 == 0:
+            d *= 2
+            if d > 9:
+                d -= 9
+        luhn_total += d
+
+    expected_check = (10 - (luhn_total % 10)) % 10
+    return int(digits[9]) == expected_check
+
+
+def uk_nino_valid(value: str) -> bool:
+    """
+    Verify UK National Insurance Number (NINO).
+    Format: 2 letters, 6 digits, 1 letter.
+    """
+    import re
+
+    # Standard NINO regex
+    pattern = r"^[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z]\d{6}[A-D]$"
+    if not re.match(pattern, value.upper()):
+        return False
+
+    # Exclude certain prefixes
+    prefix = value[:2].upper()
+    if prefix in ("BG", "GB", "KN", "NK", "NT", "TN", "ZZ"):
+        return False
+
+    return True
+
+
+def swift_bic_valid(value: str) -> bool:
+    """Verify SWIFT/BIC code (8 or 11 chars)."""
+    val = value.replace(" ", "").upper()
+    if len(val) not in (8, 11):
+        return False
+
+    import re
+
+    return bool(re.match(r"^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$", val))
+
+
+def aws_access_key_valid(value: str) -> bool:
+    """Verify AWS Access Key (Starts with AKIA/ASIA, length 20)."""
+    if len(value) != 20:
+        return False
+    if not (value.startswith("AKIA") or value.startswith("ASIA")):
+        return False
+    return all(c.isalnum() for c in value)
+
+
+def google_api_key_valid(value: str) -> bool:
+    """Verify Google API Key (Starts with AIza, length 39)."""
+    if len(value) != 39:
+        return False
+    if not value.startswith("AIza"):
+        return False
+    import re
+
+    return bool(re.match(r"^[A-Za-z0-9_-]{39}$", value))
+
+
+def crypto_btc_valid(value: str) -> bool:
+    """Verify Bitcoin address (Base58, length 26-35)."""
+    if not (26 <= len(value) <= 35):
+        return False
+
+    # Base58 character set: no 0, O, I, l
+    base58_chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+    return all(c in base58_chars for c in value)
+
+
+def crypto_eth_valid(value: str) -> bool:
+    """Verify Ethereum address (Starts with 0x, 40 hex chars)."""
+    if len(value) != 42:
+        return False
+    if not value.startswith("0x"):
+        return False
+
+    import re
+
+    return bool(re.match(r"^0x[0-9a-fA-F]{40}$", value))
+
+
 # Registry of verification functions
 VERIFICATION_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
     "iban_mod97": iban_mod97,
@@ -2930,6 +3082,15 @@ VERIFICATION_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
     "in_pincode_valid": in_pincode_valid,
     # Japanese
     "jp_my_number_valid": jp_my_number_valid,
+    "jp_corporate_number_valid": jp_corporate_number_valid,
+    "tw_ubn_valid": tw_ubn_valid,
+    "us_npi_valid": us_npi_valid,
+    "uk_nino_valid": uk_nino_valid,
+    "swift_bic_valid": swift_bic_valid,
+    "aws_access_key_valid": aws_access_key_valid,
+    "google_api_key_valid": google_api_key_valid,
+    "crypto_btc_valid": crypto_btc_valid,
+    "crypto_eth_valid": crypto_eth_valid,
     # European IDs
     "spain_dni_valid": spain_dni_valid,
     "spain_nie_valid": spain_nie_valid,

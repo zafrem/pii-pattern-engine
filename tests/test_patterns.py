@@ -21,19 +21,23 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "verification" / "python")
 from verification import get_verification_function
 
 
-def compile_pattern_with_flags(pattern_dict: Dict[str, Any]) -> re.Pattern:
+def compile_pattern_with_flags(pattern_dict: Dict[str, Any], lang: str = "python") -> re.Pattern:
     """
     Compile a regex pattern with appropriate flags from the pattern dictionary.
+    Prioritizes language-specific patterns if available.
 
     Args:
         pattern_dict: Pattern dictionary from YAML file
+        lang: Target language for pattern selection
 
     Returns:
         Compiled regex pattern
     """
     pattern_str = pattern_dict.get("pattern", "")
+    if "langs" in pattern_dict and lang in pattern_dict["langs"]:
+        pattern_str = pattern_dict["langs"][lang]
+    
     flags = 0
-
     # Handle flags if specified
     if "flags" in pattern_dict:
         flag_list = pattern_dict["flags"]
@@ -54,6 +58,7 @@ def compile_pattern_with_flags(pattern_dict: Dict[str, Any]) -> re.Pattern:
 def compile_pattern_with_flags_re2(pattern_dict: Dict[str, Any]):
     """
     Compile a regex pattern with google-re2 and appropriate flags.
+    Prioritizes 'go' language pattern if available.
 
     Args:
         pattern_dict: Pattern dictionary from YAML file
@@ -62,6 +67,8 @@ def compile_pattern_with_flags_re2(pattern_dict: Dict[str, Any]):
         Compiled re2 pattern
     """
     pattern_str = pattern_dict.get('pattern', '')
+    if "langs" in pattern_dict and "go" in pattern_dict["langs"]:
+        pattern_str = pattern_dict["langs"]["go"]
 
     # Build options for re2
     options = re2.Options()
@@ -137,7 +144,7 @@ class TestPatternStructure:
     @pytest.mark.parametrize("file_path,pattern", PATTERN_TEST_DATA)
     def test_pattern_has_required_fields(self, file_path, pattern):
         """Test that each pattern has required fields."""
-        required_fields = ["id", "location", "category", "description", "pattern"]
+        required_fields = ["id", "location", "category", "description", "pattern", "match_type"]
         for field in required_fields:
             assert field in pattern, (
                 f"{file_path} pattern {pattern.get('id', 'unknown')} " f"missing '{field}'"
@@ -190,11 +197,16 @@ class TestPatternRE2:
 
         pattern_id = pattern['id']
         regex = compile_pattern_with_flags_re2(pattern)
+        match_type = pattern.get("match_type", "exactly_matches")
 
         for example in pattern['examples']['match']:
             example_str = str(example)
-            assert regex.search(example_str), \
-                f"{file_path} pattern {pattern_id} should match '{example_str}' with RE2"
+            if match_type == "exactly_matches":
+                assert regex.fullmatch(example_str), \
+                    f"{file_path} pattern {pattern_id} should exactly match '{example_str}' with RE2"
+            else:
+                assert regex.search(example_str), \
+                    f"{file_path} pattern {pattern_id} should match '{example_str}' with RE2"
 
     @pytest.mark.parametrize("file_path,pattern", PATTERN_TEST_DATA)
     def test_nomatch_examples_with_re2(self, file_path, pattern):
@@ -210,13 +222,17 @@ class TestPatternRE2:
         regex = compile_pattern_with_flags_re2(pattern)
         has_verification = 'verification' in pattern
         verification_func = None
+        match_type = pattern.get("match_type", "exactly_matches")
 
         if has_verification:
             verification_func = get_verification_function(pattern['verification'])
 
         for example in pattern['examples']['nomatch']:
             example_str = str(example)
-            match = regex.search(example_str)
+            if match_type == "exactly_matches":
+                match = regex.fullmatch(example_str)
+            else:
+                match = regex.search(example_str)
 
             if not match:
                 # Regex doesn't match - this is expected for nomatch examples
@@ -247,12 +263,18 @@ class TestPatternMatching:
 
         pattern_id = pattern["id"]
         regex = compile_pattern_with_flags(pattern)
+        match_type = pattern.get("match_type", "exactly_matches")
 
         for example in pattern["examples"]["match"]:
             example_str = str(example)  # Handle both string and numeric examples
-            assert regex.search(
-                example_str
-            ), f"{file_path} pattern {pattern_id} should match '{example_str}'"
+            if match_type == "exactly_matches":
+                assert regex.fullmatch(
+                    example_str
+                ), f"{file_path} pattern {pattern_id} should exactly match '{example_str}'"
+            else:
+                assert regex.search(
+                    example_str
+                ), f"{file_path} pattern {pattern_id} should match '{example_str}'"
 
     @pytest.mark.parametrize("file_path,pattern", PATTERN_TEST_DATA)
     def test_nomatch_examples(self, file_path, pattern):
@@ -268,13 +290,17 @@ class TestPatternMatching:
         regex = compile_pattern_with_flags(pattern)
         has_verification = "verification" in pattern
         verification_func = None
+        match_type = pattern.get("match_type", "exactly_matches")
 
         if has_verification:
             verification_func = get_verification_function(pattern["verification"])
 
         for example in pattern["examples"]["nomatch"]:
             example_str = str(example)  # Handle both string and numeric examples
-            match = regex.search(example_str)
+            if match_type == "exactly_matches":
+                match = regex.fullmatch(example_str)
+            else:
+                match = regex.search(example_str)
 
             if not match:
                 # Regex doesn't match - this is expected for nomatch examples
@@ -325,10 +351,15 @@ class TestPatternVerification:
         verification_func = get_verification_function(verification_name)
         pattern_id = pattern["id"]
         regex = compile_pattern_with_flags(pattern)
+        match_type = pattern.get("match_type", "exactly_matches")
 
         for example in pattern["examples"]["match"]:
             example_str = str(example)
-            match = regex.search(example_str)
+            if match_type == "exactly_matches":
+                match = regex.fullmatch(example_str)
+            else:
+                match = regex.search(example_str)
+            
             if match:
                 matched_text = match.group(0)
                 msg = (
@@ -356,11 +387,16 @@ class TestPatternVerification:
         verification_func = get_verification_function(verification_name)
         pattern_id = pattern["id"]
         regex = compile_pattern_with_flags(pattern)
+        match_type = pattern.get("match_type", "exactly_matches")
 
         # Only test examples that match the regex (verification should reject these)
         for example in pattern["examples"]["nomatch"]:
             example_str = str(example)
-            match = regex.search(example_str)
+            if match_type == "exactly_matches":
+                match = regex.fullmatch(example_str)
+            else:
+                match = regex.search(example_str)
+            
             if match:
                 # This example matches the regex, so verification should reject it
                 matched_text = match.group(0)

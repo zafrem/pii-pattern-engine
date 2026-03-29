@@ -21,6 +21,8 @@ categories:
       - 電子郵件
       - 邮箱
       - 电邮
+      - correo electrónico
+      - courriel
     contexts:
       - "Email:"
       - "E-mail:"
@@ -28,6 +30,8 @@ categories:
       - "이메일:"
       - "メールアドレス:"
       - "电子邮箱:"
+      - "Correo:"
+      - "Courriel:"
 
   phone:
     description: Phone numbers
@@ -53,6 +57,10 @@ categories:
       - 联系电话
       - 電話號碼
       - 手机
+      - teléfono
+      - móvil
+      - celular
+      - portable
     contexts:
       - "Phone:"
       - "Tel:"
@@ -61,6 +69,9 @@ categories:
       - "전화번호:"
       - "携帯番号:"
       - "电话:"
+      - "Teléfono:"
+      - "Móvil:"
+      - "Téléphone:"
 
   address:
     description: Physical addresses
@@ -81,6 +92,8 @@ categories:
       - 地址
       - 邮编
       - 郵遞區號
+      - dirección
+      - adresse
     contexts:
       - "Address:"
       - "Street:"
@@ -89,6 +102,8 @@ categories:
       - "주소:"
       - "住所:"
       - "地址:"
+      - "Dirección:"
+      - "Adresse:"
 
   zipcode:
     description: Postal/ZIP codes
@@ -103,12 +118,17 @@ categories:
       - 郵便番号
       - 邮编
       - 郵遞區號
+      - código postal
+      - cp
+      - code postal
     contexts:
       - "ZIP:"
       - "Postal Code:"
       - "우편번호:"
       - "郵便番号:"
       - "邮编:"
+      - "C.P.:"
+      - "CP:"
 
 metadata:
   related_categories:

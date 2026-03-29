@@ -1,5 +1,5 @@
 category: address
-description: Keywords related to physical addresses (US and KR)
+description: Keywords related to physical addresses (US, KR, JP, CN, ES, FR)
 
 categories:
   address_us:
@@ -209,6 +209,82 @@ categories:
       - "省:"
       - "市:"
       - "区:"
+
+  address_es:
+    description: Spanish Address indicators
+    patterns:
+      - calle
+      - c/
+      - avenida
+      - av.
+      - plaza
+      - pl.
+      - paseo
+      - p.º
+      - carretera
+      - ctra.
+      - código postal
+      - cp
+      - c.p.
+      - provincia
+      - municipio
+      - comunidad autónoma
+      - piso
+      - puerta
+      # Major Cities (Anchors)
+      - Madrid
+      - Barcelona
+      - Valencia
+      - Sevilla
+      - Zaragoza
+      - Málaga
+      - Murcia
+      - Palma
+      - Las Palmas
+      - Bilbao
+    contexts:
+      - "Dirección:"
+      - "C.P.:"
+      - "Provincia:"
+      - "Ciudad:"
+
+  address_fr:
+    description: French Address indicators
+    patterns:
+      - rue
+      - avenue
+      - ave
+      - boulevard
+      - blvd
+      - place
+      - pl
+      - route
+      - rte
+      - impasse
+      - imp
+      - code postal
+      - cp
+      - ville
+      - département
+      - région
+      - étage
+      - appartement
+      - apt
+      # Major Cities (Anchors)
+      - Paris
+      - Marseille
+      - Lyon
+      - Toulouse
+      - Nice
+      - Nantes
+      - Montpellier
+      - Strasbourg
+      - Bordeaux
+      - Lille
+    contexts:
+      - "Adresse:"
+      - "Code Postal:"
+      - "Ville:"
 
 metadata:
   severity: medium

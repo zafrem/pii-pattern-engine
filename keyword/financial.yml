@@ -44,6 +44,14 @@ categories:
       - 户名
       - 收款人
       - 账户名
+      - banco
+      - cuenta
+      - número de cuenta
+      - banque
+      - compte
+      - numéro de compte
+      - titulaire
+      - bénéficiaire
     contexts:
       - "bank account:"
       - "account number:"
@@ -52,6 +60,8 @@ categories:
       - "口座番号:"
       - "银行账号:"
       - "예금주:"
+      - "Cuenta:"
+      - "Numéro de compte:"
 
   credit_card:
     description: Credit card numbers and related terms
@@ -79,6 +89,10 @@ categories:
       - カード番号
       - 信用卡
       - 卡号
+      - tarjeta de crédito
+      - tarjeta de débito
+      - carte de crédit
+      - carte de débit
     contexts:
       - "card number:"
       - "credit card:"
@@ -87,6 +101,8 @@ categories:
       - "카드번호:"
       - "カード番号:"
       - "信用卡号:"
+      - "Tarjeta:"
+      - "Carte:"
 
   iban:
     description: International Bank Account Number

@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 # Add verification module to path
-sys.path.insert(0, str(Path(__file__).parent / "verification" / "python"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "verification" / "python"))
 
 from verification import korean_name_valid
 

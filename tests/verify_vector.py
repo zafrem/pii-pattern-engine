@@ -6,7 +6,7 @@ from pathlib import Path
 os.environ["ENABLE_KOREAN_VECTOR_VERIFICATION"] = "true"
 
 # Add verification module to path
-sys.path.insert(0, str(Path(__file__).parent / "verification" / "python"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "verification" / "python"))
 
 from verification import korean_name_valid, get_vector_similarity_score
 

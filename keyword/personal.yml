@@ -22,6 +22,10 @@ categories:
       - 氏名
       - 姓名
       - 名字
+      - nombre
+      - apellido
+      - nom
+      - prénom
     contexts:
       - "Name:"
       - "Full Name:"
@@ -30,6 +34,10 @@ categories:
       - "이름:"
       - "氏名:"
       - "姓名:"
+      - "Nombre:"
+      - "Apellido:"
+      - "Nom:"
+      - "Prénom:"
 
   date_of_birth:
     description: Date of birth
@@ -46,6 +54,8 @@ categories:
       - 생일
       - 生年月日
       - 出生日期
+      - fecha de nacimiento
+      - date de naissance
     contexts:
       - "DOB:"
       - "Date of Birth:"
@@ -54,6 +64,8 @@ categories:
       - "생일:"
       - "生年月日:"
       - "出生日期:"
+      - "Fecha de nacimiento:"
+      - "Date de naissance:"
 
   age:
     description: Age information
@@ -63,11 +75,15 @@ categories:
       - 나이
       - 年齢
       - 年龄
+      - edad
+      - âge
     contexts:
       - "Age:"
       - "Years old:"
       - "나이:"
       - "年齢:"
+      - "Edad:"
+      - "Âge:"
 
   gender:
     description: Gender information
@@ -79,12 +95,18 @@ categories:
       - 성별
       - 性別
       - 性别
+      - género
+      - sexo
+      - genre
+      - sexe
     contexts:
       - "Gender:"
       - "Sex:"
       - "성별:"
       - "性別:"
       - "性别:"
+      - "Género:"
+      - "Sexe:"
 
   nationality:
     description: Nationality/citizenship
@@ -95,11 +117,15 @@ categories:
       - country of citizenship
       - 국적
       - 国籍
+      - nacionalidad
+      - nationalité
     contexts:
       - "Nationality:"
       - "Citizenship:"
       - "국적:"
       - "国籍:"
+      - "Nacionalidad:"
+      - "Nationalité:"
 
 metadata:
   related_categories:

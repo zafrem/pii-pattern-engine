@@ -50,12 +50,16 @@ categories:
       - パスポート番号
       - 护照
       - 護照號碼
+      - pasaporte
+      - passeport
     contexts:
       - "Passport #:"
       - "Passport Number:"
       - "여권번호:"
       - "パスポート番号:"
       - "护照号码:"
+      - "Pasaporte:"
+      - "Passeport:"
 
   national_id:
     description: National identification numbers
@@ -79,6 +83,13 @@ categories:
       - pan card
       - nric
       - ic number
+      - dni
+      - documento nacional de identidad
+      - nie
+      - cif
+      - cni
+      - carte nationale d'identité
+      - nir
     contexts:
       - "ID Number:"
       - "National ID:"
@@ -86,6 +97,11 @@ categories:
       - "身份证号:"
       - "マイナンバー:"
       - "Aadhaar:"
+      - "DNI:"
+      - "NIE:"
+      - "CIF:"
+      - "CNI:"
+      - "NIR:"
 
   drivers_license:
     description: Driver's license numbers
@@ -104,12 +120,17 @@ categories:
       - 免許証
       - 驾驶证
       - 駕駛執照
+      - licencia de conducir
+      - carnet de conducir
+      - permis de conduire
     contexts:
       - "Driver's License:"
       - "DL#:"
       - "License No:"
       - "운전면허번호:"
       - "運転免許証番号:"
+      - "Licencia:"
+      - "Permis:"
 
 metadata:
   related_categories:

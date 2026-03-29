@@ -191,6 +191,11 @@ _templates/
 *.db
 *.sqlite
 
+# Generated PII training data (contains fake but realistic PII — do not upload)
+ml/data/
+local_llm/data/
+local_llm/output/
+
 # Logs
 *.log
 logs/

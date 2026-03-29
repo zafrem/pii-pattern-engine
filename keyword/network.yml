@@ -27,6 +27,8 @@ categories:
       - IP주소
       - IPアドレス
       - IP地址
+      - dirección IP
+      - adresse IP
     contexts:
       - "IP:"
       - "IP Address:"
@@ -36,6 +38,7 @@ categories:
       - "Destination:"
       - "Client IP:"
       - "IP地址:"
+      - "IP:"
 
   url:
     description: URLs and web addresses
@@ -58,12 +61,18 @@ categories:
       - 链接
       - 网址
       - 网页
+      - enlace
+      - sitio web
+      - lien
+      - site web
     contexts:
       - "URL:"
       - "Link:"
       - "Website:"
       - "Endpoint:"
       - "网址:"
+      - "Enlace:"
+      - "Lien:"
 
   mac_address:
     description: MAC addresses
@@ -78,11 +87,14 @@ categories:
       - MACアドレス
       - MAC地址
       - 物理地址
+      - dirección física
+      - adresse physique
     contexts:
       - "MAC:"
       - "MAC Address:"
       - "Hardware Address:"
       - "MAC地址:"
+      - "Dirección física:"
 
 metadata:
   related_categories:

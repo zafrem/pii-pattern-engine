@@ -7,7 +7,7 @@ patterns:
   description: Generic high-entropy token (20+ chars, base64url/hex, high entropy)
   pattern: '[A-Za-z0-9_\-+/=.]{20,}'
   verification: high_entropy_token
-  priority: 50
+  priority: 100
   mask: '[REDACTED_TOKEN]'
   examples:
     match:
@@ -63,7 +63,7 @@ patterns:
   location: comm
   category: token
   description: AWS Secret Access Key (40 chars, base64)
-  pattern: '[A-Za-z0-9/+=]{40}'
+  pattern: \b[A-Za-z0-9/+=]{40}\b
   verification: high_entropy_token
   priority: 5
   mask: '[REDACTED_AWS_SECRET]'
@@ -83,10 +83,10 @@ patterns:
     type: Secret Access Key
   match_type: exactly_matches
   langs:
-    python: '[A-Za-z0-9/+=]{40}'
-    go: '[A-Za-z0-9/+=]{40}'
-    java: '[A-Za-z0-9/+=]{40}'
-    javascript: '[A-Za-z0-9/+=]{40}'
+    python: \b[A-Za-z0-9/+=]{40}\b
+    go: \b[A-Za-z0-9/+=]{40}\b
+    java: \b[A-Za-z0-9/+=]{40}\b
+    javascript: \b[A-Za-z0-9/+=]{40}\b
 - id: github_token_01
   location: comm
   category: token
@@ -234,7 +234,7 @@ patterns:
   description: Generic API key pattern (32+ random chars without common prefixes)
   pattern: '[A-Za-z0-9_\-+/=]{32,}'
   verification: high_entropy_token
-  priority: 60
+  priority: 110
   mask: '[REDACTED_API_KEY]'
   examples:
     match:

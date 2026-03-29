@@ -70,7 +70,7 @@ patterns:
   location: kr
   category: address
   description: Korean postal code (5 digits)
-  pattern: '[0-9]{5}'
+  pattern: \b[0-9]{5}\b
   verification: korean_zipcode_valid
   mask: '*****'
   examples:
@@ -100,10 +100,10 @@ patterns:
       Uses verification to reject sequential numbers, repeated digits, and timestamps.
   match_type: exactly_matches
   langs:
-    python: '[0-9]{5}'
-    go: '[0-9]{5}'
-    java: '[0-9]{5}'
-    javascript: '[0-9]{5}'
+    python: \b[0-9]{5}\b
+    go: \b[0-9]{5}\b
+    java: \b[0-9]{5}\b
+    javascript: \b[0-9]{5}\b
 - id: korean_name_01
   location: kr
   category: name

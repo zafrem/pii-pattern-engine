@@ -505,6 +505,12 @@ def jp_zipcode_valid(value: str) -> bool:
     if is_sequential_up or is_sequential_down:
         return False
 
+    # Valid Japanese postal code prefixes range from 001 to 999
+    # but 000 and 999 are not assigned to any prefecture
+    prefix = int(digits_only[:3])
+    if prefix == 0 or prefix >= 999:
+        return False
+
     return True
 
 

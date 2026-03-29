@@ -5,7 +5,7 @@ patterns:
   location: us
   category: address
   description: US ZIP code (5 digits or ZIP+4)
-  pattern: '[0-9]{5}(?:-[0-9]{4})?'
+  pattern: \b[0-9]{5}(?:-[0-9]{4})?\b
   verification: us_zipcode_valid
   mask: '*****'
   examples:
@@ -36,10 +36,10 @@ patterns:
       Uses verification to reject sequential/repetitive patterns.
   match_type: exactly_matches
   langs:
-    python: '[0-9]{5}(?:-[0-9]{4})?'
-    go: '[0-9]{5}(?:-[0-9]{4})?'
-    java: '[0-9]{5}(?:-[0-9]{4})?'
-    javascript: '[0-9]{5}(?:-[0-9]{4})?'
+    python: \b[0-9]{5}(?:-[0-9]{4})?\b
+    go: \b[0-9]{5}(?:-[0-9]{4})?\b
+    java: \b[0-9]{5}(?:-[0-9]{4})?\b
+    javascript: \b[0-9]{5}(?:-[0-9]{4})?\b
 - id: ein_01
   location: us
   category: other

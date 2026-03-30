@@ -141,6 +141,7 @@ patterns:
   category: bank
   description: Rakuten Bank account (0036-XXX-XXXXXXX)
   pattern: 0036-?[0-9]{3}-?[0-9]{7}
+  verification: generic_number_not_timestamp
   mask: 0036-***-*******
   examples:
     match:

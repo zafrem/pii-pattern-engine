@@ -383,20 +383,11 @@ def not_timestamp(value: str) -> bool:
 def korean_zipcode_valid(value: str) -> bool:
     """
     Verify Korean postal code is valid.
-
-    Checks against kr_zipcodes.csv if available, otherwise uses heuristics.
     """
-    # 1. Data-driven check if data exists
-    valid_zips = _load_data_file("kr_zipcodes.csv")
-    if valid_zips:
-        return value in valid_zips or value.replace("-", "") in valid_zips
-
-    # 2. Heuristic fallback
-    # Remove any separators
     digits_only = "".join(c for c in value if c.isdigit())
-
     if len(digits_only) != 5:
         return False
+    return "0" <= digits_only[0] <= "6"
 
     # Reject sequential patterns (12345, 54321, etc.)
     is_sequential_up = all(
@@ -1335,6 +1326,8 @@ CHINESE_NON_NAME_KEYWORDS = {
     "公司",
     "部门",
     "部門",
+    "任务",
+    "任務",
 }
 
 
@@ -2114,44 +2107,56 @@ def not_repeating_pattern(value: str) -> bool:
     Returns:
         True if NOT a repeating pattern, False if is a repeating pattern
     """
-    if not value or len(value) < 4:
+    if not value:
         return True
 
-    # Check all same character
-    if len(set(value)) == 1:
+    # Normalize for numeric strings (remove hyphens, spaces)
+    normalized = "".join(c for c in value if c.isdigit())
+    if not normalized:
+        # If no digits, use the original string for basic checks
+        normalized = value
+
+    # Check all same character (VERY IMPORTANT for 010-0000-0000)
+    if len(set(normalized)) == 1:
         return False
 
+    if len(normalized) < 4:
+        return True
+
     # Check for sequential digits
-    digits_only = "".join(c for c in value if c.isdigit())
-    if len(digits_only) >= 4:
+    if normalized.isdigit() and len(normalized) >= 4:
         is_ascending = all(
-            int(digits_only[i]) == int(digits_only[i - 1]) + 1
-            for i in range(1, len(digits_only))
+            int(normalized[i]) == int(normalized[i - 1]) + 1
+            for i in range(1, len(normalized))
         )
         is_descending = all(
-            int(digits_only[i]) == int(digits_only[i - 1]) - 1
-            for i in range(1, len(digits_only))
+            int(normalized[i]) == int(normalized[i - 1]) - 1
+            for i in range(1, len(normalized))
         )
         if is_ascending or is_descending:
             return False
 
     # Check for 2-char repeating pattern
-    if len(value) >= 4:
-        pattern2 = value[:2]
-        if pattern2 * (len(value) // 2) == value[: len(pattern2) * (len(value) // 2)]:
+    if len(normalized) >= 4:
+        pattern2 = normalized[:2]
+        if pattern2 * (len(normalized) // 2) == normalized[
+            : len(pattern2) * (len(normalized) // 2)
+        ]:
             if (
-                len(value) % 2 == 0
-                or value[-(len(value) % 2) :] == pattern2[: len(value) % 2]
+                len(normalized) % 2 == 0
+                or normalized[-(len(normalized) % 2) :] == pattern2[: len(normalized) % 2]
             ):
                 return False
 
     # Check for 3-char repeating pattern
-    if len(value) >= 6:
-        pattern3 = value[:3]
-        if pattern3 * (len(value) // 3) == value[: len(pattern3) * (len(value) // 3)]:
+    if len(normalized) >= 6:
+        pattern3 = normalized[:3]
+        if pattern3 * (len(normalized) // 3) == normalized[
+            : len(pattern3) * (len(normalized) // 3)
+        ]:
             if (
-                len(value) % 3 == 0
-                or value[-(len(value) % 3) :] == pattern3[: len(value) % 3]
+                len(normalized) % 3 == 0
+                or normalized[-(len(normalized) % 3) :] == pattern3[: len(normalized) % 3]
             ):
                 return False
 
@@ -2454,11 +2459,6 @@ def kr_corporate_registration_valid(value: str) -> bool:
 
     Format: XXXXXX-XXXXXXX (13 digits)
 
-    Checksum algorithm:
-    - Weights: [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
-    - For each product > 9, subtract 9
-    - Check digit = (10 - (sum % 10)) % 10
-
     Args:
         value: Corporate registration number string
 
@@ -2471,21 +2471,15 @@ def kr_corporate_registration_valid(value: str) -> bool:
     if len(digits) != 13:
         return False
 
-    # Reject all same digits
-    if len(set(digits)) == 1:
-        return False
-
     # Checksum calculation
     weights = [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
     total = 0
 
     for i in range(12):
-        product = int(digits[i]) * weights[i]
-        if product > 9:
-            product -= 9
-        total += product
+        total += int(digits[i]) * weights[i]
 
     check_digit = (10 - (total % 10)) % 10
+    return int(digits[12]) == check_digit
 
     return int(digits[12]) == check_digit
 
@@ -3050,6 +3044,141 @@ def crypto_eth_valid(value: str) -> bool:
     return bool(re.match(r"^0x[0-9a-fA-F]{40}$", value))
 
 
+def imei_valid(value: str) -> bool:
+    """
+    Verify 15-digit IMEI using Luhn algorithm.
+
+    Args:
+        value: IMEI string
+
+    Returns:
+        True if valid 15-digit IMEI, False otherwise
+    """
+    digits_only = "".join(c for c in value if c.isdigit())
+    if len(digits_only) != 15:
+        return False
+
+    # Check for all zeros or obvious test patterns
+    if len(set(digits_only)) == 1:
+        return False
+
+    return luhn(digits_only)
+
+
+def mac_address_valid(value: str) -> bool:
+    """
+    Verify MAC address format and common exclusion rules.
+
+    Args:
+        value: MAC address string
+
+    Returns:
+        True if likely a valid hardware MAC address, False otherwise
+    """
+    # Normalize: remove separators
+    mac = value.replace(":", "").replace("-", "").replace(" ", "").upper()
+
+    if len(mac) != 12:
+        return False
+
+    # Reject broadcast and null MACs
+    if mac == "FFFFFFFFFFFF" or mac == "000000000000":
+        return False
+
+    return True
+
+
+def kr_vehicle_registration_valid(value: str) -> bool:
+    """
+    Verify Korean vehicle registration plate format.
+
+    Supports:
+    - New format: 123가 4567 (3 digits + Hangul + 4 digits)
+    - Old format: 12가 3456 (2 digits + Hangul + 4 digits)
+
+    Valid Hangul characters for private vehicles:
+    가, 나, 다, 라, 마, 거, 너, 더, 러, 머, 버, 서, 어, 저, 고, 노, 도, 로, 모, 보, 소, 오, 조, 구, 누, 두, 루, 무, 부, 수, 우, 주
+    """
+    import re
+
+    # Remove spaces
+    val = value.replace(" ", "")
+
+    # Private vehicle Hangul set
+    valid_hangul = "가나다라마거너더러머버서어저고노도로모보소오조구누두루무부수우주"
+    # Commercial/Special: 하, 허, 호 (Rental), 바, 사, 아, 자 (Taxi/Bus), 배 (Delivery)
+    valid_hangul += "하허호바사아자배"
+
+    # Use regex to validate parts
+    # Pattern: 2-3 digits + 1 Hangul + 4 digits
+    pattern = rf"^(\d{{2,3}})([{valid_hangul}])(\d{{4}})$"
+    if re.match(pattern, val):
+        return True
+
+    return False
+
+
+def kr_pccc_valid(value: str) -> bool:
+    """
+    Verify Korean Personal Customs Clearance Code (PCCC).
+    Format: P + 12 digits.
+    The last digit is a checksum (currently simplified check).
+    """
+    if not value or len(value) != 13:
+        return False
+
+    if value[0].upper() != "P":
+        return False
+
+    if not value[1:].isdigit():
+        return False
+
+    return True
+
+
+def kr_driver_license_valid(value: str) -> bool:
+    """
+    Verify Korean Driver's License Number.
+    Supports both formats:
+    - New (12 digits): XX-XX-XXXXXX-XX
+    - Old (10 digits): XX-XXXXXX-XX
+    The first 2 digits are region codes (11-28).
+    """
+    digits_only = "".join(c for c in value if c.isdigit())
+    if len(digits_only) not in (10, 12):
+        return False
+
+    # Reject all same digits
+    if len(set(digits_only)) == 1:
+        return False
+
+    region_code = int(digits_only[:2])
+    valid_regions = {11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28}
+
+    if region_code not in valid_regions:
+        return False
+
+    return True
+
+
+def latitude_valid(value: str) -> bool:
+    """Verify decimal latitude is within -90 to 90 range."""
+    try:
+        lat = float(value)
+        return -90.0 <= lat <= 90.0
+    except ValueError:
+        return False
+
+
+def longitude_valid(value: str) -> bool:
+    """Verify decimal longitude is within -180 to 180 range."""
+    try:
+        lon = float(value)
+        return -180.0 <= lon <= 180.0
+    except ValueError:
+        return False
+
+
 # Registry of verification functions
 VERIFICATION_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
     "iban_mod97": iban_mod97,
@@ -3097,6 +3226,13 @@ VERIFICATION_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
     "google_api_key_valid": google_api_key_valid,
     "crypto_btc_valid": crypto_btc_valid,
     "crypto_eth_valid": crypto_eth_valid,
+    "imei_valid": imei_valid,
+    "mac_address_valid": mac_address_valid,
+    "kr_vehicle_registration_valid": kr_vehicle_registration_valid,
+    "kr_pccc_valid": kr_pccc_valid,
+    "kr_driver_license_valid": kr_driver_license_valid,
+    "latitude_valid": latitude_valid,
+    "longitude_valid": longitude_valid,
     # European IDs
     "spain_dni_valid": spain_dni_valid,
     "spain_nie_valid": spain_nie_valid,

@@ -129,7 +129,7 @@ patterns:
     action_on_match: redact
     severity: critical
   metadata:
-    note: CMB cards typically start with 621 and are 16-20 digits total
+    note: CMB (招商银行) cards typically start with 621 and are 16-20 digits total
   match_type: exactly_matches
   langs:
     python: 621[0-9]{13,17}

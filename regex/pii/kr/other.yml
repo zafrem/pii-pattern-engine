@@ -8,27 +8,17 @@ patterns:
   description: Korean Business Registration Number (사업자등록번호)
   pattern: '[0-9]{3}-[0-9]{2}-[0-9]{5}'
   verification: kr_business_registration_valid
-  mask: '***-**-*****'
+  mask: '***-**-****#'
   examples:
     match:
-    - 123-81-00995
-    - 220-81-04569
-    - 214-87-00139
+    - 123-45-67891
     nomatch:
-    - 12-345-67890
-    - 123-456-7890
-    - 123-45-678901
-    - 123-45-678901-2
     - 123-45-67890
-    - 111-11-11111
-    - 000-00-00000
-    - 123-81-009956
+    - 1234567891
   policy:
     store_raw: false
-    action_on_match: report
-    severity: medium
-  metadata:
-    note: 'Exactly 10 digits with hyphens: XXX-XX-XXXXX. Uses checksum verification.'
+    action_on_match: redact
+    severity: high
   match_type: exactly_matches
   langs:
     python: '[0-9]{3}-[0-9]{2}-[0-9]{5}'
@@ -39,106 +29,72 @@ patterns:
   location: kr
   category: other
   description: Korean Corporate Registration Number (법인등록번호)
-  pattern: '[0-9]{6}-?[0-9]{7}'
+  pattern: '[0-9]{6}-[0-9]{7}'
   verification: kr_corporate_registration_valid
-  mask: '******-*******'
+  mask: '******-******#'
   examples:
     match:
-    - 110111-1234568
-    - 134511-2345671
-    - '1801115678906'
+    - 110111-0003204
     nomatch:
-    - 12345-12345678
-    - 123456-123456
     - 123456-1234567
-    - 111111-1111111
-    - 000000-0000000
-    - 110111-123456
-  policy:
-    store_raw: false
-    action_on_match: report
-    severity: medium
-  metadata:
-    note: Uses weighted checksum verification.
-  match_type: exactly_matches
-  langs:
-    python: '[0-9]{6}-?[0-9]{7}'
-    go: '[0-9]{6}-?[0-9]{7}'
-    java: '[0-9]{6}-?[0-9]{7}'
-    javascript: '[0-9]{6}-?[0-9]{7}'
-- id: zipcode_01
-  location: kr
-  category: address
-  description: Korean postal code (5 digits)
-  pattern: \b[0-9]{5}\b
-  verification: korean_zipcode_valid
-  mask: '*****'
-  examples:
-    match:
-    - '06234'
-    - '48058'
-    - '63309'
-    - '50010'
-    nomatch:
-    - '1234'
-    - '123456'
-    - A1234
-    - 1234A
-    - '012345'
-    - '123456789'
-    - '12345'
-    - '11111'
-    - ABC12345
-    - 12345XYZ
-    - MODEL12345A
-  policy:
-    store_raw: false
-    action_on_match: report
-    severity: low
-  metadata:
-    note: Uses word boundaries to prevent matching when embedded in alphanumeric strings.
-      Uses verification to reject sequential numbers, repeated digits, and timestamps.
-  match_type: exactly_matches
-  langs:
-    python: \b[0-9]{5}\b
-    go: \b[0-9]{5}\b
-    java: \b[0-9]{5}\b
-    javascript: \b[0-9]{5}\b
-- id: korean_name_01
-  location: kr
-  category: name
-  description: Korean full name (family name + given name)
-  pattern: '[가-힣]{2,5}'
-  verification: korean_name_valid
-  mask: '***'
-  examples:
-    match:
-    - 김철수
-    - 이영희
-    - 박민수
-    - 최지은
-    - 정현우
-    - 강미영
-    - 조성민
-    - 윤서연
-    nomatch:
-    - 김
-    - abcd
-    - '123'
-    - 가
-    - 맛있어요
-    - 감사해요
-    - 전화번호는
-    - 이메일은
-    - 성명은
-    - 연락처
-    - 주소는
+    - '1234561234568'
   policy:
     store_raw: false
     action_on_match: redact
     severity: high
+  match_type: exactly_matches
+  langs:
+    python: '[0-9]{6}-[0-9]{7}'
+    go: '[0-9]{6}-[0-9]{7}'
+    java: '[0-9]{6}-[0-9]{7}'
+    javascript: '[0-9]{6}-[0-9]{7}'
+- id: zipcode_01
+  location: kr
+  category: other
+  description: Korean Zipcode (5 digits)
+  pattern: '\b[0-4][0-9]{4}\b'
+  verification: korean_zipcode_valid
+  mask: '#####'
+  examples:
+    match:
+    - '06164'
+    - '40000'
+    nomatch:
+    - '50000'
+    - '1234'
+    - '123456'
+  policy:
+    store_raw: true
+    action_on_match: report
+    severity: low
+  match_type: exactly_matches
+  langs:
+    python: '\b[0-4][0-9]{4}\b'
+    go: '\b[0-4][0-9]{4}\b'
+    java: '\b[0-4][0-9]{4}\b'
+    javascript: '\b[0-4][0-9]{4}\b'
+- id: name_01
+  location: kr
+  category: other
+  description: Korean Name (2-5 characters)
+  pattern: '[가-힣]{2,5}'
+  verification: korean_name_valid
+  mask: '*'
+  examples:
+    match:
+    - 김철수
+    - 이영희
+    - 박지성
+    nomatch:
+    - 김
+    - 김철수무궁화
+    - abc
+  policy:
+    store_raw: true
+    action_on_match: report
+    severity: low
   metadata:
-    note: Matches Korean names with known surname prefixes. Uses surname verification
+    note: Detects Korean names with known surname prefixes. Uses surname verification
       to reduce false positives.
   match_type: exactly_matches
   langs:
@@ -146,3 +102,29 @@ patterns:
     go: '[가-힣]{2,5}'
     java: '[가-힣]{2,5}'
     javascript: '[가-힣]{2,5}'
+
+- id: personal_customs_code_01
+  location: kr
+  category: other
+  description: Korean Personal Customs Clearance Code (PCCC)
+  pattern: '[pP][0-9]{12}'
+  verification: kr_pccc_valid
+  mask: 'P************'
+  examples:
+    match:
+    - P123456789012
+    - p123456789012
+    nomatch:
+    - P12345678901
+    - A123456789012
+  policy:
+    store_raw: false
+    action_on_match: report
+    severity: medium
+  match_type: exactly_matches
+  langs:
+    python: '[pP][0-9]{12}'
+    go: '[pP][0-9]{12}'
+    java: '[pP][0-9]{12}'
+    javascript: '[pP][0-9]{12}'
+

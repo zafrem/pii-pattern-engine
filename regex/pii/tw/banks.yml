@@ -35,6 +35,7 @@ patterns:
   category: bank
   description: First Commercial Bank account (007-XXXXXXXXXXXX)
   pattern: 007-?[0-9]{9,13}
+  verification: generic_number_not_timestamp
   mask: 007-*********
   examples:
     match:

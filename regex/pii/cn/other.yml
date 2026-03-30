@@ -70,7 +70,7 @@ patterns:
 - id: chinese_name_01
   location: cn
   category: name
-  description: Chinese name in Simplified Chinese (2-4 characters)
+  description: Simplified Chinese name (2-4 characters)
   pattern: '[一-鿿]{2,4}'
   verification: chinese_name_valid
   mask: '***'
@@ -89,21 +89,15 @@ patterns:
     - abcd
     - '123'
     - A
-    - 好好学习
-    - 天天向上
-    - 黄金
-    - 高度
-    - 方法
-    - 电话
-    - 周围
+    - 学习
     - 任务
   policy:
     store_raw: false
     action_on_match: redact
     severity: high
   metadata:
-    note: Matches Chinese names with known surname prefixes. Uses surname verification
-      to reduce false positives.
+    note: Matches Simplified Chinese names with known surname prefixes. Uses surname
+      verification to reduce false positives.
   match_type: exactly_matches
   langs:
     python: '[一-鿿]{2,4}'

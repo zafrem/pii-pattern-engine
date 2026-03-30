@@ -79,8 +79,8 @@ patterns:
     - abcd
     - '123'
     - A
-    - 好好學習
-    - 天天向上
+    - 學習
+    - 任務
   policy:
     store_raw: false
     action_on_match: redact
@@ -97,8 +97,7 @@ patterns:
 - id: address_simple_01
   location: tw
   category: address
-  description: Taiwan address - simplified pattern (zipcode, city, district, road,
-    number)
+  description: Taiwan address in Traditional Chinese (zipcode, city, district, road, number)
   pattern: (?:\d{3}(?:\d{2})?\s*)?[一-鿿]{1,}(?:市|縣)[一-鿿]{1,}(?:區|鄉|鎮|市)[一-鿿a-zA-Z0-9]+(?:路|街|大道)(?:[一二三四五六七八九十\d]+段)?(?:\d+巷)?(?:\d+弄)?(?:\d+(?:-\d+)?(?:之\d+)?號)
   mask: '***市***區***路***號'
   examples:

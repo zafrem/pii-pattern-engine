@@ -121,6 +121,7 @@ patterns:
   category: credit_card
   description: Diners Club credit card number
   pattern: 3[0689][0-9]{12}
+  verification: credit_card_bin_valid
   mask: '****-******-****'
   examples:
     match:

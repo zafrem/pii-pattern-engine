@@ -40,10 +40,14 @@ categories:
       - 名義人
       - 受取人
       - 账号
+      - 帳號
       - 銀行賬號
+      - 銀行帳號
       - 户名
+      - 戶名
       - 收款人
       - 账户名
+      - 帳戶名
       - banco
       - cuenta
       - número de cuenta
@@ -59,6 +63,7 @@ categories:
       - "계좌번호:"
       - "口座番号:"
       - "银行账号:"
+      - "銀行帳號:"
       - "예금주:"
       - "Cuenta:"
       - "Numéro de compte:"
@@ -89,6 +94,7 @@ categories:
       - カード番号
       - 信用卡
       - 卡号
+      - 卡號
       - tarjeta de crédito
       - tarjeta de débito
       - carte de crédit
@@ -101,6 +107,7 @@ categories:
       - "카드번호:"
       - "カード番号:"
       - "信用卡号:"
+      - "信用卡號:"
       - "Tarjeta:"
       - "Carte:"
 

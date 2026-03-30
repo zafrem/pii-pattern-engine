@@ -172,36 +172,47 @@ categories:
       - "配送先:"
 
   address_cn:
-    description: Chinese Address indicators
+    description: Chinese Address indicators (Mainland)
     patterns:
       - 省
       - 市
       - 区
+      - 區
       - 县
+      - 縣
       - 镇
+      - 鎮
       - 村
       - 路
       - 街
       - 大道
       - 弄
       - 号
+      - 號
       - 室
       - 楼
+      - 樓
       - 单元
+      - 單元
       - 栋
+      - 棟
       - 座
       # Major Cities/Provinces (Anchors)
       - 北京
       - 上海
       - 广州
+      - 廣州
       - 深圳
       - 天津
       - 重庆
+      - 重慶
       - 杭州
       - 成都
       - 武汉
+      - 武漢
       - 西安
       - 苏州
+      - 蘇州
       - 南京
     contexts:
       - "地址:"
@@ -209,6 +220,54 @@ categories:
       - "省:"
       - "市:"
       - "区:"
+      - "區:"
+
+  address_tw:
+    description: Taiwan Address indicators
+    patterns:
+      - 縣
+      - 市
+      - 區
+      - 鄉
+      - 鎮
+      - 里
+      - 鄰
+      - 路
+      - 街
+      - 大道
+      - 段
+      - 巷
+      - 弄
+      - 衖
+      - 號
+      - 樓
+      - 室
+      # Major Cities/Counties (Anchors)
+      - 台北
+      - 臺北
+      - 新北
+      - 桃園
+      - 台中
+      - 臺中
+      - 台南
+      - 臺南
+      - 高雄
+      - 基隆
+      - 新竹
+      - 嘉義
+      - 屏東
+      - 宜蘭
+      - 花蓮
+      - 台東
+      - 臺東
+    contexts:
+      - "地址:"
+      - "住址:"
+      - "戶籍地址:"
+      - "通訊地址:"
+      - "縣:"
+      - "市:"
+      - "區:"
 
   address_es:
     description: Spanish Address indicators

@@ -99,8 +99,8 @@ patterns:
   examples:
     match:
     - ghp_1a2B3c4D5e6F7g8H9i0J1k2L3m4N5o6P7q8R9s0T1u2V3w4X5y6Z
-    - gho_16C7e42F292c6912E7710c838347Ae178B4a
-    - ghu_16C7e42F292c6912E7710c838347Ae178B4a
+    - gho_qZ_MNalpe5ffOoXBbgi6ohnEHJITLt5oiU2GoO2Y
+    - ghu_1nvUGH61YFVYIS7n0c0_32qheTr0sPIS_jXatgcr
     nomatch:
     - ghp_short
     - github_token_123
@@ -182,8 +182,8 @@ patterns:
   mask: xox*-***************************
   examples:
     match:
-    - xoxb-EXAMPLE-EXAMPLE-ExAmPlEtOkEnFoRtEsTiNg
-    - xoxp-EXAMPLE-EXAMPLE-EXAMPLE-TeSt123ToKeN
+    - xoxb-CFQeOsli2cduwe1UqvoXHEQ9N9iWGgRVRLzBAvwS
+    - xoxp-duStbJ3Ktc3InfzpoTENOjF91pUHFzihpLvMTuMS
     nomatch:
     - xoxb-short
     - xoxz-invalidprefix

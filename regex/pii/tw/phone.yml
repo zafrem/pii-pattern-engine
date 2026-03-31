@@ -82,6 +82,7 @@ patterns:
   category: phone
   description: Taiwan landline number with closing parenthesis
   pattern: 0[2-8]\)[0-9]{7,8}
+  verification: not_repeating_pattern
   mask: 0*-)********
   examples:
     match:

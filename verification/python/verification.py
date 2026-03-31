@@ -303,8 +303,8 @@ def high_entropy_token(value: str) -> bool:
     # High entropy threshold
     # Base64: theoretical max ~6 bits/char, practical ~5-5.5 for random data
     # Hex: theoretical max ~4 bits/char, practical ~3.5-4 for random data
-    # Set threshold at 4.0 to catch both formats while filtering repetitive strings
-    min_entropy = 4.0
+    # Set threshold at 4.5 to filter more strictly for random strings
+    min_entropy = 4.5
 
     return entropy >= min_entropy
 
@@ -2403,7 +2403,56 @@ def kr_alien_registration_valid(value: str) -> bool:
     if len(set(digits)) == 1:
         return False
 
-    return True
+    # Checksum: Similar to RRN but with a +2 offset
+    # Weights: 2, 3, 4, 5, 6, 7, 8, 9, 2, 3, 4, 5
+    weights = [2, 3, 4, 5, 6, 7, 8, 9, 2, 3, 4, 5]
+    total = sum(int(digits[i]) * weights[i] for i in range(12))
+    check_digit = (11 - (total % 11)) % 10
+    check_digit = (check_digit + 2) % 10
+
+    return int(digits[12]) == check_digit
+
+
+def jp_driver_license_valid(value: str) -> bool:
+    """
+    Verify Japanese Driver's License Number (運転免許証番号).
+
+    Format: 12 digits
+    - Digits 1-2: Region code (10-99)
+    - Digits 3-4: Last 2 digits of the year of first issuance
+    - Digits 5-10: Serial number
+    - Digit 11: Check digit (Modulus 11)
+    - Digit 12: Re-issuance count
+
+    Args:
+        value: Driver's license number string
+
+    Returns:
+        True if valid, False otherwise
+    """
+    # Remove hyphens/spaces
+    digits = "".join(c for c in value if c.isdigit())
+
+    if len(digits) != 12:
+        return False
+
+    # Region code (10-99)
+    region_code = int(digits[0:2])
+    if region_code < 10:
+        return False
+
+    # Check digit (11th digit) calculation
+    # Weights for first 10 digits
+    weights = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]
+    total = sum(int(digits[i]) * weights[i] for i in range(10))
+    remainder = total % 11
+
+    if remainder <= 1:
+        expected_check = 0
+    else:
+        expected_check = 11 - remainder
+
+    return int(digits[10]) == expected_check
 
 
 def jp_my_number_valid(value: str) -> bool:
@@ -3210,6 +3259,7 @@ VERIFICATION_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
     "kr_rrn_valid": kr_rrn_valid,
     "kr_alien_registration_valid": kr_alien_registration_valid,
     "kr_corporate_registration_valid": kr_corporate_registration_valid,
+    "jp_driver_license_valid": jp_driver_license_valid,
     # Zipcode verification (JP, CN, TW, IN)
     "jp_zipcode_valid": jp_zipcode_valid,
     "cn_zipcode_valid": cn_zipcode_valid,

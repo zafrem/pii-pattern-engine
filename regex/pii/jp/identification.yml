@@ -70,14 +70,15 @@ patterns:
   category: other
   description: Japanese driver's license (12 digits)
   pattern: '[0-9]{4}-?[0-9]{2}-?[0-9]{6}'
+  verification: jp_driver_license_valid
   mask: '****-**-******'
   examples:
     match:
-    - 1234-56-789012
-    - '123456789012'
-    - 9876-54-321098
-    - 5678-90-123456
-    - '111122334455'
+    - 1234-56-789032
+    - '123456789032'
+    - 9876-54-321038
+    - 5678-90-123486
+    - '111122334415'
     nomatch:
     - 123-456-789012
     - 12345-6-789012

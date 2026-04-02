@@ -353,12 +353,17 @@ func HighEntropyToken(value string) bool {
 		}
 	}
 
+	// Normalize for entropy calculation: lowercase and treat separators as spaces
+	normalized := strings.ToLower(value)
+	normalized = strings.ReplaceAll(normalized, "-", " ")
+	normalized = strings.ReplaceAll(normalized, "_", " ")
+
 	counts := make(map[rune]int)
-	for _, r := range value {
+	for _, r := range normalized {
 		counts[r]++
 	}
 
-	length := float64(len(value))
+	length := float64(len(normalized))
 	entropy := 0.0
 	for _, count := range counts {
 		p := float64(count) / length

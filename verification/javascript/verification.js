@@ -123,12 +123,15 @@ function high_entropy_token(value) {
   const allowedChars = /^[A-Za-z0-9_\-+/./=]+$/;
   if (!allowedChars.test(value)) return false;
 
+  // Normalize for entropy calculation: lowercase and treat separators as spaces
+  const normalized = value.toLowerCase().replace(/[-_]/g, " ");
+
   const charCounts = {};
-  for (const char of value) {
+  for (const char of normalized) {
     charCounts[char] = (charCounts[char] || 0) + 1;
   }
 
-  const length = value.length;
+  const length = normalized.length;
   let entropy = 0;
   for (const count of Object.values(charCounts)) {
     const p = count / length;

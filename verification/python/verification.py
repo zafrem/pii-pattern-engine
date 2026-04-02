@@ -293,9 +293,12 @@ def high_entropy_token(value: str) -> bool:
     if not all(c in allowed_chars for c in value):
         return False
 
+    # Normalize for entropy calculation: lowercase and treat separators as spaces
+    normalized = value.lower().replace("-", " ").replace("_", " ")
+
     # Calculate Shannon entropy
-    char_counts = Counter(value)
-    length = len(value)
+    char_counts = Counter(normalized)
+    length = len(normalized)
     entropy = -sum(
         (count / length) * math.log2(count / length) for count in char_counts.values()
     )

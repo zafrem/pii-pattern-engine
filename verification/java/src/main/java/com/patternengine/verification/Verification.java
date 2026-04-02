@@ -272,13 +272,16 @@ public class Verification {
             if (allowedChars.indexOf(c) == -1) return false;
         }
 
+        // Normalize for entropy calculation: lowercase and treat separators as spaces
+        String normalized = value.toLowerCase().replace('-', ' ').replace('_', ' ');
+
         Map<Character, Integer> counts = new HashMap<>();
-        for (char c : value.toCharArray()) {
+        for (char c : normalized.toCharArray()) {
             counts.put(c, counts.getOrDefault(c, 0) + 1);
         }
 
         double entropy = 0;
-        double length = value.length();
+        double length = normalized.length();
         for (int count : counts.values()) {
             double p = count / length;
             entropy -= p * (Math.log(p) / Math.log(2));

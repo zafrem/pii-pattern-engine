@@ -73,12 +73,14 @@ class StructuralFeatureExtractor(BaseEstimator, TransformerMixin):
                         "\uac00" <= c <= "\ud7af")
         cjk_ratio = cjk_count / max(length, 1)
 
-        # Entropy (character diversity)
-        if length > 0:
+        # Entropy (character diversity) - normalize: lowercase, treat separators as spaces
+        normalized = text.lower().replace("-", " ").replace("_", " ")
+        norm_length = len(normalized)
+        if norm_length > 0:
             freq = {}
-            for c in text:
+            for c in normalized:
                 freq[c] = freq.get(c, 0) + 1
-            entropy = -sum((v / length) * np.log2(v / length) for v in freq.values())
+            entropy = -sum((v / norm_length) * np.log2(v / norm_length) for v in freq.values())
         else:
             entropy = 0.0
 

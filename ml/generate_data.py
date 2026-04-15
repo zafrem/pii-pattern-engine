@@ -412,6 +412,25 @@ def gen_jp_bank(n):
     return samples
 
 
+# ---- English Names ----
+
+def gen_en_name(n, ref_data):
+    surnames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
+                "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
+                "Thomas", "Taylor", "Moore", "Jackson", "Martin"]
+    given = ref_data.get("en_given_names", ["John", "Jane", "James", "Mary", "Robert"])
+    samples = []
+    for _ in range(n):
+        first = random.choice(given)
+        last = random.choice(surnames)
+        if random.random() < 0.2:  # 20% middle name
+            middle = random.choice(given)
+            samples.append(f"{first} {middle} {last}")
+        else:
+            samples.append(f"{first} {last}")
+    return samples
+
+
 # ---- Taiwan ----
 
 def gen_tw_national_id(n):
@@ -741,6 +760,7 @@ GENERATORS_WITH_REF = {
     ("jp", "other", "zipcode_jp"): gen_jp_zipcode,
     ("tw", "other", "zipcode_tw"): gen_tw_zipcode,
     ("in", "other", "pincode_in"): gen_in_pincode,
+    ("comm", "other", "name_en"): gen_en_name,
 }
 
 

@@ -11,12 +11,12 @@ While regex patterns catch structured PII (SSN, phone numbers), LLMs excel at:
 - **Edge cases**: Obfuscated PII like "my ssn is one two three..."
 
 ## Architecture
-
 ```
-pattern-engine/
+pii-pattern-engine/
 ├── regex/          # Rule-based patterns (fast, precise)
 ├── ml/             # sklearn classifiers (medium speed, good accuracy)
 └── local_llm/      # LLM fine-tuning (slower, best contextual understanding)
+```
     ├── generate_instruct_data.py   # Create training dataset
     ├── finetune_qlora.py           # QLoRA fine-tuning script
     ├── predict.py                  # Inference (interactive/batch)

@@ -112,7 +112,7 @@ _DATA_CACHE: Dict[str, Set[str]] = {}
 
 def _get_data_path() -> Path:
     """Determine data directory path."""
-    # Data is in pattern-engine/datas/
+    # Data is in pii-pattern-engine/datas/
     return Path(__file__).parent.parent.parent / "datas"
 
 
@@ -153,7 +153,7 @@ def _get_no_words(lang: str) -> Set[str]:
         return _NO_WORDS_CACHE[lang]
 
     no_words = set()
-    # Configuration is in pattern-engine/keyword/no_words.yml
+    # Configuration is in pii-pattern-engine/keyword/no_words.yml
     config_path = Path(__file__).parent.parent.parent / "keyword" / "no_words.yml"
 
     if config_path.exists():

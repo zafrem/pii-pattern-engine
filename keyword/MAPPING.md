@@ -92,13 +92,11 @@ def get_keywords_for_pattern(pattern_file):
     """Get keyword file for a pattern file."""
     for key, value in PATTERN_KEYWORD_MAP.items():
         if key in pattern_file:
-            return f"regex-patterns/keywords/{value}"
+            return f"pii-pattern-engine/keywords/{value}"
     return None
 ```
 
 ## Category Priority
-
-When multiple categories could apply, use this priority:
 
 1. **identification** - Critical PII (SSN, passport, national ID)
 2. **financial** - Financial data (bank accounts, credit cards)
@@ -118,11 +116,11 @@ def load_patterns_with_keywords(pattern_path):
 
     # Determine keyword file
     if "bank" in pattern_path or "credit" in pattern_path:
-        keyword_file = "regex-patterns/keywords/financial.yml"
+        keyword_file = "pii-pattern-engine/keywords/financial.yml"
     elif "ssn" in pattern_path or "rrn" in pattern_path or "identification" in pattern_path:
-        keyword_file = "regex-patterns/keywords/identification.yml"
+        keyword_file = "pii-pattern-engine/keywords/identification.yml"
     elif "email" in pattern_path or "phone" in pattern_path:
-        keyword_file = "regex-patterns/keywords/contact.yml"
+        keyword_file = "pii-pattern-engine/keywords/contact.yml"
     # ... and so on
 
     return registry, keyword_file
@@ -131,5 +129,5 @@ def load_patterns_with_keywords(pattern_path):
 ## See Also
 
 - [Keywords README](README.md) - Detailed keyword system documentation
-- [Pattern Files](../pii/) - Regex pattern definitions
-- [Verification Functions](../_verification/) - Pattern validation
+- [Pattern Files](../regex/pii/) - Regex pattern definitions
+- [Verification Functions](../verification/) - Pattern validation

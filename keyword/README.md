@@ -58,9 +58,9 @@ metadata:
 - **iban** - International Bank Account Numbers
 
 **Related Patterns:**
-- `regex-patterns/pii/*/banks.yml`
-- `regex-patterns/pii/common/credit-cards.yml`
-- `regex-patterns/pii/iban.yml`
+- `pii-pattern-engine/regex/pii/*/banks.yml`
+- `pii-pattern-engine/regex/pii/common/credit-cards.yml`
+- `pii-pattern-engine/regex/pii/iban.yml`
 
 ### Identification (`identification.yml`)
 - **ssn** - US Social Security Numbers
@@ -70,9 +70,9 @@ metadata:
 - **drivers_license** - Driver's license numbers
 
 **Related Patterns:**
-- `regex-patterns/pii/us/ssn.yml`
-- `regex-patterns/pii/kr/rrn.yml`
-- `regex-patterns/pii/*/identification.yml`
+- `pii-pattern-engine/regex/pii/us/ssn.yml`
+- `pii-pattern-engine/regex/pii/kr/rrn.yml`
+- `pii-pattern-engine/regex/pii/*/identification.yml`
 
 ### Contact (`contact.yml`)
 - **email** - Email addresses
@@ -81,9 +81,9 @@ metadata:
 - **zipcode** - Postal/ZIP codes
 
 **Related Patterns:**
-- `regex-patterns/pii/common/email.yml`
-- `regex-patterns/pii/*/phone.yml`
-- `regex-patterns/pii/*/other.yml` (addresses)
+- `pii-pattern-engine/regex/pii/common/email.yml`
+- `pii-pattern-engine/regex/pii/*/phone.yml`
+- `pii-pattern-engine/regex/pii/*/other.yml` (addresses)
 
 ### Network (`network.yml`)
 - **ip_address** - IPv4/IPv6 addresses
@@ -91,8 +91,8 @@ metadata:
 - **mac_address** - MAC addresses
 
 **Related Patterns:**
-- `regex-patterns/pii/common/ip.yml`
-- `regex-patterns/pii/common/urls.yml`
+- `pii-pattern-engine/regex/pii/common/ip.yml`
+- `pii-pattern-engine/regex/pii/common/urls.yml`
 
 ### Personal (`personal.yml`)
 - **name** - Personal names
@@ -102,7 +102,7 @@ metadata:
 - **nationality** - Citizenship/nationality
 
 **Related Patterns:**
-- Various patterns in `regex-patterns/pii/*/other.yml`
+- Various patterns in `pii-pattern-engine/regex/pii/*/other.yml`
 
 ## Usage
 
@@ -114,7 +114,7 @@ Use keywords to filter or prioritize pattern matches based on surrounding text:
 from datadetector import Engine, load_registry
 
 # Load patterns and keywords
-registry = load_registry(paths=["regex-patterns/pii/us/ssn.yml"])
+registry = load_registry(paths=["pii-pattern-engine/regex/pii/us/ssn.yml"])
 engine = Engine(registry)
 
 # Text with context
@@ -155,7 +155,7 @@ Use keywords to determine which patterns to load:
 ```python
 # User mentions "bank account" - load bank-related patterns
 if "bank" in user_query.lower():
-    registry = load_registry(paths=["regex-patterns/pii/*/banks.yml"])
+    registry = load_registry(paths=["pii-pattern-engine/regex/pii/*/banks.yml"])
 ```
 
 ## Adding New Keywords
@@ -185,7 +185,7 @@ categories:
 
 ## Integration with Pattern Files
 
-Keywords complement the regex patterns in `regex-patterns/pii/` and `regex-patterns/hash/`:
+Keywords complement the regex patterns in `pii-pattern-engine/regex/pii/` and `pii-pattern-engine/regex/hash/`:
 
 | Keyword Category | Pattern Files |
 |-----------------|---------------|
@@ -205,6 +205,6 @@ Keywords complement the regex patterns in `regex-patterns/pii/` and `regex-patte
 
 ## See Also
 
-- [Pattern Files](../pii/) - Regex patterns for PII detection
-- [Verification Functions](../_verification/) - Additional validation logic
-- [Hash Patterns](../hash/) - Token and secret detection patterns
+- [Pattern Files](../regex/pii/) - Regex patterns for PII detection
+- [Verification Functions](../verification/) - Additional validation logic
+- [Hash Patterns](../regex/hash/) - Token and secret detection patterns

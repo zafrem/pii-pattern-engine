@@ -1,10 +1,10 @@
-# Pattern Engine
+# PII Pattern Engine
 
 A comprehensive collection of regular expression patterns and verification functions for detecting personally identifiable information (PII) and sensitive data across multiple languages and regions.
 
 ## Overview
 
-Pattern Engine provides:
+PII Pattern Engine provides:
 - **Regex Patterns**: 160+ patterns for PII detection across US, Korea, Japan, China, Taiwan, India, EU, and common international formats
 - **Verification Functions**: 32 Python verification functions for checksum validation and data quality checks
 - **Keyword Mappings**: Context-aware keywords in multiple languages for improved accuracy
@@ -13,7 +13,7 @@ Pattern Engine provides:
 ## Project Structure
 
 ```
-pattern-engine/
+pii-pattern-engine/
 ├── regex/                    # Regex pattern definitions (YAML)
 │   ├── pii/                 # Personally Identifiable Information patterns
 │   │   ├── us/             # United States (SSN, driver's license, passport, phone, etc.)
@@ -59,8 +59,8 @@ pattern-engine/
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/pattern-engine.git
-cd pattern-engine
+git clone https://github.com/yourusername/pii-pattern-engine.git
+cd pii-pattern-engine
 
 # Install test dependencies
 pip install -r tests/requirements.txt

@@ -2,7 +2,7 @@
 """
 ReDoS (Regular Expression Denial of Service) Vulnerability Checker
 
-This script analyzes all regex patterns in the pattern-engine project
+This script analyzes all regex patterns in the pii-pattern-engine project
 for potential ReDoS vulnerabilities.
 """
 

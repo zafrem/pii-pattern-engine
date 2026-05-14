@@ -5,9 +5,6 @@ categories:
   address_us:
     description: US Address indicators
     patterns:
-      - zip
-      - zip code
-      - postal code
       - st
       - street
       - ave
@@ -29,6 +26,18 @@ categories:
       - suite
       - bldg
       - floor
+      - city
+      - county
+      - cty
+      - district
+      - dist
+      - town
+      - township
+      - twp
+      - neighborhood
+      - nbhd
+      - village
+      - vlg
       # State abbreviations
       - AL
       - AK
@@ -81,15 +90,12 @@ categories:
       - WI
       - WY
     contexts:
-      - "Zip:"
-      - "Zip Code:"
       - "State:"
       - "Address:"
 
   address_kr:
     description: Korean Address indicators
     patterns:
-      - 우편번호
       - 도
       - 시
       - 군
@@ -127,15 +133,12 @@ categories:
       - 고양
       - 용인
     contexts:
-      - "우편번호:"
       - "주소:"
       - "배송지:"
 
   address_jp:
     description: Japanese Address indicators
     patterns:
-      - 〒
-      - 郵便番号
       - 住所
       - 配送先
       - お届け先
@@ -145,14 +148,18 @@ categories:
       - 県
       - 市
       - 区
+      - 郡
       - 町
       - 村
+      - 里
+      - 路
+      - 通り
       - 丁目
       - 番地
       - 号
       - ビル
       - マンション
-      - アパート
+      - ア파트
       # Major Prefectures/Cities (Anchors)
       - 東京
       - 大阪
@@ -166,8 +173,6 @@ categories:
       - 名古屋
       - 神戸
     contexts:
-      - "〒"
-      - "郵便番号:"
       - "住所:"
       - "配送先:"
 
@@ -182,7 +187,10 @@ categories:
       - 縣
       - 镇
       - 鎮
+      - 乡
+      - 鄉
       - 村
+      - 里
       - 路
       - 街
       - 大道
@@ -231,6 +239,7 @@ categories:
       - 鄉
       - 鎮
       - 里
+      - 村
       - 鄰
       - 路
       - 街
@@ -282,11 +291,6 @@ categories:
       - p.º
       - carretera
       - ctra.
-      - código postal
-      - cp
-      - c.p.
-      - provincia
-      - municipio
       - comunidad autónoma
       - piso
       - puerta
@@ -303,7 +307,6 @@ categories:
       - Bilbao
     contexts:
       - "Dirección:"
-      - "C.P.:"
       - "Provincia:"
       - "Ciudad:"
 
@@ -321,8 +324,6 @@ categories:
       - rte
       - impasse
       - imp
-      - code postal
-      - cp
       - ville
       - département
       - région
@@ -342,7 +343,6 @@ categories:
       - Lille
     contexts:
       - "Adresse:"
-      - "Code Postal:"
       - "Ville:"
 
 metadata:

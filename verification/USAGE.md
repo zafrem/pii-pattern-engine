@@ -63,8 +63,6 @@ is_valid = validator("4532015112830366")
 | `luhn` | Luhn checksum (credit cards) | `luhn("4532015112830366")` |
 | `high_entropy_token` | API keys, secrets | `high_entropy_token("ghp_...")` |
 | `korean_bank_account_valid` | Korean bank accounts | `korean_bank_account_valid("110...")` |
-| `korean_zipcode_valid` | Korean postal codes | `korean_zipcode_valid("06234")` |
-| `us_zipcode_valid` | US ZIP codes | `us_zipcode_valid("90210")` |
 | `us_ssn_valid` | US Social Security Numbers | `us_ssn_valid("123-45-6789")` |
 | `not_timestamp` | Reject timestamps | `not_timestamp("1234567890")` |
 | `generic_number_not_timestamp` | Generic timestamp check | `generic_number_not_timestamp(...)` |

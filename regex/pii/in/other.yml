@@ -1,35 +1,6 @@
 namespace: in
-description: India other patterns (postal codes, tax IDs, bank codes)
+description: India other patterns (tax IDs, bank codes)
 patterns:
-- id: pincode_01
-  location: in
-  category: address
-  description: Indian PIN code (6 digits)
-  pattern: '[1-9][0-9]{5}'
-  verification: in_pincode_valid
-  mask: '******'
-  examples:
-    match:
-    - '110001'
-    - '400001'
-    - '560001'
-    nomatch:
-    - '11000'
-    - '1100011'
-    - A10001
-    - '000001'
-    - '123456'
-    - '111111'
-  policy:
-    store_raw: false
-    action_on_match: report
-    severity: low
-  match_type: exactly_matches
-  langs:
-    python: '[1-9][0-9]{5}'
-    go: '[1-9][0-9]{5}'
-    java: '[1-9][0-9]{5}'
-    javascript: '[1-9][0-9]{5}'
 - id: ifsc_01
   location: in
   category: bank

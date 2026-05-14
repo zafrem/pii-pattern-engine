@@ -1,41 +1,6 @@
 namespace: cn
-description: China other patterns (zipcode, social credit, names)
+description: China other patterns (social credit, names, addresses)
 patterns:
-- id: zipcode_01
-  location: cn
-  category: address
-  description: Chinese postal code (6 digits)
-  pattern: '[0-9]{6}'
-  verification: cn_zipcode_valid
-  mask: '******'
-  examples:
-    match:
-    - '100000'
-    - '200000'
-    - '518000'
-    - '310000'
-    nomatch:
-    - '10000'
-    - '1000000'
-    - A10000
-    - 10000A
-    - '12345678901234'
-    - '123456'
-    - '111111'
-    - '000000'
-  policy:
-    store_raw: false
-    action_on_match: report
-    severity: low
-  metadata:
-    note: Uses negative lookahead/lookbehind to prevent matching when embedded in
-      longer numbers
-  match_type: exactly_matches
-  langs:
-    python: '[0-9]{6}'
-    go: '[0-9]{6}'
-    java: '[0-9]{6}'
-    javascript: '[0-9]{6}'
 - id: social_credit_01
   location: cn
   category: other
@@ -104,3 +69,31 @@ patterns:
     go: '[一-鿿]{2,4}'
     java: '[一-鿿]{2,4}'
     javascript: '[一-鿿]{2,4}'
+
+- id: address_01
+  location: cn
+  category: address
+  description: Chinese Address (Province + City + District/Street)
+  pattern: '(?:北京市|天津市|河北省|山西省|内蒙古自治区|辽宁省|吉林省|黑龙江省|上海市|江苏省|浙江省|安徽省|福建省|江西省|山东省|河南省|湖北省|湖南省|广东省|广西壮族自治区|海南省|重庆市|四川省|贵州省|云南省|西藏自治区|陕西省|甘肃省|青海省|宁夏回族自治区|新疆维吾尔自治区|香港特别行政区|澳门特别行政区|台湾省)(?:[一-鿿]{2,10}(?:市|区|县))(?:[一-鿿0-9]{2,20}(?:路|街|巷|号))?'
+  verification: chinese_address_valid
+  mask: '*** *** ***'
+  examples:
+    match:
+    - 北京市东城区王府井大街1号
+    - 广东省广州市天河区中山大道
+    nomatch:
+    - 北京市
+    - 东城区
+    - 美国纽约
+  policy:
+    store_raw: false
+    action_on_match: redact
+    severity: high
+  metadata:
+    note: Uses address database verification to ensure valid province and city combinations.
+  match_type: exactly_matches
+  langs:
+    python: '(?:北京市|天津市|河北省|山西省|内蒙古自治区|辽宁省|吉林省|黑龙江省|上海市|江苏省|浙江省|安徽省|福建省|江西省|山东省|河南省|湖北省|湖南省|广东省|广西壮族自治区|海南省|重庆市|四川省|贵州省|云南省|西藏自治区|陕西省|甘肃省|青海省|宁夏回族自治区|新疆维吾尔自治区|香港特别行政区|澳门特别行政区|台湾省)(?:[一-鿿]{2,10}(?:市|区|县))(?:[一-鿿0-9]{2,20}(?:路|街|巷|号))?'
+    go: '(?:北京市|天津市|河北省|山西省|内蒙古自治区|辽宁省|吉林省|黑龙江省|上海市|江苏省|浙江省|安徽省|福建省|江西省|山东省|河南省|湖北省|湖南省|广东省|广西壮族自治区|海南省|重庆市|四川省|贵州省|云南省|西藏自治区|陕西省|甘肃省|青海省|宁夏回族自治区|新疆维吾尔自治区|香港特别行政区|澳门特别行政区|台湾省)(?:[一-鿿]{2,10}(?:市|区|县))(?:[一-鿿0-9]{2,20}(?:路|街|巷|号))?'
+    java: '(?:北京市|天津市|河北省|山西省|内蒙古自治区|辽宁省|吉林省|黑龙江省|上海市|江苏省|浙江省|安徽省|福建省|江西省|山东省|河南省|湖北省|湖南省|广东省|广西壮族自治区|海南省|重庆市|四川省|贵州省|云南省|西藏自治区|陕西省|甘肃省|青海省|宁夏回族自治区|新疆维吾尔自治区|香港特别行政区|澳门特别行政区|台湾省)(?:[一-鿿]{2,10}(?:市|区|县))(?:[一-鿿0-9]{2,20}(?:路|街|巷|号))?'
+    javascript: '(?:北京市|天津市|河北省|山西省|内蒙古自治区|辽宁省|吉林省|黑龙江省|上海市|江苏省|浙江省|安徽省|福建省|江西省|山东省|河南省|湖北省|湖南省|广东省|广西壮族自治区|海南省|重庆市|四川省|贵州省|云南省|西藏自治区|陕西省|甘肃省|青海省|宁夏回族自治区|新疆维吾尔自治区|香港特别行政区|澳门特别行政区|台湾省)(?:[一-鿿]{2,10}(?:市|区|县))(?:[一-鿿0-9]{2,20}(?:路|街|巷|号))?'

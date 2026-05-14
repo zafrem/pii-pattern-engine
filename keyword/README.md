@@ -78,7 +78,6 @@ metadata:
 - **email** - Email addresses
 - **phone** - Phone numbers
 - **address** - Physical addresses
-- **zipcode** - Postal/ZIP codes
 
 **Related Patterns:**
 - `pii-pattern-engine/regex/pii/common/email.yml`

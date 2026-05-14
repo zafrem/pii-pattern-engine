@@ -65,8 +65,6 @@ public class Verification {
         registerVerificationFunction("dms_coordinate", Verification::dmsCoordinate);
         registerVerificationFunction("high_entropy_token", Verification::highEntropyToken);
         registerVerificationFunction("not_timestamp", Verification::notTimestamp);
-        registerVerificationFunction("korean_zipcode_valid", Verification::koreanZipcodeValid);
-        registerVerificationFunction("us_zipcode_valid", Verification::usZipcodeValid);
         registerVerificationFunction("korean_bank_account_valid", Verification::koreanBankAccountValid);
         registerVerificationFunction("generic_number_not_timestamp", Verification::genericNumberNotTimestamp);
         registerVerificationFunction("contains_letter", Verification::containsLetter);
@@ -86,10 +84,6 @@ public class Verification {
         registerVerificationFunction("kr_rrn_valid", Verification::krRrnValid);
         registerVerificationFunction("kr_alien_registration_valid", Verification::krAlienRegistrationValid);
         registerVerificationFunction("kr_corporate_registration_valid", Verification::krCorporateRegistrationValid);
-        registerVerificationFunction("jp_zipcode_valid", Verification::jpZipcodeValid);
-        registerVerificationFunction("cn_zipcode_valid", Verification::cnZipcodeValid);
-        registerVerificationFunction("tw_zipcode_valid", Verification::twZipcodeValid);
-        registerVerificationFunction("in_pincode_valid", Verification::inPincodeValid);
         registerVerificationFunction("jp_my_number_valid", Verification::jpMyNumberValid);
         registerVerificationFunction("spain_dni_valid", Verification::spainDniValid);
         registerVerificationFunction("spain_nie_valid", Verification::spainNieValid);
@@ -332,165 +326,6 @@ public class Verification {
                 }
             } catch (Exception e) {}
         }
-
-        return true;
-    }
-
-    /**
-     * Verify Korean postal code is valid.
-     */
-    public static boolean koreanZipcodeValid(String value) {
-        Set<String> validZips = loadDataFile("kr_zipcodes.csv");
-        if (!validZips.isEmpty()) {
-            return validZips.contains(value) || validZips.contains(value.replace("-", ""));
-        }
-
-        String digitsOnly = value.replaceAll("\\D", "");
-        if (digitsOnly.length() != 5) return false;
-
-        boolean isSequentialUp = true;
-        boolean isSequentialDown = true;
-        for (int i = 1; i < digitsOnly.length(); i++) {
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) + 1) isSequentialUp = false;
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) - 1) isSequentialDown = false;
-        }
-
-        if (isSequentialUp || isSequentialDown) return false;
-
-        Set<Character> distinctDigits = new HashSet<>();
-        for (char c : digitsOnly.toCharArray()) distinctDigits.add(c);
-        if (distinctDigits.size() == 1) return false;
-
-        return true;
-    }
-
-    /**
-     * Verify US postal code is valid.
-     */
-    public static boolean usZipcodeValid(String value) {
-        String digitsOnly = value.replaceAll("\\D", "");
-        Set<String> validZips = loadDataFile("us_zipcodes.csv");
-        if (!validZips.isEmpty()) {
-            if (digitsOnly.length() == 5) return validZips.contains(digitsOnly);
-            else if (digitsOnly.length() == 9) return validZips.contains(digitsOnly.substring(0, 5));
-        }
-
-        if (digitsOnly.length() != 5 && digitsOnly.length() != 9) return false;
-
-        String baseZip = digitsOnly.substring(0, 5);
-        boolean isSequentialUp = true;
-        boolean isSequentialDown = true;
-        for (int i = 1; i < baseZip.length(); i++) {
-            if (Character.getNumericValue(baseZip.charAt(i)) != Character.getNumericValue(baseZip.charAt(i - 1)) + 1) isSequentialUp = false;
-            if (Character.getNumericValue(baseZip.charAt(i)) != Character.getNumericValue(baseZip.charAt(i - 1)) - 1) isSequentialDown = false;
-        }
-        if (isSequentialUp || isSequentialDown) return false;
-
-        Set<Character> distinctDigits = new HashSet<>();
-        for (char c : baseZip.toCharArray()) distinctDigits.add(c);
-        if (distinctDigits.size() == 1) return false;
-
-        return true;
-    }
-
-    /**
-     * Verify Japanese postal code is valid.
-     */
-    public static boolean jpZipcodeValid(String value) {
-        String digitsOnly = value.replaceAll("[^0-9]", "");
-        if (digitsOnly.length() != 7) return false;
-
-        Set<String> validZips = loadDataFile("jp_zipcodes.csv");
-        if (!validZips.isEmpty()) {
-            String hyphenFormat = digitsOnly.substring(0, 3) + "-" + digitsOnly.substring(3);
-            return validZips.contains(hyphenFormat) || validZips.contains(digitsOnly);
-        }
-
-        Set<Character> distinctDigits = new HashSet<>();
-        for (char c : digitsOnly.toCharArray()) distinctDigits.add(c);
-        if (distinctDigits.size() == 1) return false;
-
-        boolean isSequentialUp = true;
-        boolean isSequentialDown = true;
-        for (int i = 1; i < digitsOnly.length(); i++) {
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) + 1) isSequentialUp = false;
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) - 1) isSequentialDown = false;
-        }
-        if (isSequentialUp || isSequentialDown) return false;
-
-        return true;
-    }
-
-    /**
-     * Verify Chinese postal code is valid.
-     */
-    public static boolean cnZipcodeValid(String value) {
-        String digitsOnly = value.replaceAll("\\D", "");
-        if (digitsOnly.length() != 6) return false;
-
-        Set<String> validZips = loadDataFile("cn_zipcodes.csv");
-        if (!validZips.isEmpty()) return validZips.contains(digitsOnly);
-
-        Set<Character> distinctDigits = new HashSet<>();
-        for (char c : digitsOnly.toCharArray()) distinctDigits.add(c);
-        if (distinctDigits.size() == 1) return false;
-
-        boolean isSequentialUp = true;
-        boolean isSequentialDown = true;
-        for (int i = 1; i < digitsOnly.length(); i++) {
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) + 1) isSequentialUp = false;
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) - 1) isSequentialDown = false;
-        }
-        if (isSequentialUp || isSequentialDown) return false;
-
-        int firstTwo = Integer.parseInt(digitsOnly.substring(0, 2));
-        return firstTwo >= 1 && firstTwo <= 86;
-    }
-
-    /**
-     * Verify Taiwan postal code is valid.
-     */
-    public static boolean twZipcodeValid(String value) {
-        String digitsOnly = value.replaceAll("\\D", "");
-        if (digitsOnly.length() != 3 && digitsOnly.length() != 5) return false;
-
-        Set<String> validZips = loadDataFile("tw_zipcodes.csv");
-        if (!validZips.isEmpty()) {
-            if (validZips.contains(digitsOnly)) return true;
-            if (digitsOnly.length() == 5 && validZips.contains(digitsOnly.substring(0, 3))) return true;
-            return false;
-        }
-
-        Set<Character> distinctDigits = new HashSet<>();
-        for (char c : digitsOnly.toCharArray()) distinctDigits.add(c);
-        if (distinctDigits.size() == 1) return false;
-
-        int firstDigit = Character.getNumericValue(digitsOnly.charAt(0));
-        return firstDigit != 0;
-    }
-
-    /**
-     * Verify Indian PIN code is valid.
-     */
-    public static boolean inPincodeValid(String value) {
-        String digitsOnly = value.replaceAll("\\D", "");
-        if (digitsOnly.length() != 6) return false;
-        if (digitsOnly.charAt(0) == '0') return false;
-
-        Set<String> validPins = loadDataFile("in_pincodes.csv");
-        if (!validPins.isEmpty()) return validPins.contains(digitsOnly);
-
-        Set<Character> distinctDigits = new HashSet<>();
-        for (char c : digitsOnly.toCharArray()) distinctDigits.add(c);
-        if (distinctDigits.size() == 1) return false;
-
-        boolean isSequentialUp = true;
-        boolean isSequentialDown = true;
-        for (int i = 1; i < digitsOnly.length(); i++) {
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) + 1) isSequentialUp = false;
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) - 1) isSequentialDown = false;
-        }
-        if (isSequentialUp || isSequentialDown) return false;
 
         return true;
     }

@@ -15,6 +15,7 @@ import pytest
 
 from verification import (
     belgium_rrn_valid,
+    chinese_address_valid,
     cn_national_id_valid,
     contains_letter,
     credit_card_bin_valid,
@@ -28,7 +29,9 @@ from verification import (
     india_aadhaar_valid,
     india_pan_valid,
     ipv4_public,
+    japanese_address_valid,
     jp_my_number_valid,
+    korean_address_valid,
     korean_bank_account_valid,
     kr_alien_registration_valid,
     kr_business_registration_valid,
@@ -45,8 +48,119 @@ from verification import (
     sweden_personnummer_valid,
     tw_national_id_valid,
     unregister_verification_function,
+    us_address_valid,
     us_ssn_valid,
 )
+
+
+class TestKoreanAddressValid:
+    """Tests for Korean address verification."""
+
+    def test_valid_addresses(self):
+        """Test valid Korean administrative division combinations."""
+        valid_addresses = [
+            "서울특별시 강남구 역삼동",
+            "경기도 수원시 팔달구",
+            "서울특별시 종로구 청운동",
+            "부산광역시 중구",
+        ]
+        for addr in valid_addresses:
+            assert korean_address_valid(addr), f"Expected '{addr}' to be valid"
+
+    def test_partial_valid(self):
+        """Test that Level 2 (City/District) match is enough."""
+        assert korean_address_valid("서울특별시 강남구")
+        assert korean_address_valid("경기도 수원시")
+
+    def test_invalid_combinations(self):
+        """Test invalid province/city combinations."""
+        # Mismatched province and city (Suwon is in Gyeonggi, not Seoul)
+        assert not korean_address_valid("서울특별시 수원시")
+
+    def test_fallback_provinces(self):
+        """Test that major provinces are recognized even without Level 2/3."""
+        assert korean_address_valid("서울특별시")
+        assert korean_address_valid("제주특별자치도")
+
+
+class TestUsAddressValid:
+    """Tests for US address verification."""
+
+    def test_valid_addresses(self):
+        """Test valid US state and city combinations."""
+        valid_addresses = [
+            "New York, New York",
+            "Los Angeles, California",
+            "Chicago, Illinois",
+            "Houston, Texas",
+            "albany, new york", # Test case insensitivity
+        ]
+        for addr in valid_addresses:
+            assert us_address_valid(addr), f"Expected '{addr}' to be valid"
+
+    def test_invalid_combinations(self):
+        """Test mismatched state and city."""
+        assert not us_address_valid("New York, California")
+        assert not us_address_valid("Los Angeles, New York")
+
+    def test_fallback_states(self):
+        """Test that states are recognized even without valid city."""
+        assert us_address_valid("California")
+        assert us_address_valid("Texas")
+
+
+class TestJapaneseAddressValid:
+    """Tests for Japanese address verification."""
+
+    def test_valid_addresses(self):
+        """Test valid Japanese prefecture and city/ward combinations."""
+        valid_addresses = [
+            "東京都千代田区",
+            "大阪府大阪市",
+            "北海道札幌市",
+            "神奈川県横浜市",
+        ]
+        for addr in valid_addresses:
+            assert japanese_address_valid(addr), f"Expected '{addr}' to be valid"
+
+    def test_invalid_combinations(self):
+        """Test mismatched prefecture and city."""
+        assert not japanese_address_valid("東京都大阪市")
+        assert not japanese_address_valid("大阪府千代田区")
+
+    def test_fallback_prefectures(self):
+        """Test that prefectures are recognized."""
+        assert japanese_address_valid("東京都")
+        assert japanese_address_valid("沖縄県")
+
+
+class TestChineseAddressValid:
+    """Tests for Chinese address verification."""
+
+    def test_valid_addresses(self):
+        """Test valid Chinese province, city, and street combinations."""
+        valid_addresses = [
+            "北京市市辖区东城区东华门街道",
+            "广东省深圳市南山区",
+            "广东省广州市天河区",
+        ]
+        for addr in valid_addresses:
+            assert chinese_address_valid(addr), f"Expected '{addr}' to be valid"
+
+    def test_partial_valid(self):
+        """Test that Level 2 (City) match is enough."""
+        assert chinese_address_valid("北京市市辖区")
+        assert chinese_address_valid("广东省深圳市")
+
+    def test_invalid_combinations(self):
+        """Test mismatched province and city."""
+        assert not chinese_address_valid("北京市深圳市")
+
+    def test_fallback_provinces(self):
+        """Test that provinces are recognized."""
+        assert chinese_address_valid("北京市")
+        assert chinese_address_valid("四川省")
+
 
 
 class TestIbanMod97:

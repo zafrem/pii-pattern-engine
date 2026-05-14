@@ -10,10 +10,12 @@ All verification functions follow the signature: (str) -> bool
 import logging
 import math
 import os
+import re
+import ipaddress
 import yaml
 from collections import Counter
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Set
+from typing import Any, Callable, Dict, List, Optional, Set, Union
 
 try:
     import numpy as np
@@ -166,7 +168,12 @@ def _get_optimized_address_data(filename: str, hierarchy: List[str]) -> Dict:
                     for i, level_key in enumerate(hierarchy):
                         val = row.get(level_key)
                         if not val:
+                            # If we hit an empty value, it means this level is a leaf
+                            if "_items" not in current_level:
+                                current_level["_items"] = set()
+                            current_level["_items"].add("")
                             break
+
                         # Normalize keys for lookup
                         lookup_val = val.lower() if filename == "us_addresses.csv" else val
 
@@ -190,87 +197,51 @@ def _get_optimized_address_data(filename: str, hierarchy: List[str]) -> Dict:
 def korean_address_valid(value: str) -> bool:
     """
     Verify Korean address contains valid administrative divisions.
-    Checks for combinations of province (level1) and city/district (level2).
     """
-    # hierarchy: level1 (Prov), level2 (City), level3 (Dong)
+    common_provinces = {"서울특별시", "경기도", "부산광역시", "인천광역시", "대구광역시", "대전광역시", "광주광역시", "울산광역시", "세종특별자치시", "강원도", "충청북도", "충청남도", "전라북도", "전라남도", "경상북도", "경상남도", "제주특별자치도"}
     data = _get_optimized_address_data("kr_addresses.csv", ["level1", "level2", "level3"])
+
     if not data:
-        common_provinces = {"서울특별시", "경기도", "부산광역시", "인천광역시", "대구광역시", "대전광역시", "광주광역시", "울산광역시", "세종특별자치시", "강원도", "충청북도", "충청남도", "전라북도", "전라남도", "경상북도", "경상남도", "제주특별자치도"}
         return any(prov in value for prov in common_provinces)
 
-    # Fast check: Iterate over level1 keys found in the string
-    for prov in data:
-        if prov in value:
-            # If province found, check city (level2)
-            for city in data[prov]:
-                if city == "_items": continue
-                if city in value:
-                    # If city found, check dong (level3)
-                    if "_items" in data[prov][city]:
-                        for dong in data[prov][city]["_items"]:
-                            if dong in value:
-                                return True
-                    return True # Level 2 match is enough for high confidence
+    matched_provinces = [p for p in data if p in value]
+    if not matched_provinces:
+        return any(prov in value for prov in common_provinces)
+
+    for prov in matched_provinces:
+        cities = data[prov]
+        for city, dong_data in cities.items():
+            if city == "_items": continue
+            if city in value:
+                return True
+
+    if len(value.strip()) <= 10 and any(value.strip() == p for p in matched_provinces):
+        return True
+
     return False
+
 
 
 def us_address_valid(value: str) -> bool:
     """
     Verify US address contains valid state and city.
     """
-    # hierarchy: state, city
-    data = _get_optimized_address_data("us_addresses.csv", ["state", "city"])
+    states = {"Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"}
+    data = _get_optimized_address_data("us_addresses.csv", ["city", "state"])
+
     if not data:
-        states = {"AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"}
-        return any(state in value for state in states)
+        return any(state.lower() in value.lower() for state in states)
 
     normalized_value = value.lower()
-    for state in data:
-        # Check for state name (e.g., "New York") or abbreviation if in value
-        if state.lower() in normalized_value:
-            if "_items" in data[state]:
-                for city in data[state]["_items"]:
-                    if city in normalized_value:
+    for city, states_data in data.items():
+        if city in normalized_value:
+            if "_items" in states_data:
+                for state in states_data["_items"]:
+                    if state.lower() in normalized_value:
                         return True
-    return False
-
-
-def japanese_address_valid(value: str) -> bool:
-    """
-    Verify Japanese address contains valid prefecture and city.
-    """
-    data = _get_optimized_address_data("jp_addresses.csv", ["prefecture", "city"])
-    if not data:
-        prefectures = {"北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", " 大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"}
-        return any(pref in value for pref in prefectures)
-
-    for pref in data:
-        if pref in value:
-            if "_items" in data[pref]:
-                for city in data[pref]["_items"]:
-                    if city in value:
-                        return True
-    return False
-
-
-def chinese_address_valid(value: str) -> bool:
-    """
-    Verify Chinese address contains valid province, city, and street.
-    """
-    # hierarchy: province, city, area, street
-    data = _get_optimized_address_data("cn_addresses.csv", ["province", "city", "area", "street"])
-    if not data:
-        provinces = {"北京市", "天津市", "河北省", "山西省", "内蒙古自治区", "辽宁省", "吉林省", "黑龙江省", "上海市", "江苏省", "浙江省", "安徽省", "福建省", "江西省", "山东省", "河南省", "湖北省", "湖南省", "广东省", "广西壮族自治区", "海南省", "重庆市", "四川省", "贵州省", "云南省", "西藏自治区", "陕西省", "甘肃省", "青海省", "宁夏回族自治区", "新疆维吾尔自治区", "香港特别行政区", "澳门特别行政区", "台湾省"}
-        return any(prov in value for prov in provinces)
-
-    for prov in data:
-        if prov in value:
-            # Optimization: only check cities within this province
-            for city in data[prov]:
-                if city == "_items": continue
-                if city in value:
-                    # Optional: deep check for street if provided
-                    if city in data[prov] and isinstance(data[prov][city], dict):
+    
+    for state in states:
+        if value.strip().lower() == state.lower():
                         for area in data[prov][city]:
                             if area == "_items": continue
                             if area in value:

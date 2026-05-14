@@ -186,7 +186,6 @@ _static/
 _templates/
 
 # Data files (if any sensitive data is present)
-*.csv
 *.dat
 *.db
 *.sqlite

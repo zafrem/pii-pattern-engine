@@ -18,34 +18,70 @@ verification/
     └── src/main/java/com/piipatternengine/verification/Verification.java
 ```
 
-## Python Verification Functions
+## Verification Functions
 
-The Python verification module provides functions for validating matched patterns beyond simple regex matching.
+All four implementations (Python, JavaScript, Go, Java) expose the same set of functions. The table below lists every available function and which languages implement it.
 
-### Available Functions
+| Function | Python | JS | Go | Java | Description |
+|---|:---:|:---:|:---:|:---:|----|
+| `iban_mod97` | ✓ | ✓ | ✓ | ✓ | IBAN Mod-97 checksum |
+| `luhn` | ✓ | ✓ | ✓ | ✓ | Luhn algorithm (credit cards, etc.) |
+| `high_entropy_token` | ✓ | ✓ | ✓ | ✓ | API key / secret token detection |
+| `not_timestamp` | ✓ | ✓ | ✓ | ✓ | Reject Unix timestamp-like numbers |
+| `generic_number_not_timestamp` | ✓ | ✓ | ✓ | ✓ | Generic timestamp rejection |
+| `contains_letter` | ✓ | ✓ | ✓ | ✓ | String contains at least one letter |
+| `dms_coordinate` | ✓ | ✓ | ✓ | ✓ | DMS coordinate format validation |
+| `korean_bank_account_valid` | ✓ | ✓ | ✓ | ✓ | Korean bank account validation |
+| `us_ssn_valid` | ✓ | ✓ | ✓ | ✓ | US Social Security Number |
+| `cn_national_id_valid` | ✓ | ✓ | ✓ | ✓ | Chinese National ID (18-digit) |
+| `tw_national_id_valid` | ✓ | ✓ | ✓ | ✓ | Taiwan National ID |
+| `india_aadhaar_valid` | ✓ | ✓ | ✓ | ✓ | India Aadhaar (Verhoeff) |
+| `india_pan_valid` | ✓ | ✓ | ✓ | ✓ | India PAN format |
+| `kr_rrn_valid` | ✓ | ✓ | ✓ | ✓ | Korean Resident Registration Number |
+| `kr_alien_registration_valid` | ✓ | ✓ | ✓ | ✓ | Korean Alien Registration Number |
+| `kr_business_registration_valid` | ✓ | ✓ | ✓ | ✓ | Korean Business Registration Number |
+| `kr_corporate_registration_valid` | ✓ | ✓ | ✓ | ✓ | Korean Corporate Registration Number |
+| `jp_my_number_valid` | ✓ | ✓ | ✓ | ✓ | Japanese My Number |
+| `jp_corporate_number_valid` | ✓ | ✓ | ✓ | ✓ | Japanese Corporate Number |
+| `tw_ubn_valid` | ✓ | ✓ | ✓ | ✓ | Taiwan Unified Business Number |
+| `us_npi_valid` | ✓ | ✓ | ✓ | ✓ | US National Provider Identifier |
+| `uk_nino_valid` | ✓ | ✓ | ✓ | ✓ | UK National Insurance Number |
+| `spain_dni_valid` | ✓ | ✓ | ✓ | ✓ | Spanish DNI |
+| `spain_nie_valid` | ✓ | ✓ | ✓ | ✓ | Spanish NIE |
+| `netherlands_bsn_valid` | ✓ | ✓ | ✓ | ✓ | Dutch BSN |
+| `poland_pesel_valid` | ✓ | ✓ | ✓ | ✓ | Polish PESEL |
+| `sweden_personnummer_valid` | ✓ | ✓ | ✓ | ✓ | Swedish Personnummer |
+| `france_insee_valid` | ✓ | ✓ | ✓ | ✓ | French INSEE/NIR |
+| `belgium_rrn_valid` | ✓ | ✓ | ✓ | ✓ | Belgian RRN |
+| `finland_hetu_valid` | ✓ | ✓ | ✓ | ✓ | Finnish HETU |
+| `swift_bic_valid` | ✓ | ✓ | ✓ | ✓ | SWIFT/BIC code |
+| `aws_access_key_valid` | ✓ | ✓ | ✓ | ✓ | AWS Access Key |
+| `google_api_key_valid` | ✓ | ✓ | ✓ | ✓ | Google API Key |
+| `crypto_btc_valid` | ✓ | ✓ | ✓ | ✓ | Bitcoin address |
+| `crypto_eth_valid` | ✓ | ✓ | ✓ | ✓ | Ethereum address |
+| `ipv4_public` | ✓ | ✓ | ✓ | ✓ | IPv4 public (non-private) address |
+| `not_repeating_pattern` | ✓ | ✓ | ✓ | ✓ | Reject all-same / sequential patterns |
+| `credit_card_bin_valid` | ✓ | ✓ | ✓ | ✓ | Credit card BIN + Luhn check |
+| `cjk_name_standalone` | ✓ | ✓ | ✓ | ✓ | CJK-only character string |
+| `chinese_name_valid` | ✓ | ✓ | ✓ | ✓ | Chinese name (surname + given name) |
+| `korean_name_valid` | ✓ | ✓ | ✓ | ✓ | Korean name (surname + given name) |
+| `japanese_name_kanji_valid` | ✓ | ✓ | ✓ | ✓ | Japanese kanji name |
+| `english_name_valid` | ✓ | ✓ | ✓ | ✓ | English name (First Last) |
+| `korean_address_valid` | ✓ | ✓ | ✓ | ✓ | Korean address (province-level check) |
+| `japanese_address_valid` | ✓ | ✓ | ✓ | ✓ | Japanese address (prefecture check) |
+| `chinese_address_valid` | ✓ | ✓ | ✓ | ✓ | Chinese address (province check) |
+| `us_address_valid` | ✓ | — | — | — | US address (city + state, Python only) |
 
-#### Financial Validators
-- `iban_mod97(value)` - IBAN Mod-97 checksum validation
-- `luhn(value)` - Luhn algorithm (credit cards, etc.)
-- `korean_bank_account_valid(value)` - Korean bank account validation
+### Notes on Key Functions
 
-#### Geographic Validators
-- `dms_coordinate(value)` - DMS coordinate format validation
-- `korean_address_valid(value)` - Korean address validation (database-backed)
-- `us_address_valid(value)` - US address validation (database-backed)
-- `japanese_address_valid(value)` - Japanese address validation (database-backed)
-- `chinese_address_valid(value)` - Chinese address validation (database-backed)
+#### `high_entropy_token`
+Shannon entropy is calculated on the **raw value** (no normalization). Threshold is **4.5 bits/char**. Accepts characters from `A-Za-z0-9_-+/.=`, minimum 20 characters.
 
-#### Token/Secret Validators
-- `high_entropy_token(value)` - High-entropy token detection (API keys, secrets)
+#### Address Validators
+Python uses database-backed lookups (`*_addresses.csv`) with a province/prefecture fallback. Go, Java, and JavaScript use the hardcoded fallback list directly (province/prefecture/state string containment check).
 
-#### Identity Validators
-- `us_ssn_valid(value)` - US Social Security Number validation
-
-#### Generic Validators
-- `not_timestamp(value)` - Reject timestamp-like numeric strings
-- `generic_number_not_timestamp(value)` - Generic timestamp rejection
-- `contains_letter(value)` - Check if string contains letters
+#### Name Validators
+`chinese_name_valid`, `korean_name_valid`, and `japanese_name_kanji_valid` load given-name dictionaries from CSV files when available. `english_name_valid` checks against a hardcoded surname list plus optional `en_surnames.csv` / `en_given_names.csv`.
 
 ### Usage in Python
 

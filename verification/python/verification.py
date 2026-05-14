@@ -233,15 +233,111 @@ def us_address_valid(value: str) -> bool:
         return any(state.lower() in value.lower() for state in states)
 
     normalized_value = value.lower()
+    
+    # 1. Check for standalone states (exact match or abbreviation)
+    state_abbreviations = {
+        "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
+        "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", "FL": "Florida", "GA": "Georgia",
+        "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa",
+        "KS": "Kansas", "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
+        "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi",
+        "MO": "Missouri", "MT": "Montana", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire",
+        "NJ": "New Jersey", "NM": "New Mexico", "NY": "New York", "NC": "North Carolina",
+        "ND": "North Dakota", "OH": "Ohio", "OK": "Oklahoma", "OR": "Oregon", "PA": "Pennsylvania",
+        "RI": "Rhode Island", "SC": "South Carolina", "SD": "South Dakota", "TN": "Tennessee",
+        "TX": "Texas", "UT": "Utah", "VT": "Vermont", "VA": "Virginia", "WA": "Washington",
+        "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming"
+    }
+
+    val_strip = value.strip().upper()
+    if val_strip in [s.upper() for s in states] or val_strip in state_abbreviations:
+        return True
+
+    # 2. Check for city-state pairs (including abbreviations)
     for city, states_data in data.items():
         if city in normalized_value:
             if "_items" in states_data:
                 for state in states_data["_items"]:
-                    if state.lower() in normalized_value:
-                        return True
+                    state_lower = state.lower()
+                    state_abbr = next((k.lower() for k, v in state_abbreviations.items() if v.lower() == state_lower), None)
+                    
+                    # Check for full state name
+                    found_state = state_lower in normalized_value
+                    
+                    # Check for abbreviation (with word boundaries to avoid matching inside words like "California")
+                    if not found_state and state_abbr:
+                        pattern = rf"\b{re.escape(state_abbr)}\b"
+                        if re.search(pattern, normalized_value):
+                            found_state = True
+                    
+                    if found_state:
+                        # If city and state names are the same (e.g., "New York"),
+                        # we require at least two occurrences of the name OR a match via abbreviation.
+                        if city == state_lower:
+                            # state_abbr is guaranteed to be different from city (e.g., "NY" vs "New York")
+                            is_abbr_match = state_abbr and re.search(rf"\b{re.escape(state_abbr)}\b", normalized_value)
+                            if normalized_value.count(city) >= 2 or is_abbr_match:
+                                return True
+                        else:
+                            # Different names (e.g., "Los Angeles, California")
+                            return True
     
-    for state in states:
-        if value.strip().lower() == state.lower():
+    return False
+
+
+def japanese_address_valid(value: str) -> bool:
+    """
+    Verify Japanese address contains valid prefecture and city.
+    """
+    data = _get_optimized_address_data("jp_addresses.csv", ["prefecture", "city"])
+    if not data:
+        prefectures = {"北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"}
+        return any(pref in value for pref in prefectures)
+
+    for pref in data:
+        if pref in value:
+            if "_items" in data[pref]:
+                for city in data[pref]["_items"]:
+                    if city in value:
+                        return True
+            # Also allow just prefecture match
+            if value.strip() == pref:
+                return True
+    return False
+
+
+def chinese_address_valid(value: str) -> bool:
+    """
+    Verify Chinese address contains valid province, city, and street.
+    """
+    # hierarchy: province, city, area, street
+    data = _get_optimized_address_data("cn_addresses.csv", ["province", "city", "area", "street"])
+    if not data:
+        provinces = {"北京市", "天津市", "河北省", "山西省", "内蒙古自治区", "辽宁省", "吉林省", "黑龙江省", "上海市", "江苏省", "浙江省", "安徽省", "福建省", "江西省", "山东省", "河南省", "湖北省", "湖南省", "广东省", "广西壮族自治区", "海南省", "重庆市", "四川省", "贵州省", "云南省", "西藏自治区", "陕西省", "甘肃省", "青海省", "宁夏回族自治区", "新疆维吾尔自治区", "香港特别行政区", "澳门特别行政区", "台湾省"}
+        return any(prov in value for prov in provinces)
+
+    for prov in data:
+        if prov in value:
+            # Optimization: only check cities within this province
+            for city in data[prov]:
+                if city == "_items": continue
+                
+                # Special handling for "市辖区" (City-governed districts)
+                # If city is "市辖区", we check it against the value.
+                if city == "市辖区":
+                    if city in value:
+                        return True
+                    # Fallback to checking areas if city name is NOT in the string
+                    # (In some cases "市辖区" is omitted in the address string)
+                    for area in data[prov][city]:
+                        if area == "_items": continue
+                        if area in value:
+                            return True
+                    continue
+
+                if city in value:
+                    # Optional: deep check for street if provided
+                    if city in data[prov] and isinstance(data[prov][city], dict):
                         for area in data[prov][city]:
                             if area == "_items": continue
                             if area in value:
@@ -252,7 +348,11 @@ def us_address_valid(value: str) -> bool:
                                             return True
                                 return True
                     return True
+            # Also allow just province match
+            if value.strip() == prov:
+                return True
     return False
+
 
 
 
@@ -458,23 +558,16 @@ def high_entropy_token(value: str) -> bool:
     if not all(c in allowed_chars for c in value):
         return False
 
-    # Normalize for entropy calculation: lowercase and treat separators as spaces
-    normalized = value.lower().replace("-", " ").replace("_", " ")
+    # Normalize separators to spaces before entropy calculation
+    normalized = value.replace("-", " ").replace("_", " ").replace("|", " ")
 
-    # Calculate Shannon entropy
     char_counts = Counter(normalized)
     length = len(normalized)
     entropy = -sum(
         (count / length) * math.log2(count / length) for count in char_counts.values()
     )
 
-    # High entropy threshold
-    # Base64: theoretical max ~6 bits/char, practical ~5-5.5 for random data
-    # Hex: theoretical max ~4 bits/char, practical ~3.5-4 for random data
-    # Set threshold at 4.5 to filter more strictly for random strings
-    min_entropy = 4.5
-
-    return entropy >= min_entropy
+    return entropy >= 4.5
 
 
 # Common English surnames - covers ~25-30% of US/UK population
@@ -1379,10 +1472,13 @@ def chinese_name_valid(value: str) -> bool:
     surname = None
     given_name = None
 
-    # Load surnames from data file
+    # Load surnames from data file and merge with hardcoded fallback
     valid_surnames = _load_data_file("cn_surnames.csv")
     if not valid_surnames:
-        valid_surnames = CHINESE_SURNAMES # Fallback to hardcoded for robustness
+        valid_surnames = CHINESE_SURNAMES
+    else:
+        # Merge to ensure we don't miss anything (like compound surnames)
+        valid_surnames = valid_surnames.union(CHINESE_SURNAMES)
 
     # Check compound surnames first (2 chars)
     if len(value) >= 3 and value[:2] in valid_surnames:
@@ -3296,6 +3392,7 @@ VERIFICATION_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
     "luhn": luhn,
     "dms_coordinate": dms_coordinate,
     "high_entropy_token": high_entropy_token,
+    "english_name_valid": english_name_valid,
     "not_timestamp": not_timestamp,
     "korean_bank_account_valid": korean_bank_account_valid,
     "generic_number_not_timestamp": generic_number_not_timestamp,

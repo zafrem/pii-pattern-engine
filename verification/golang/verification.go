@@ -62,6 +62,10 @@ var (
 		"google_api_key_valid":            GoogleApiKeyValid,
 		"crypto_btc_valid":                CryptoBtcValid,
 		"crypto_eth_valid":                CryptoEthValid,
+		"english_name_valid":              EnglishNameValid,
+		"korean_address_valid":            KoreanAddressValid,
+		"japanese_address_valid":          JapaneseAddressValid,
+		"chinese_address_valid":           ChineseAddressValid,
 	}
 
 	mu sync.RWMutex
@@ -161,6 +165,22 @@ var KOREAN_NON_NAME_KEYWORDS = map[string]struct{}{
 	"메일": {}, "팩스": {}, "모바일": {}, "정보": {}, "문의": {}, "확인": {}, "성별": {}, "생년": {}, "월일": {}, "생일": {},
 	"직업": {}, "나이": {}, "회사": {}, "부서": {}, "직책": {}, "전화번": {}, "메일주": {}, "이메일주": {}, "연락처는": {}, "주소는": {},
 	"이름은": {}, "성명은": {},
+}
+
+var ENGLISH_SURNAMES = map[string]struct{}{
+	"Smith": {}, "Johnson": {}, "Williams": {}, "Brown": {}, "Jones": {}, "Garcia": {}, "Miller": {}, "Davis": {},
+	"Rodriguez": {}, "Martinez": {}, "Hernandez": {}, "Lopez": {}, "Gonzalez": {}, "Wilson": {}, "Anderson": {},
+	"Thomas": {}, "Taylor": {}, "Moore": {}, "Jackson": {}, "Martin": {}, "Lee": {}, "Perez": {}, "Thompson": {},
+	"White": {}, "Harris": {}, "Sanchez": {}, "Clark": {}, "Ramirez": {}, "Lewis": {}, "Robinson": {}, "Walker": {},
+	"Young": {}, "Allen": {}, "King": {}, "Wright": {}, "Scott": {}, "Torres": {}, "Nguyen": {}, "Hill": {},
+	"Flores": {}, "Green": {}, "Adams": {}, "Nelson": {}, "Baker": {}, "Hall": {}, "Rivera": {}, "Campbell": {},
+	"Mitchell": {}, "Carter": {}, "Roberts": {}, "Gomez": {}, "Phillips": {}, "Evans": {}, "Turner": {},
+	"Diaz": {}, "Parker": {}, "Cruz": {}, "Edwards": {}, "Collins": {}, "Reyes": {}, "Stewart": {}, "Morris": {},
+	"Morales": {}, "Murphy": {}, "Cook": {}, "Rogers": {}, "Gutierrez": {}, "Ortiz": {}, "Morgan": {}, "Cooper": {},
+	"Peterson": {}, "Bailey": {}, "Reed": {}, "Kelly": {}, "Howard": {}, "Ramos": {}, "Kim": {}, "Cox": {}, "Ward": {},
+	"Richardson": {}, "Watson": {}, "Brooks": {}, "Chavez": {}, "Wood": {}, "James": {}, "Bennett": {}, "Gray": {},
+	"Mendoza": {}, "Ruiz": {}, "Hughes": {}, "Price": {}, "Alvarez": {}, "Castillo": {}, "Sanders": {}, "Patel": {},
+	"Myers": {}, "Long": {}, "Ross": {}, "Foster": {}, "Jimenez": {},
 }
 
 var JAPANESE_NON_NAME_KEYWORDS = map[string]struct{}{
@@ -347,10 +367,8 @@ func HighEntropyToken(value string) bool {
 		}
 	}
 
-	// Normalize for entropy calculation: lowercase and treat separators as spaces
-	normalized := strings.ToLower(value)
-	normalized = strings.ReplaceAll(normalized, "-", " ")
-	normalized = strings.ReplaceAll(normalized, "_", " ")
+	// Normalize separators to spaces before entropy calculation
+	normalized := strings.NewReplacer("-", " ", "_", " ", "|", " ").Replace(value)
 
 	counts := make(map[rune]int)
 	for _, r := range normalized {
@@ -364,7 +382,7 @@ func HighEntropyToken(value string) bool {
 		entropy -= p * math.Log2(p)
 	}
 
-	return entropy >= 4.0
+	return entropy >= 4.5
 }
 
 func NotTimestamp(value string) bool {
@@ -1620,4 +1638,104 @@ func CryptoEthValid(value string) bool {
 	}
 	match, _ := regexp.MatchString(`^0x[0-9a-fA-F]{40}$`, value)
 	return match
+}
+
+func EnglishNameValid(value string) bool {
+	parts := strings.Fields(strings.TrimSpace(value))
+	if len(parts) < 2 || len(parts) > 4 {
+		return false
+	}
+	for _, p := range parts {
+		if len(p) == 0 || !unicode.IsUpper([]rune(p)[0]) {
+			return false
+		}
+	}
+
+	firstName := parts[0]
+	lastName := parts[len(parts)-1]
+
+	validSurnames := _loadDataFile("en_surnames.csv")
+	if len(validSurnames) == 0 {
+		validSurnames = ENGLISH_SURNAMES
+	}
+
+	validGivenNames := _loadDataFile("en_given_names.csv")
+	_, isCommonGiven := validGivenNames[firstName]
+	_, isCommonSurname := validSurnames[lastName]
+
+	if isCommonGiven && isCommonSurname {
+		return true
+	}
+	if (isCommonGiven || isCommonSurname) && len(lastName) >= 2 && len(lastName) <= 15 {
+		return true
+	}
+
+	if len(parts) == 2 {
+		firstAlpha := true
+		for _, r := range firstName {
+			if !unicode.IsLetter(r) {
+				firstAlpha = false
+				break
+			}
+		}
+		lastAlpha := true
+		for _, r := range lastName {
+			if !unicode.IsLetter(r) {
+				lastAlpha = false
+				break
+			}
+		}
+		if firstAlpha && lastAlpha && len([]rune(firstName)) >= 2 && len([]rune(lastName)) >= 2 {
+			return true
+		}
+	}
+	return false
+}
+
+func KoreanAddressValid(value string) bool {
+	provinces := []string{
+		"서울특별시", "경기도", "부산광역시", "인천광역시", "대구광역시", "대전광역시",
+		"광주광역시", "울산광역시", "세종특별자치시", "강원도", "충청북도", "충청남도",
+		"전라북도", "전라남도", "경상북도", "경상남도", "제주특별자치도",
+	}
+	for _, p := range provinces {
+		if strings.Contains(value, p) {
+			return true
+		}
+	}
+	return false
+}
+
+func JapaneseAddressValid(value string) bool {
+	prefectures := []string{
+		"北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
+		"茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
+		"新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
+		"静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
+		"奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
+		"徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
+		"熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県",
+	}
+	for _, p := range prefectures {
+		if strings.Contains(value, p) {
+			return true
+		}
+	}
+	return false
+}
+
+func ChineseAddressValid(value string) bool {
+	provinces := []string{
+		"北京市", "天津市", "河北省", "山西省", "内蒙古自治区", "辽宁省", "吉林省",
+		"黑龙江省", "上海市", "江苏省", "浙江省", "安徽省", "福建省", "江西省",
+		"山东省", "河南省", "湖北省", "湖南省", "广东省", "广西壮族自治区", "海南省",
+		"重庆市", "四川省", "贵州省", "云南省", "西藏自治区", "陕西省", "甘肃省",
+		"青海省", "宁夏回族自治区", "新疆维吾尔自治区", "香港特别行政区", "澳门特别行政区", "台湾省",
+	}
+	for _, p := range provinces {
+		if strings.Contains(value, p) {
+			return true
+		}
+	}
+	return false
 }

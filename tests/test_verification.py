@@ -540,25 +540,26 @@ class TestKoreanAlienRegistrationValid:
     def test_valid_alien_registration(self):
         """Test valid alien registration numbers."""
         valid_numbers = [
-            "900101-5234567",
-            "850315-6789012",
-            "920228-7123456",
+            "900101-5234561",
+            "850315-6789019",
+            "920228-7123452",
         ]
         for num in valid_numbers:
             assert kr_alien_registration_valid(num), f"Expected {num} to be valid"
 
     def test_invalid_gender_digit(self):
         """Test with citizen gender digits (should fail)."""
-        assert not kr_alien_registration_valid("900101-1234567")  # 1 is for citizens
-        assert not kr_alien_registration_valid("900101-4234567")  # 4 is for citizens
+        assert not kr_alien_registration_valid("900101-1234561")  # 1 is for citizens
+        assert not kr_alien_registration_valid("900101-4234561")  # 4 is for citizens
 
     def test_invalid_month(self):
         """Test with invalid month."""
-        assert not kr_alien_registration_valid("901301-5234567")  # Month 13
+        assert not kr_alien_registration_valid("901301-5234561")  # Month 13
 
     def test_invalid_day(self):
         """Test with invalid day."""
-        assert not kr_alien_registration_valid("900132-5234567")  # Day 32
+        assert not kr_alien_registration_valid("900132-5234561")  # Day 32
+
 
 
 class TestKoreanCorporateRegistrationValid:
@@ -567,12 +568,13 @@ class TestKoreanCorporateRegistrationValid:
     def test_valid_corporate_registration(self):
         """Test valid corporate registration numbers."""
         valid_numbers = [
-            "110111-1234568",
-            "134511-2345671",
-            "1801115678906",
+            "110111-1234569",
+            "134511-2345674",
+            "1801115678909",
         ]
         for num in valid_numbers:
             assert kr_corporate_registration_valid(num), f"Expected {num} to be valid"
+
 
     def test_invalid_checksum(self):
         """Test with invalid checksum."""

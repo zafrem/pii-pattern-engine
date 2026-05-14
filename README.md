@@ -164,7 +164,7 @@ if jp_my_number_valid("123456789012"):
 
 - **Financial**: Bank accounts, credit cards, IBAN, routing numbers
 - **Identification**: National IDs, SSN, passports, driver's licenses
-- **Contact**: Email, phone numbers, addresses, zipcodes
+- **Contact**: Email, phone numbers, addresses
 - **Network**: IPv4, IPv6, URLs, MAC addresses
 - **Tokens/Secrets**: API keys, JWT, AWS keys, GitHub tokens, private keys
 
@@ -193,13 +193,11 @@ The project includes 32 verification functions for advanced validation:
 | Function | Purpose |
 |----------|---------|
 | `us_ssn_valid` | US SSN validation (area/group/serial checks) |
-| `us_zipcode_valid` | US ZIP code validation |
 
 ### Korea Validators
 
 | Function | Purpose |
 |----------|---------|
-| `korean_zipcode_valid` | Korean postal code validation |
 | `korean_bank_account_valid` | Korean bank account validation with prefix checking |
 | `kr_rrn_valid` | Korean Resident Registration Number validation |
 | `kr_alien_registration_valid` | Korean alien registration number validation |

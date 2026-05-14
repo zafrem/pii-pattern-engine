@@ -108,6 +108,7 @@ def get_vector_similarity_score(value: str) -> float:
 # --- Existing Data Loading Logic ---
 # Cache for data-driven verification
 _DATA_CACHE: Dict[str, Set[str]] = {}
+_ADDRESS_DATA_CACHE: Dict[str, List[Dict[str, str]]] = {}
 
 
 def _get_data_path() -> Path:
@@ -140,6 +141,148 @@ def _load_data_file(filename: str) -> Set[str]:
 
     _DATA_CACHE[filename] = values
     return values
+
+
+_ADDRESS_CACHE_OPTIMIZED: Dict[str, Dict] = {}
+
+
+def _get_optimized_address_data(filename: str, hierarchy: List[str]) -> Dict:
+    """Load and cache address data in a nested dictionary for fast lookup."""
+    if filename in _ADDRESS_CACHE_OPTIMIZED:
+        return _ADDRESS_CACHE_OPTIMIZED[filename]
+
+    data_path = _get_data_path() / filename
+    nested_data = {}
+
+    if data_path.exists():
+        try:
+            import csv
+            with open(data_path, encoding="utf-8") as f:
+                # Skip comment lines
+                lines = (line for line in f if not line.startswith('#'))
+                reader = csv.DictReader(lines)
+                for row in reader:
+                    current_level = nested_data
+                    for i, level_key in enumerate(hierarchy):
+                        val = row.get(level_key)
+                        if not val:
+                            break
+                        # Normalize keys for lookup
+                        lookup_val = val.lower() if filename == "us_addresses.csv" else val
+
+                        if i == len(hierarchy) - 1:
+                            # Final level: use a set for O(1) membership check
+                            if "_items" not in current_level:
+                                current_level["_items"] = set()
+                            current_level["_items"].add(lookup_val)
+                        else:
+                            if lookup_val not in current_level:
+                                current_level[lookup_val] = {}
+                            current_level = current_level[lookup_val]
+            logger.info(f"Loaded and optimized address data from {filename}")
+        except Exception as e:
+            logger.error(f"Failed to load optimized address data {filename}: {e}")
+
+    _ADDRESS_CACHE_OPTIMIZED[filename] = nested_data
+    return nested_data
+
+
+def korean_address_valid(value: str) -> bool:
+    """
+    Verify Korean address contains valid administrative divisions.
+    Checks for combinations of province (level1) and city/district (level2).
+    """
+    # hierarchy: level1 (Prov), level2 (City), level3 (Dong)
+    data = _get_optimized_address_data("kr_addresses.csv", ["level1", "level2", "level3"])
+    if not data:
+        common_provinces = {"서울특별시", "경기도", "부산광역시", "인천광역시", "대구광역시", "대전광역시", "광주광역시", "울산광역시", "세종특별자치시", "강원도", "충청북도", "충청남도", "전라북도", "전라남도", "경상북도", "경상남도", "제주특별자치도"}
+        return any(prov in value for prov in common_provinces)
+
+    # Fast check: Iterate over level1 keys found in the string
+    for prov in data:
+        if prov in value:
+            # If province found, check city (level2)
+            for city in data[prov]:
+                if city == "_items": continue
+                if city in value:
+                    # If city found, check dong (level3)
+                    if "_items" in data[prov][city]:
+                        for dong in data[prov][city]["_items"]:
+                            if dong in value:
+                                return True
+                    return True # Level 2 match is enough for high confidence
+    return False
+
+
+def us_address_valid(value: str) -> bool:
+    """
+    Verify US address contains valid state and city.
+    """
+    # hierarchy: state, city
+    data = _get_optimized_address_data("us_addresses.csv", ["state", "city"])
+    if not data:
+        states = {"AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"}
+        return any(state in value for state in states)
+
+    normalized_value = value.lower()
+    for state in data:
+        # Check for state name (e.g., "New York") or abbreviation if in value
+        if state.lower() in normalized_value:
+            if "_items" in data[state]:
+                for city in data[state]["_items"]:
+                    if city in normalized_value:
+                        return True
+    return False
+
+
+def japanese_address_valid(value: str) -> bool:
+    """
+    Verify Japanese address contains valid prefecture and city.
+    """
+    data = _get_optimized_address_data("jp_addresses.csv", ["prefecture", "city"])
+    if not data:
+        prefectures = {"北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", " 大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"}
+        return any(pref in value for pref in prefectures)
+
+    for pref in data:
+        if pref in value:
+            if "_items" in data[pref]:
+                for city in data[pref]["_items"]:
+                    if city in value:
+                        return True
+    return False
+
+
+def chinese_address_valid(value: str) -> bool:
+    """
+    Verify Chinese address contains valid province, city, and street.
+    """
+    # hierarchy: province, city, area, street
+    data = _get_optimized_address_data("cn_addresses.csv", ["province", "city", "area", "street"])
+    if not data:
+        provinces = {"北京市", "天津市", "河北省", "山西省", "内蒙古自治区", "辽宁省", "吉林省", "黑龙江省", "上海市", "江苏省", "浙江省", "安徽省", "福建省", "江西省", "山东省", "河南省", "湖北省", "湖南省", "广东省", "广西壮族自治区", "海南省", "重庆市", "四川省", "贵州省", "云南省", "西藏自治区", "陕西省", "甘肃省", "青海省", "宁夏回族自治区", "新疆维吾尔自治区", "香港特别行政区", "澳门特别行政区", "台湾省"}
+        return any(prov in value for prov in provinces)
+
+    for prov in data:
+        if prov in value:
+            # Optimization: only check cities within this province
+            for city in data[prov]:
+                if city == "_items": continue
+                if city in value:
+                    # Optional: deep check for street if provided
+                    if city in data[prov] and isinstance(data[prov][city], dict):
+                        for area in data[prov][city]:
+                            if area == "_items": continue
+                            if area in value:
+                                # Final level street check
+                                if "_items" in data[prov][city][area]:
+                                    for street in data[prov][city][area]["_items"]:
+                                        if street in value:
+                                            return True
+                                return True
+                    return True
+    return False
+
 
 
 # Cache for no_words keyword configuration
@@ -503,250 +646,6 @@ def not_timestamp(value: str) -> bool:
             pass
 
     # Not a recognized timestamp format
-    return True
-
-
-def korean_zipcode_valid(value: str) -> bool:
-    """
-    Verify Korean postal code is valid.
-    """
-    digits_only = "".join(c for c in value if c.isdigit())
-    if len(digits_only) != 5:
-        return False
-    if not ("0" <= digits_only[0] <= "6"):
-        return False
-
-    # Reject sequential patterns (12345, 54321, etc.)
-    is_sequential_up = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) + 1
-        for i in range(1, len(digits_only))
-    )
-    is_sequential_down = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) - 1
-        for i in range(1, len(digits_only))
-    )
-
-    if is_sequential_up or is_sequential_down:
-        return False
-
-    # Reject all same digit (00000, 11111, etc.)
-    if len(set(digits_only)) == 1:
-        return False
-
-    # Accept as likely valid postal code
-    return True
-
-
-def us_zipcode_valid(value: str) -> bool:
-    """
-    Verify US postal code is valid.
-
-    Checks against us_zipcodes.csv if available, otherwise uses heuristics.
-    """
-    # Remove any separators to get raw digits first
-    digits_only = "".join(c for c in value if c.isdigit())
-
-    # 1. Data-driven check if data exists
-    valid_zips = _load_data_file("us_zipcodes.csv")
-    if valid_zips:
-        # If we have 5 digits, check exact match
-        if len(digits_only) == 5:
-            return digits_only in valid_zips
-        # If we have 9 digits (ZIP+4), check if the base 5-digit zip is valid
-        elif len(digits_only) == 9:
-            return digits_only[:5] in valid_zips
-
-        # If length is weird but data is present, we might want to fail?
-        # But let's fall back to heuristics just in case regex matched something else
-
-    # 2. Heuristic fallback
-    # US ZIP can be 5 digits or 9 digits (ZIP+4)
-    if len(digits_only) not in [5, 9]:
-        return False
-
-    # Check the first 5 digits (the base ZIP code)
-    base_zip = digits_only[:5]
-
-    # Reject sequential patterns in base ZIP (12345, 54321, etc.)
-    is_sequential_up = all(
-        int(base_zip[i]) == int(base_zip[i - 1]) + 1 for i in range(1, len(base_zip))
-    )
-    is_sequential_down = all(
-        int(base_zip[i]) == int(base_zip[i - 1]) - 1 for i in range(1, len(base_zip))
-    )
-
-    if is_sequential_up or is_sequential_down:
-        return False
-
-    # Reject all same digit in base ZIP (00000, 11111, etc.)
-    if len(set(base_zip)) == 1:
-        return False
-
-    return True
-
-
-def jp_zipcode_valid(value: str) -> bool:
-    """
-    Verify Japanese postal code is valid.
-
-    Checks against jp_zipcodes.csv if available, otherwise uses heuristics.
-    Japanese postal codes are 7 digits, often formatted as XXX-XXXX.
-    """
-    # Normalize: remove hyphen
-    digits_only = value.replace("-", "").replace("−", "").replace("‐", "")
-    digits_only = "".join(c for c in digits_only if c.isdigit())
-
-    if len(digits_only) != 7:
-        return False
-
-    # 1. Data-driven check if data exists
-    valid_zips = _load_data_file("jp_zipcodes.csv")
-    if valid_zips:
-        # Try with hyphen format (stored format)
-        hyphen_format = f"{digits_only[:3]}-{digits_only[3:]}"
-        return hyphen_format in valid_zips or digits_only in valid_zips
-
-    # 2. Heuristic fallback
-    # Reject all same digit (0000000, 1111111, etc.)
-    if len(set(digits_only)) == 1:
-        return False
-
-    # Reject sequential patterns (1234567, 7654321)
-    is_sequential_up = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) + 1
-        for i in range(1, len(digits_only))
-    )
-    is_sequential_down = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) - 1
-        for i in range(1, len(digits_only))
-    )
-    if is_sequential_up or is_sequential_down:
-        return False
-
-    # Valid Japanese postal code prefixes range from 001 to 999
-    # but 000 and 999 are not assigned to any prefecture
-    prefix = int(digits_only[:3])
-    if prefix == 0 or prefix >= 999:
-        return False
-
-    return True
-
-
-def cn_zipcode_valid(value: str) -> bool:
-    """
-    Verify Chinese postal code is valid.
-
-    Checks against cn_zipcodes.csv if available, otherwise uses heuristics.
-    Chinese postal codes are 6 digits (e.g., 100000).
-    """
-    digits_only = "".join(c for c in value if c.isdigit())
-
-    if len(digits_only) != 6:
-        return False
-
-    # 1. Data-driven check if data exists
-    valid_zips = _load_data_file("cn_zipcodes.csv")
-    if valid_zips:
-        return digits_only in valid_zips
-
-    # 2. Heuristic fallback
-    # Reject all same digit (000000, 111111, etc.)
-    if len(set(digits_only)) == 1:
-        return False
-
-    # Reject sequential patterns (123456, 654321)
-    is_sequential_up = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) + 1
-        for i in range(1, len(digits_only))
-    )
-    is_sequential_down = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) - 1
-        for i in range(1, len(digits_only))
-    )
-    if is_sequential_up or is_sequential_down:
-        return False
-
-    # Chinese postal codes: first 2 digits range 01-86
-    first_two = int(digits_only[:2])
-    if first_two < 1 or first_two > 86:
-        return False
-
-    return True
-
-
-def tw_zipcode_valid(value: str) -> bool:
-    """
-    Verify Taiwan postal code is valid.
-
-    Checks against tw_zipcodes.csv if available, otherwise uses heuristics.
-    Taiwan postal codes are 3 or 5 digits (e.g., 100 or 10041).
-    """
-    digits_only = "".join(c for c in value if c.isdigit())
-
-    if len(digits_only) not in [3, 5]:
-        return False
-
-    # 1. Data-driven check if data exists
-    valid_zips = _load_data_file("tw_zipcodes.csv")
-    if valid_zips:
-        # Check exact match, or for 5-digit check if first 3 digits are valid
-        if digits_only in valid_zips:
-            return True
-        if len(digits_only) == 5 and digits_only[:3] in valid_zips:
-            return True
-        return False
-
-    # 2. Heuristic fallback
-    # Reject all same digit
-    if len(set(digits_only)) == 1:
-        return False
-
-    # Taiwan postal codes: first digit 1-9, valid range roughly 100-983
-    first_digit = int(digits_only[0])
-    if first_digit == 0:
-        return False
-
-    return True
-
-
-def in_pincode_valid(value: str) -> bool:
-    """
-    Verify Indian PIN code is valid.
-
-    Checks against in_pincodes.csv if available, otherwise uses heuristics.
-    Indian PIN codes are 6 digits starting with 1-9 (e.g., 110001).
-    """
-    digits_only = "".join(c for c in value if c.isdigit())
-
-    if len(digits_only) != 6:
-        return False
-
-    # First digit must be 1-9
-    if digits_only[0] == "0":
-        return False
-
-    # 1. Data-driven check if data exists
-    valid_pins = _load_data_file("in_pincodes.csv")
-    if valid_pins:
-        return digits_only in valid_pins
-
-    # 2. Heuristic fallback
-    # Reject all same digit (111111, 222222, etc.)
-    if len(set(digits_only)) == 1:
-        return False
-
-    # Reject sequential patterns (123456, 654321)
-    is_sequential_up = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) + 1
-        for i in range(1, len(digits_only))
-    )
-    is_sequential_down = all(
-        int(digits_only[i]) == int(digits_only[i - 1]) - 1
-        for i in range(1, len(digits_only))
-    )
-    if is_sequential_up or is_sequential_down:
-        return False
-
     return True
 
 
@@ -3427,8 +3326,6 @@ VERIFICATION_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
     "dms_coordinate": dms_coordinate,
     "high_entropy_token": high_entropy_token,
     "not_timestamp": not_timestamp,
-    "korean_zipcode_valid": korean_zipcode_valid,
-    "us_zipcode_valid": us_zipcode_valid,
     "korean_bank_account_valid": korean_bank_account_valid,
     "generic_number_not_timestamp": generic_number_not_timestamp,
     "contains_letter": contains_letter,
@@ -3452,11 +3349,6 @@ VERIFICATION_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
     "kr_alien_registration_valid": kr_alien_registration_valid,
     "kr_corporate_registration_valid": kr_corporate_registration_valid,
     "jp_driver_license_valid": jp_driver_license_valid,
-    # Zipcode verification (JP, CN, TW, IN)
-    "jp_zipcode_valid": jp_zipcode_valid,
-    "cn_zipcode_valid": cn_zipcode_valid,
-    "tw_zipcode_valid": tw_zipcode_valid,
-    "in_pincode_valid": in_pincode_valid,
     # Japanese
     "jp_my_number_valid": jp_my_number_valid,
     "jp_corporate_number_valid": jp_corporate_number_valid,
@@ -3484,6 +3376,11 @@ VERIFICATION_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
     "france_insee_valid": france_insee_valid,
     "belgium_rrn_valid": belgium_rrn_valid,
     "finland_hetu_valid": finland_hetu_valid,
+    # Address validation
+    "korean_address_valid": korean_address_valid,
+    "us_address_valid": us_address_valid,
+    "japanese_address_valid": japanese_address_valid,
+    "chinese_address_valid": chinese_address_valid,
 }
 
 

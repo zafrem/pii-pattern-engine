@@ -176,68 +176,6 @@ function not_timestamp(value) {
   return true;
 }
 
-function korean_zipcode_valid(value) {
-  const digitsOnly = value.replace(/\D/g, "");
-  if (digitsOnly.length !== 5) return false;
-  return digitsOnly[0] >= '0' && digitsOnly[0] <= '6';
-}
-
-function us_zipcode_valid(value) {
-  const digitsOnly = value.replace(/\D/g, "");
-  const validZips = _loadData("us_zipcodes.csv");
-  if (validZips.size > 0) {
-    if (digitsOnly.length === 5) return validZips.has(digitsOnly);
-    if (digitsOnly.length === 9) return validZips.has(digitsOnly.slice(0, 5));
-  }
-  if (digitsOnly.length !== 5 && digitsOnly.length !== 9) return false;
-  const baseZip = digitsOnly.slice(0, 5);
-  if (new Set(baseZip).size === 1) return false;
-  return true;
-}
-
-function jp_zipcode_valid(value) {
-  const digitsOnly = value.replace(/[-−‐]/g, "").replace(/\D/g, "");
-  if (digitsOnly.length !== 7) return false;
-  const validZips = _loadData("jp_zipcodes.csv");
-  if (validZips.size > 0) {
-    return validZips.has(`${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`) || validZips.has(digitsOnly);
-  }
-  if (new Set(digitsOnly).size === 1) return false;
-  return true;
-}
-
-function cn_zipcode_valid(value) {
-  const digitsOnly = value.replace(/\D/g, "");
-  if (digitsOnly.length !== 6) return false;
-  const validZips = _loadData("cn_zipcodes.csv");
-  if (validZips.size > 0) return validZips.has(digitsOnly);
-  if (new Set(digitsOnly).size === 1) return false;
-  const firstTwo = parseInt(digitsOnly.slice(0, 2), 10);
-  return firstTwo >= 1 && firstTwo <= 86;
-}
-
-function tw_zipcode_valid(value) {
-  const digitsOnly = value.replace(/\D/g, "");
-  if (digitsOnly.length !== 3 && digitsOnly.length !== 5) return false;
-  const validZips = _loadData("tw_zipcodes.csv");
-  if (validZips.size > 0) {
-    if (validZips.has(digitsOnly)) return true;
-    if (digitsOnly.length === 5 && validZips.has(digitsOnly.slice(0, 3))) return true;
-    return false;
-  }
-  if (new Set(digitsOnly).size === 1) return false;
-  return digitsOnly[0] !== '0';
-}
-
-function in_pincode_valid(value) {
-  const digitsOnly = value.replace(/\D/g, "");
-  if (digitsOnly.length !== 6 || digitsOnly[0] === '0') return false;
-  const validPins = _loadData("in_pincodes.csv");
-  if (validPins.size > 0) return validPins.has(digitsOnly);
-  if (new Set(digitsOnly).size === 1) return false;
-  return true;
-}
-
 function korean_bank_account_valid(value) {
   const digitsOnly = value.replace(/\D/g, "");
   if (!digitsOnly) return false;
@@ -426,7 +364,6 @@ function credit_card_bin_valid(value) {
 
 const VERIFICATION_FUNCTIONS = {
   iban_mod97, luhn, dms_coordinate, high_entropy_token, not_timestamp,
-  korean_zipcode_valid, us_zipcode_valid, jp_zipcode_valid, cn_zipcode_valid, tw_zipcode_valid, in_pincode_valid,
   korean_bank_account_valid, generic_number_not_timestamp, contains_letter, us_ssn_valid,
   chinese_name_valid, korean_name_valid, japanese_name_kanji_valid, cjk_name_standalone,
   cn_national_id_valid, tw_national_id_valid, india_aadhaar_valid, india_pan_valid,

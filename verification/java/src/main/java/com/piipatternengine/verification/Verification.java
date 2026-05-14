@@ -42,6 +42,23 @@ public class Verification {
         "佐藤", "鈴木", "高橋", "田中", "伊藤", "渡辺", "山本", "中村", "小林", "加藤", "吉田", "山田", "佐々木", "山口", "松本", "井上", "木村", "林", "斎藤", "清水", "山崎", "森", "阿部", "池田", "橋本", "山下", "石川", "中島", "前田", "藤田", "小川", "後藤", "岡田", "長谷川", "村上", "近藤", "石井", "斉藤", "坂本", "遠藤", "青木", "藤井", "西村", "福田", "太田", "三浦", "藤原", "岡本", "松田", "中川", "原田", "小野", "竹内", "金子", "和田", "中野", "原", "田村", "安藤", "河野", "上田", "大野", "高木", "工藤", "内田", "丸山", "今井", "酒井", "宮崎", "横山", "関", "堀", "島", "谷", "浜", "沢", "杉"
     ));
 
+    // Common English surnames
+    public static final Set<String> ENGLISH_SURNAMES = new HashSet<>(Arrays.asList(
+        "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
+        "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
+        "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson",
+        "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", "Walker",
+        "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill",
+        "Flores", "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell",
+        "Mitchell", "Carter", "Roberts", "Gomez", "Phillips", "Evans", "Turner",
+        "Diaz", "Parker", "Cruz", "Edwards", "Collins", "Reyes", "Stewart", "Morris",
+        "Morales", "Murphy", "Cook", "Rogers", "Gutierrez", "Ortiz", "Morgan", "Cooper",
+        "Peterson", "Bailey", "Reed", "Kelly", "Howard", "Ramos", "Kim", "Cox", "Ward",
+        "Richardson", "Watson", "Brooks", "Chavez", "Wood", "James", "Bennett", "Gray",
+        "Mendoza", "Ruiz", "Hughes", "Price", "Alvarez", "Castillo", "Sanders", "Patel",
+        "Myers", "Long", "Ross", "Foster", "Jimenez"
+    ));
+
     // Chinese non-name keywords
     public static final Set<String> CHINESE_NON_NAME_KEYWORDS = new HashSet<>(Arrays.asList(
         "王国", "王朝", "王牌", "王者", "李子", "张开", "张力", "张贴", "黄金", "黄色", "黄油", "黄土", "黄瓜", "黄油", "黄河", "黄昏", "高度", "高级", "高中", "高速", "高考", "高峰", "高手", "高端", "周围", "周期", "周末", "周年", "周边", "周到", "马上", "马路", "马力", "朱红", "曹操", "白色", "白天", "白云", "白金", "白菜", "金属", "金融", "金额", "金钱", "金牌", "田地", "田野", "田园", "石头", "石油", "石材", "方法", "方案", "方向", "方式", "方面", "方便", "任务", "任何", "任意", "任命", "程度", "程序", "江山", "江南", "江河", "余额", "余下", "于是", "何时", "何处", "何必",
@@ -102,6 +119,10 @@ public class Verification {
         registerVerificationFunction("google_api_key_valid", Verification::googleApiKeyValid);
         registerVerificationFunction("crypto_btc_valid", Verification::cryptoBtcValid);
         registerVerificationFunction("crypto_eth_valid", Verification::cryptoEthValid);
+        registerVerificationFunction("english_name_valid", Verification::englishNameValid);
+        registerVerificationFunction("korean_address_valid", Verification::koreanAddressValid);
+        registerVerificationFunction("japanese_address_valid", Verification::japaneseAddressValid);
+        registerVerificationFunction("chinese_address_valid", Verification::chineseAddressValid);
     }
 
     /**
@@ -266,8 +287,8 @@ public class Verification {
             if (allowedChars.indexOf(c) == -1) return false;
         }
 
-        // Normalize for entropy calculation: lowercase and treat separators as spaces
-        String normalized = value.toLowerCase().replace('-', ' ').replace('_', ' ');
+        // Normalize separators to spaces before entropy calculation
+        String normalized = value.replace('-', ' ').replace('_', ' ').replace('|', ' ');
 
         Map<Character, Integer> counts = new HashMap<>();
         for (char c : normalized.toCharArray()) {
@@ -281,7 +302,7 @@ public class Verification {
             entropy -= p * (Math.log(p) / Math.log(2));
         }
 
-        return entropy >= 4.0;
+        return entropy >= 4.5;
     }
 
     /**
@@ -1295,5 +1316,87 @@ public class Verification {
         if (value.length() != 42) return false;
         if (!value.startsWith("0x")) return false;
         return value.matches("^0x[0-9a-fA-F]{40}$");
+    }
+
+    /**
+     * Verify English name format (First Last or First Middle Last).
+     */
+    public static boolean englishNameValid(String value) {
+        if (value == null) return false;
+        String[] parts = value.trim().split("\\s+");
+        if (parts.length < 2 || parts.length > 4) return false;
+
+        for (String p : parts) {
+            if (p.isEmpty() || !Character.isUpperCase(p.charAt(0))) return false;
+        }
+
+        String firstName = parts[0];
+        String lastName = parts[parts.length - 1];
+
+        Set<String> validSurnames = loadDataFile("en_surnames.csv");
+        if (validSurnames.isEmpty()) validSurnames = ENGLISH_SURNAMES;
+
+        Set<String> validGivenNames = loadDataFile("en_given_names.csv");
+        boolean isCommonGiven = !validGivenNames.isEmpty() && validGivenNames.contains(firstName);
+        boolean isCommonSurname = validSurnames.contains(lastName);
+
+        if (isCommonGiven && isCommonSurname) return true;
+        if ((isCommonGiven || isCommonSurname) && lastName.length() >= 2 && lastName.length() <= 15) return true;
+
+        if (parts.length == 2 && firstName.matches("[A-Za-z]+") && lastName.matches("[A-Za-z]+")) {
+            if (firstName.length() >= 2 && lastName.length() >= 2) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Verify Korean address contains a known administrative province.
+     */
+    public static boolean koreanAddressValid(String value) {
+        String[] provinces = {
+            "서울특별시", "경기도", "부산광역시", "인천광역시", "대구광역시", "대전광역시",
+            "광주광역시", "울산광역시", "세종특별자치시", "강원도", "충청북도", "충청남도",
+            "전라북도", "전라남도", "경상북도", "경상남도", "제주특별자치도"
+        };
+        for (String p : provinces) {
+            if (value.contains(p)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Verify Japanese address contains a known prefecture.
+     */
+    public static boolean japaneseAddressValid(String value) {
+        String[] prefectures = {
+            "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
+            "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
+            "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
+            "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
+            "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
+            "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
+            "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"
+        };
+        for (String p : prefectures) {
+            if (value.contains(p)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Verify Chinese address contains a known province.
+     */
+    public static boolean chineseAddressValid(String value) {
+        String[] provinces = {
+            "北京市", "天津市", "河北省", "山西省", "内蒙古自治区", "辽宁省", "吉林省",
+            "黑龙江省", "上海市", "江苏省", "浙江省", "安徽省", "福建省", "江西省",
+            "山东省", "河南省", "湖北省", "湖南省", "广东省", "广西壮族自治区", "海南省",
+            "重庆市", "四川省", "贵州省", "云南省", "西藏自治区", "陕西省", "甘肃省",
+            "青海省", "宁夏回族自治区", "新疆维吾尔自治区", "香港特别行政区", "澳门特别行政区", "台湾省"
+        };
+        for (String p : provinces) {
+            if (value.contains(p)) return true;
+        }
+        return false;
     }
 }

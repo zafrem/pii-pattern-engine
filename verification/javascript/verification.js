@@ -52,6 +52,22 @@ const JAPANESE_NON_NAME_KEYWORDS = new Set([
   "電話", "住所", "名前", "情報", "連絡", "番号", "携帯", "確認", "登録", "氏名", "性別", "生年", "職業", "会社", "部署", "郵便", "暗号", "認証", "口座"
 ]);
 
+const ENGLISH_SURNAMES = new Set([
+  "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
+  "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
+  "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson",
+  "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", "Walker",
+  "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill",
+  "Flores", "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell",
+  "Mitchell", "Carter", "Roberts", "Gomez", "Phillips", "Evans", "Turner",
+  "Diaz", "Parker", "Cruz", "Edwards", "Collins", "Reyes", "Stewart", "Morris",
+  "Morales", "Murphy", "Cook", "Rogers", "Gutierrez", "Ortiz", "Morgan", "Cooper",
+  "Peterson", "Bailey", "Reed", "Kelly", "Howard", "Ramos", "Kim", "Cox", "Ward",
+  "Richardson", "Watson", "Brooks", "Chavez", "Wood", "James", "Bennett", "Gray",
+  "Mendoza", "Ruiz", "Hughes", "Price", "Alvarez", "Castillo", "Sanders", "Patel",
+  "Myers", "Long", "Ross", "Foster", "Jimenez"
+]);
+
 // --- Core Verification Functions ---
 
 function iban_mod97(value) {
@@ -123,8 +139,8 @@ function high_entropy_token(value) {
   const allowedChars = /^[A-Za-z0-9_\-+/./=]+$/;
   if (!allowedChars.test(value)) return false;
 
-  // Normalize for entropy calculation: lowercase and treat separators as spaces
-  const normalized = value.toLowerCase().replace(/[-_]/g, " ");
+  // Normalize separators to spaces before entropy calculation
+  const normalized = value.replace(/[-_|]/g, " ");
 
   const charCounts = {};
   for (const char of normalized) {
@@ -362,6 +378,61 @@ function credit_card_bin_valid(value) {
   return luhn(digits);
 }
 
+function english_name_valid(value) {
+  const parts = value.trim().split(/\s+/);
+  if (parts.length < 2 || parts.length > 4) return false;
+  if (!parts.every(p => p.length > 0 && p[0] === p[0].toUpperCase())) return false;
+
+  const firstName = parts[0];
+  const lastName = parts[parts.length - 1];
+
+  const validSurnames = _loadData("en_surnames.csv").size > 0 ? _loadData("en_surnames.csv") : ENGLISH_SURNAMES;
+  const validGivenNames = _loadData("en_given_names.csv");
+  const isCommonGiven = validGivenNames.size > 0 && validGivenNames.has(firstName);
+  const isCommonSurname = validSurnames.has(lastName);
+
+  if (isCommonGiven && isCommonSurname) return true;
+  if ((isCommonGiven || isCommonSurname) && lastName.length >= 2 && lastName.length <= 15) return true;
+
+  if (parts.length === 2 && /^[A-Za-z]+$/.test(firstName) && /^[A-Za-z]+$/.test(lastName)) {
+    if (firstName.length >= 2 && lastName.length >= 2) return true;
+  }
+  return false;
+}
+
+function korean_address_valid(value) {
+  const provinces = [
+    "서울특별시", "경기도", "부산광역시", "인천광역시", "대구광역시", "대전광역시",
+    "광주광역시", "울산광역시", "세종특별자치시", "강원도", "충청북도", "충청남도",
+    "전라북도", "전라남도", "경상북도", "경상남도", "제주특별자치도"
+  ];
+  return provinces.some(p => value.includes(p));
+}
+
+function japanese_address_valid(value) {
+  const prefectures = [
+    "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
+    "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
+    "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
+    "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
+    "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
+    "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
+    "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"
+  ];
+  return prefectures.some(p => value.includes(p));
+}
+
+function chinese_address_valid(value) {
+  const provinces = [
+    "北京市", "天津市", "河北省", "山西省", "内蒙古自治区", "辽宁省", "吉林省",
+    "黑龙江省", "上海市", "江苏省", "浙江省", "安徽省", "福建省", "江西省",
+    "山东省", "河南省", "湖北省", "湖南省", "广东省", "广西壮族自治区", "海南省",
+    "重庆市", "四川省", "贵州省", "云南省", "西藏自治区", "陕西省", "甘肃省",
+    "青海省", "宁夏回族自治区", "新疆维吾尔自治区", "香港特别行政区", "澳门特别行政区", "台湾省"
+  ];
+  return provinces.some(p => value.includes(p));
+}
+
 const VERIFICATION_FUNCTIONS = {
   iban_mod97, luhn, dms_coordinate, high_entropy_token, not_timestamp,
   korean_bank_account_valid, generic_number_not_timestamp, contains_letter, us_ssn_valid,
@@ -369,7 +440,8 @@ const VERIFICATION_FUNCTIONS = {
   cn_national_id_valid, tw_national_id_valid, india_aadhaar_valid, india_pan_valid,
   kr_business_registration_valid, kr_rrn_valid, kr_alien_registration_valid, jp_my_number_valid,
   kr_corporate_registration_valid, jp_driver_license_valid, imei_valid, mac_address_valid, ipv4_public,
-  not_repeating_pattern, credit_card_bin_valid
+  not_repeating_pattern, credit_card_bin_valid,
+  english_name_valid, korean_address_valid, japanese_address_valid, chinese_address_valid
 };
 
 module.exports = { ...VERIFICATION_FUNCTIONS, VERIFICATION_FUNCTIONS, setCustomData,

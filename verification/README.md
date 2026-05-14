@@ -31,8 +31,10 @@ The Python verification module provides functions for validating matched pattern
 
 #### Geographic Validators
 - `dms_coordinate(value)` - DMS coordinate format validation
-- `korean_zipcode_valid(value)` - Korean postal code validation
-- `us_zipcode_valid(value)` - US ZIP code validation
+- `korean_address_valid(value)` - Korean address validation (database-backed)
+- `us_address_valid(value)` - US address validation (database-backed)
+- `japanese_address_valid(value)` - Japanese address validation (database-backed)
+- `chinese_address_valid(value)` - Chinese address validation (database-backed)
 
 #### Token/Secret Validators
 - `high_entropy_token(value)` - High-entropy token detection (API keys, secrets)

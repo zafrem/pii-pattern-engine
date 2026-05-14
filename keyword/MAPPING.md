@@ -17,7 +17,7 @@ This document maps pattern files to their corresponding keyword categories for e
 | **Contact Patterns** |
 | common/email.yml | contact.yml | email | medium |
 | */phone.yml | contact.yml | phone | medium |
-| */other.yml (addresses) | contact.yml | address, zipcode | medium |
+| */other.yml (addresses) | contact.yml | address | medium |
 | **Network Patterns** |
 | common/ip.yml | network.yml | ip_address | low |
 | common/urls.yml | network.yml | url | low |
@@ -30,14 +30,14 @@ This document maps pattern files to their corresponding keyword categories for e
 - `us/ssn.yml` → identification.yml (ssn, itin)
 - `us/phone.yml` → contact.yml (phone)
 - `us/identification.yml` → identification.yml (drivers_license)
-- `us/other.yml` → contact.yml (address, zipcode)
+- `us/other.yml` → contact.yml (address)
 
 ### Korea (kr/)
 - `kr/banks.yml` → financial.yml (bank)
 - `kr/rrn.yml` → identification.yml (rrn)
 - `kr/phone.yml` → contact.yml (phone)
 - `kr/identification.yml` → identification.yml (passport)
-- `kr/other.yml` → contact.yml (address, zipcode) + personal.yml
+- `kr/other.yml` → contact.yml (address) + personal.yml
 
 ### China (cn/)
 - `cn/banks.yml` → financial.yml (bank)

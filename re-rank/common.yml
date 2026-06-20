@@ -1,0 +1,323 @@
+version: "2.0"
+region: Common / International
+region_code: COMM
+code_series: 9001-9013
+engine: re-rank/scoring.yml
+reference: reference/common.yml
+
+entities:
+
+  9001:
+    entity: common_email
+    keyword_scores:
+      email: 60
+      e-mail: 60
+      email address: 70
+      contact email: 65
+      mail: 30
+      이메일: 60
+      메일: 40
+      メール: 60
+      Eメール: 65
+      电子邮件: 60
+      電子郵件: 60
+      邮箱: 55
+      电邮: 55
+      correo electrónico: 60
+      courriel: 60
+    context_bonus:
+      "Email:": 25
+      "E-mail:": 25
+      "이메일:": 25
+      "メールアドレス:": 25
+      "Contact:": 15
+    regex_scores:
+      email_01: 50             # RFC-compliant format → high specificity
+    sum_example:
+      keyword_hits: [30, 60, 60, 70]   # mail, email, e-mail, email address
+      keyword_avg: 55
+      context_bonus: 0
+      regex_score: 50
+      final_score: 100         # 55+0+50 = 105 → capped
+      label: definite_pii
+
+  9002:
+    entity: common_name_en
+    keyword_scores:
+      name: 40
+      full name: 55
+      first name: 55
+      last name: 55
+      given name: 55
+      surname: 55
+      middle name: 50
+    context_bonus:
+      "Name:": 15
+      "Full Name:": 20
+      "First Name:": 20
+      "Last Name:": 20
+    regex_scores:
+      name_en_01: 30           # broad First Last pattern
+    sum_example:
+      keyword_hits: [55, 55, 55]
+      keyword_avg: 55
+      context_bonus: 20
+      regex_score: 30
+      final_score: 100         # 55+20+30 = 105 → capped
+      label: definite_pii
+
+  9003:
+    entity: common_date_iso
+    keyword_scores:
+      date of birth: 80
+      dob: 75
+      birthday: 65
+      birth date: 75
+      born: 55
+      생년월일: 80
+      生年月日: 80
+      出生日期: 80
+      fecha de nacimiento: 80
+      date de naissance: 80
+    context_bonus:
+      "DOB:": 30
+      "Date of Birth:": 35
+      "Birthday:": 25
+      "생년월일:": 35
+    regex_scores:
+      date_iso_01: 40          # YYYY-MM-DD is common in logs but DOB context narrows it
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 35
+      regex_score: 40
+      final_score: 100         # 77+35+40 = 152 → capped
+      label: definite_pii
+
+  9004:
+    entity: common_date_slash
+    keyword_scores:
+      date of birth: 80
+      dob: 75
+      birthday: 65
+      birth date: 75
+      born: 55
+      生年月日: 80
+      생년월일: 80
+    context_bonus:
+      "DOB:": 30
+      "Date of Birth:": 35
+      "Birthday:": 25
+    regex_scores:
+      date_slash_01: 40
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 35
+      regex_score: 40
+      final_score: 100         # 77+35+40 = 152 → capped
+      label: definite_pii
+
+  9005:
+    entity: common_ipv4
+    keyword_scores:
+      ip: 50
+      ip address: 65
+      ipv4: 65
+      source ip: 70
+      client ip: 70
+      remote ip: 70
+      host: 35
+      server: 30
+      아이피: 55
+      IP주소: 65
+      IP地址: 65
+    context_bonus:
+      "IP:": 25
+      "IP Address:": 30
+      "Client IP:": 30
+    regex_scores:
+      ipv4_01: 40
+    sum_example:
+      keyword_hits: [65, 70, 70]
+      keyword_avg: 68
+      context_bonus: 30
+      regex_score: 40
+      final_score: 100         # 68+30+40 = 138 → capped
+      label: definite_pii
+
+  9006:
+    entity: common_ipv6
+    keyword_scores:
+      ip: 50
+      ip address: 65
+      ipv6: 70
+      source ip: 70
+      client ip: 70
+      host: 35
+    context_bonus:
+      "IP:": 25
+      "IP Address:": 30
+    regex_scores:
+      ipv6_01: 40
+    sum_example:
+      keyword_hits: [65, 70, 70]
+      keyword_avg: 68
+      context_bonus: 30
+      regex_score: 40
+      final_score: 100         # 68+30+40 = 138 → capped
+      label: definite_pii
+
+  9007:
+    entity: common_url
+    keyword_scores:
+      url: 55
+      link: 45
+      website: 45
+      web address: 55
+      http: 50
+      https: 50
+      endpoint: 50
+    context_bonus:
+      "URL:": 20
+      "Link:": 15
+    regex_scores:
+      url_01: 30               # URLs are broad; context determines sensitivity
+    sum_example:
+      keyword_hits: [55, 55, 50]
+      keyword_avg: 53
+      context_bonus: 20
+      regex_score: 30
+      final_score: 100         # 53+20+30 = 103 → capped
+      label: definite_pii
+
+  9008:
+    entity: common_credit_card_visa
+    keyword_scores:
+      visa: 75
+      credit card: 70
+      card number: 70
+      cc: 65
+      cvv: 65
+      expiry: 55
+      신용카드: 70
+      카드번호: 70
+      カード番号: 70
+      信用卡: 70
+    context_bonus:
+      "Card Number:": 30
+      "Credit Card:": 30
+      "카드번호:": 30
+    regex_scores:
+      credit_card_visa_01: 50  # Luhn-validated
+    sum_example:
+      keyword_hits: [75, 70, 65]
+      keyword_avg: 70
+      context_bonus: 30
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  9009:
+    entity: common_credit_card_mastercard
+    keyword_scores:
+      mastercard: 75
+      credit card: 70
+      card number: 70
+      cc: 65
+      cvv: 65
+      expiry: 55
+    context_bonus:
+      "Card Number:": 30
+      "Credit Card:": 30
+    regex_scores:
+      credit_card_mastercard_01: 50
+    sum_example:
+      keyword_hits: [75, 70, 65]
+      keyword_avg: 70
+      context_bonus: 30
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  9010:
+    entity: common_credit_card_amex
+    keyword_scores:
+      amex: 80
+      american express: 80
+      credit card: 70
+      card number: 70
+      csc: 65
+    context_bonus:
+      "Card Number:": 30
+      "Amex:": 35
+    regex_scores:
+      credit_card_amex_01: 50
+    sum_example:
+      keyword_hits: [80, 70, 65]
+      keyword_avg: 72
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  9011:
+    entity: common_credit_card_discover
+    keyword_scores:
+      discover: 75
+      credit card: 70
+      card number: 70
+      cc: 65
+    context_bonus:
+      "Card Number:": 30
+      "Discover:": 30
+    regex_scores:
+      credit_card_discover_01: 50
+    sum_example:
+      keyword_hits: [75, 70, 65]
+      keyword_avg: 70
+      context_bonus: 30
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  9012:
+    entity: common_credit_card_jcb
+    keyword_scores:
+      jcb: 80
+      credit card: 70
+      card number: 70
+      クレジットカード: 70
+      カード番号: 70
+    context_bonus:
+      "Card Number:": 30
+      "JCB:": 35
+    regex_scores:
+      credit_card_jcb_01: 50
+    sum_example:
+      keyword_hits: [80, 70, 70]
+      keyword_avg: 73
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  9013:
+    entity: common_credit_card_diners
+    keyword_scores:
+      diners: 80
+      diners club: 80
+      credit card: 70
+      card number: 70
+    context_bonus:
+      "Card Number:": 30
+      "Diners:": 35
+    regex_scores:
+      credit_card_diners_01: 50
+    sum_example:
+      keyword_hits: [80, 70, 70]
+      keyword_avg: 73
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii

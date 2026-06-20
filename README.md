@@ -1,56 +1,97 @@
 # PII Pattern Engine
 
-A comprehensive collection of regular expression patterns and verification functions for detecting personally identifiable information (PII) and sensitive data across multiple languages and regions.
+A comprehensive collection of regex patterns, verification functions, and a re-rank scoring system for detecting personally identifiable information (PII) and sensitive data across multiple languages and regions.
 
 ## Overview
 
 PII Pattern Engine provides:
-- **Regex Patterns**: 160+ patterns for PII detection across US, Korea, Japan, China, Taiwan, India, EU, and common international formats
-- **Verification Functions**: 32 Python verification functions for checksum validation and data quality checks
+- **Regex Patterns**: 204 patterns for PII detection across US, Korea, Japan, China, Taiwan, India, EU, Spain, France, and common international formats
+- **Re-Rank Scoring System**: Confidence scoring engine that combines keyword signals, field-label context, and regex evidence into a single 0–100 score
+- **Reference Registry**: Stable numeric codes (1001–9510) for all 153 PII entity types — safe for use in logs, configs, and APIs
+- **Verification Functions**: 59 Python functions for checksum validation and data quality checks
 - **Keyword Mappings**: Context-aware keywords in multiple languages for improved accuracy
-- **Comprehensive Tests**: 1,965+ automated tests ensuring pattern accuracy and reliability
+- **Comprehensive Tests**: 3,500+ automated tests ensuring accuracy and reliability
 
 ## Project Structure
 
 ```
 pii-pattern-engine/
-├── regex/                    # Regex pattern definitions (YAML)
-│   ├── pii/                 # Personally Identifiable Information patterns
-│   │   ├── us/             # United States (SSN, driver's license, passport, phone, etc.)
-│   │   ├── kr/             # South Korea (RRN, bank accounts, phone, etc.)
-│   │   ├── jp/             # Japan (My Number, bank accounts, phone, etc.)
-│   │   ├── cn/             # China (ID cards, bank accounts, phone, etc.)
-│   │   ├── tw/             # Taiwan (ID cards, bank accounts, phone, etc.)
-│   │   ├── in/             # India (Aadhaar, PAN, phone, etc.)
-│   │   ├── eu/             # European Union (VAT, national IDs, passports, etc.)
-│   │   ├── common/         # International formats (email, IP, credit cards, etc.)
-│   │   └── iban.yml        # IBAN patterns with mod-97 validation
-│   └── hash/                # High-entropy tokens and secrets
-│       └── tokens.yml       # API keys, JWT, AWS keys, GitHub tokens, etc.
+├── regex/                        # Regex pattern definitions (YAML)
+│   ├── pii/                     # Personally Identifiable Information
+│   │   ├── us/                 # United States (SSN, passport, phone, etc.)
+│   │   ├── kr/                 # South Korea (RRN, bank accounts, phone, etc.)
+│   │   ├── jp/                 # Japan (My Number, bank accounts, phone, etc.)
+│   │   ├── cn/                 # China (ID cards, bank accounts, phone, etc.)
+│   │   ├── tw/                 # Taiwan (ID cards, bank accounts, phone, etc.)
+│   │   ├── in/                 # India (Aadhaar, PAN, GST, phone, etc.)
+│   │   ├── eu/                 # European Union (VAT, national IDs, passports, etc.)
+│   │   ├── es/                 # Spain (DNI, NIE, CIF, phone)
+│   │   ├── fr/                 # France (NIR, CNI, passport, phone)
+│   │   ├── common/             # International (email, IP, credit cards, URLs, etc.)
+│   │   └── iban.yml            # IBAN patterns (DE, FR, GB, IT + generic)
+│   ├── hash/                    # High-entropy tokens and secrets
+│   │   └── tokens.yml          # API keys, JWT, AWS keys, GitHub tokens, etc.
+│   ├── sox/                     # SOX financial control patterns
+│   └── tech/                    # Technical identifiers (patents, UUIDs, etc.)
 │
-├── verification/            # Verification functions for pattern validation
-│   ├── python/             # Python implementation
-│   │   ├── verification.py # 32 verification functions
+├── re-rank/                      # Confidence scoring engine (v2.0)
+│   ├── scoring.yml              # Engine config: formula, thresholds, entity index
+│   ├── kr.yml                   # Korea entities (codes 1001–1013)
+│   ├── jp.yml                   # Japan entities (codes 2001–2016)
+│   ├── cn.yml                   # China entities (codes 3001–3012)
+│   ├── tw.yml                   # Taiwan entities (codes 4001–4016)
+│   ├── us.yml                   # United States entities (codes 5001–5009)
+│   ├── eu.yml                   # European Union entities (codes 6001–6054)
+│   ├── in.yml                   # India entities (codes 7001–7009)
+│   ├── es_fr.yml                # Spain & France entities (codes 8001–8056)
+│   ├── common.yml               # Common/international entities (codes 9001–9013)
+│   └── tech.yml                 # Tech tokens & secrets (codes 9501–9510)
+│
+├── reference/                    # Stable numeric code registry
+│   ├── registry.yml             # Master flat code map (all 153 entities)
+│   ├── kr.yml                   # Korea entity reference
+│   ├── jp.yml                   # Japan entity reference
+│   ├── cn.yml                   # China entity reference
+│   ├── tw.yml                   # Taiwan entity reference
+│   ├── us.yml                   # United States entity reference
+│   ├── eu.yml                   # European Union entity reference
+│   ├── in.yml                   # India entity reference
+│   ├── es_fr.yml                # Spain & France entity reference
+│   ├── common.yml               # Common/international entity reference
+│   └── tech.yml                 # Tech tokens entity reference
+│
+├── verification/                 # Validation functions (multi-language)
+│   ├── python/
+│   │   ├── verification.py      # 59 verification functions
 │   │   └── __init__.py
+│   ├── golang/
+│   │   ├── verification.go
+│   │   └── go.mod
+│   ├── java/
+│   │   └── src/main/java/com/piipatternengine/verification/
+│   │       └── Verification.java
+│   ├── javascript/
+│   │   └── verification.js
+│   ├── __init__.py
+│   ├── README.md
+│   └── USAGE.md
+│
+├── keyword/                      # Context-aware keywords (multi-language)
+│   ├── financial.yml
+│   ├── identification.yml
+│   ├── contact.yml
+│   ├── network.yml
+│   ├── personal.yml
 │   └── README.md
 │
-├── keyword/                 # Context-aware keywords (multi-language)
-│   ├── financial.yml       # Bank, credit card, IBAN keywords
-│   ├── identification.yml  # SSN, passport, national ID keywords
-│   ├── contact.yml         # Email, phone, address keywords
-│   ├── network.yml         # IP, URL, MAC address keywords
-│   ├── personal.yml        # Name, DOB, gender keywords
+├── tests/                        # Test suite
+│   ├── test_rerank.py           # Re-rank scoring tests (400 tests)
+│   ├── test_verification.py     # Verification function tests
+│   ├── test_patterns.py         # Pattern validation tests
 │   └── README.md
 │
-├── tests/                   # Comprehensive test suite
-│   ├── test_verification.py # Verification function tests (129 tests)
-│   ├── test_patterns.py     # Pattern validation tests (1,836+ tests)
-│   ├── requirements.txt     # Test dependencies
-│   ├── run_tests.sh        # Test runner script
-│   └── README.md
-│
-├── pytest.ini              # Pytest configuration
-└── README.md               # This file
+├── pytest.ini
+└── README.md
 ```
 
 ## Quick Start
@@ -58,11 +99,8 @@ pii-pattern-engine/
 ### Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/yourusername/pii-pattern-engine.git
 cd pii-pattern-engine
-
-# Install test dependencies
 pip install -r tests/requirements.txt
 ```
 
@@ -72,93 +110,145 @@ pip install -r tests/requirements.txt
 # Run all tests
 pytest
 
-# Run specific test file
-pytest tests/test_verification.py
-pytest tests/test_patterns.py
+# Run re-rank scoring tests only
+pytest tests/test_rerank.py -v
 
-# Run with verbose output
-pytest -v
+# Run pattern validation tests
+pytest tests/test_patterns.py
 
 # Run with coverage
 pytest --cov=verification --cov-report=html
 ```
 
-### Using Patterns
+### Using the Re-Rank Scorer
 
 ```python
 import re
 import yaml
-from verification.python.verification import luhn, iban_mod97
+from pathlib import Path
+from collections import defaultdict
 
-# Load a pattern file
+# Load engine config and all entity definitions
+engine   = yaml.safe_load(Path('re-rank/scoring.yml').read_text(encoding='utf-8'))
+entities = {}
+for f in Path('re-rank').glob('*.yml'):
+    if f.name == 'scoring.yml':
+        continue
+    data = yaml.safe_load(f.read_text(encoding='utf-8'))
+    for code, cfg in data.get('entities', {}).items():
+        entities[int(code)] = cfg
+
+# Score a sentence against entity 9001 (common_email)
+sentence   = "Email: alice@company.org"
+entity     = entities[9001]
+s_lower    = sentence.lower()
+
+kw_hits    = [(kw, sc) for kw, sc in entity['keyword_scores'].items() if kw.lower() in s_lower]
+kw_avg     = sum(sc for _, sc in kw_hits) / len(kw_hits) if kw_hits else 0
+ctx_bonus  = max((b for c, b in entity['context_bonus'].items() if c.lower() in s_lower), default=0)
+# regex_score added after pattern matching ...
+
+# final_score = min(kw_avg + ctx_bonus + regex_score, 100)
+```
+
+See [re-rank/README.md](re-rank/README.md) for the full scoring guide and integration examples.
+
+### Using Regex Patterns
+
+```python
+import re
+import yaml
+from verification.python.verification import luhn
+
 with open('regex/pii/common/credit-cards.yml') as f:
     patterns = yaml.safe_load(f)
 
-# Use a pattern
 visa_pattern = patterns['patterns'][0]['pattern']
 text = "My card is 4111111111111111"
-
 match = re.search(visa_pattern, text)
 if match and luhn(match.group(0)):
-    print("Valid Visa card detected!")
+    print("Valid Visa card detected")
 ```
 
 ### Using Verification Functions
 
 ```python
 from verification.python.verification import (
-    iban_mod97,
-    luhn,
-    high_entropy_token,
-    us_ssn_valid,
-    kr_rrn_valid,
-    cn_national_id_valid,
-    jp_my_number_valid
+    iban_mod97, luhn, high_entropy_token,
+    us_ssn_valid, kr_rrn_valid, cn_national_id_valid,
+    jp_my_number_valid, india_aadhaar_valid
 )
 
-# Verify IBAN
-if iban_mod97("GB82WEST12345698765432"):
-    print("Valid IBAN")
-
-# Verify credit card using Luhn algorithm
-if luhn("4111111111111111"):
-    print("Valid card number")
-
-# Detect high-entropy tokens (API keys, secrets)
-if high_entropy_token("ghp_1a2B3c4D5e6F7g8H9i0J1k2L3m4N5o6P7q8R9s0T"):
-    print("High-entropy token detected")
-
-# Validate US SSN
-if us_ssn_valid("123-45-6789"):
-    print("Valid SSN format")
-
-# Validate Korean RRN
-if kr_rrn_valid("850101-1234567"):
-    print("Valid Korean RRN")
-
-# Validate Chinese national ID
-if cn_national_id_valid("11010519491231002X"):
-    print("Valid Chinese national ID")
-
-# Validate Japanese My Number
-if jp_my_number_valid("123456789012"):
-    print("Valid Japanese My Number")
+iban_mod97("GB82WEST12345698765432")   # True — valid IBAN
+luhn("4111111111111111")               # True — valid Luhn
+kr_rrn_valid("850101-1234567")        # True — valid Korean RRN
+cn_national_id_valid("11010519491231002X")  # True
 ```
 
-## Pattern Categories
+## Re-Rank Scoring System
 
-### Geographic Coverage
+The re-rank engine produces a confidence score (0–100) using three additive signals:
 
-| Region | Patterns | Description |
-|--------|----------|-------------|
-| **US** | 8 | SSN, ITIN, passport, driver's license, phone, zipcode |
-| **Korea** | 28 | RRN, alien registration, bank accounts, phone, zipcode |
-| **Japan** | 17 | My Number, bank accounts, phone, zipcode |
-| **China** | 12 | ID cards, bank accounts, phone |
-| **Taiwan** | 20 | ID cards, bank accounts, phone |
-| **India** | 10 | Aadhaar, PAN, phone |
-| **EU** | 38 | VAT, national IDs, passports (FR, DE, IT, ES, NL, BE, etc.) |
-| **Common** | 22 | Email, IP, credit cards, URLs, IBAN, tokens/secrets |
+```
+final_score = min(keyword_avg + context_bonus + regex_score, 100)
+```
+
+| Signal | Description |
+|--------|-------------|
+| `keyword_avg` | Average score of all keywords found in the text (0–100 each) |
+| `context_bonus` | Flat bonus when a labeled field prefix (e.g. `"SSN:"`) is detected |
+| `regex_score` | Score of the best-matching regex pattern (calibrated 30–65) |
+
+### Confidence Thresholds
+
+| Score | Label | Action |
+|-------|-------|--------|
+| 100 | `definite_pii` | redact |
+| 80–99 | `high_confidence_pii` | redact |
+| 60–79 | `probable_pii` | flag |
+| 40–59 | `possible_pii` | review |
+| 20–39 | `low_confidence_pii` | log |
+| 0–19 | `not_pii` | pass |
+
+### Entity Coverage
+
+| Region | File | Entity Codes | Count |
+|--------|------|-------------|-------|
+| Korea | `kr.yml` | 1001–1013 | 13 |
+| Japan | `jp.yml` | 2001–2016 | 16 |
+| China | `cn.yml` | 3001–3012 | 12 |
+| Taiwan | `tw.yml` | 4001–4016 | 16 |
+| United States | `us.yml` | 5001–5009 | 9 |
+| European Union | `eu.yml` | 6001–6054 | 43 |
+| India | `in.yml` | 7001–7009 | 9 |
+| Spain & France | `es_fr.yml` | 8001–8056 | 12 |
+| Common / International | `common.yml` | 9001–9013 | 13 |
+| Tech / Tokens | `tech.yml` | 9501–9510 | 10 |
+| **Total** | | | **153** |
+
+See [re-rank/README.md](re-rank/README.md) for the full scoring reference.
+
+## Regex Pattern Coverage
+
+### By Region
+
+| Region | Patterns | Key Types |
+|--------|----------|-----------|
+| **Korea** | 30 | RRN, alien reg., bank accounts, phone, vehicle, address |
+| **EU** | 39 | National IDs, passports, VAT numbers (14 countries) |
+| **Common** | 25 | Email, IP, credit cards, URLs, dates, names, IBAN |
+| **Taiwan** | 20 | National IDs, bank accounts, phone, business |
+| **Japan** | 17 | My Number, bank accounts, phone, address |
+| **Hash/Tokens** | 10 | AWS keys, GitHub tokens, Stripe, Slack, JWT, private keys |
+| **China** | 12 | National IDs, bank accounts, phone |
+| **India** | 9 | Aadhaar, PAN, GST, voter ID, phone |
+| **US** | 10 | SSN, ITIN, passport, driver's license, phone |
+| **Spain** | 7 | DNI, NIE, CIF, phone |
+| **France** | 6 | NIR, CNI, passport, phone |
+| **IBAN** | 5 | DE, FR, GB, IT + generic |
+| **SOX** | 7 | Financial control patterns |
+| **Tech** | 7 | Patents, UUIDs, identifiers |
+| **Total** | **204** | |
 
 ### Data Types
 
@@ -168,78 +258,50 @@ if jp_my_number_valid("123456789012"):
 - **Network**: IPv4, IPv6, URLs, MAC addresses
 - **Tokens/Secrets**: API keys, JWT, AWS keys, GitHub tokens, private keys
 
+## Reference Registry
+
+All 153 PII entity types have stable integer codes, safe for use in logs, pipelines, and APIs:
+
+```yaml
+# reference/registry.yml (excerpt)
+kr_name:                      1001
+kr_rrn:                       1002
+us_ssn:                       5002
+common_email:                 9001
+tech_aws_access_key:          9502
+tech_github_token:            9504
+tech_private_key:             9510
+```
+
+Regional detail files (`reference/kr.yml`, `reference/eu.yml`, etc.) provide per-entity metadata: severity, PII type, linked regex patterns, and keyword categories.
+
 ## Verification Functions
 
-The project includes 32 verification functions for advanced validation:
+59 functions for advanced validation beyond regex:
 
-### Core Validators
-
-| Function | Purpose | Example |
-|----------|---------|---------|
-| `iban_mod97` | IBAN checksum validation | GB82WEST12345698765432 |
-| `luhn` | Credit card validation | 4111111111111111 |
-| `credit_card_bin_valid` | Credit card BIN validation | Valid issuer prefix check |
-| `dms_coordinate` | GPS coordinate validation | 37°46′29.7″N |
-| `high_entropy_token` | API key/secret detection | High randomness check |
-| `not_timestamp` | Reject timestamp-like numbers | Filter false positives |
-| `generic_number_not_timestamp` | Generic timestamp filtering | Flexible validation |
-| `not_repeating_pattern` | Reject repeating digits | Filter 111-1111-1111 |
-| `contains_letter` | Check for alphabetic characters | A1234567 |
-| `ipv4_public` | Validate public IPv4 address | Non-private IP check |
-| `cjk_name_standalone` | Validate CJK name format | Standalone name detection |
-
-### US Validators
+### Core
 
 | Function | Purpose |
 |----------|---------|
-| `us_ssn_valid` | US SSN validation (area/group/serial checks) |
+| `iban_mod97` | IBAN mod-97 checksum |
+| `luhn` | Credit card Luhn algorithm |
+| `high_entropy_token` | API key / secret entropy check |
+| `not_timestamp` | Reject timestamp-like numbers |
+| `ipv4_public` | Validate public IPv4 |
+| `cjk_name_standalone` | CJK standalone name format |
 
-### Korea Validators
+### Regional
 
-| Function | Purpose |
-|----------|---------|
-| `korean_bank_account_valid` | Korean bank account validation with prefix checking |
-| `kr_rrn_valid` | Korean Resident Registration Number validation |
-| `kr_alien_registration_valid` | Korean alien registration number validation |
-| `kr_corporate_registration_valid` | Korean corporate registration number validation |
-| `kr_business_registration_valid` | Korean business registration number validation |
-
-### Japan Validators
-
-| Function | Purpose |
-|----------|---------|
-| `jp_my_number_valid` | Japanese My Number validation with check digit |
-
-### China/Taiwan Validators
-
-| Function | Purpose |
-|----------|---------|
-| `cn_national_id_valid` | Chinese national ID validation with checksum |
-| `tw_national_id_valid` | Taiwanese national ID validation |
-
-### India Validators
-
-| Function | Purpose |
-|----------|---------|
-| `india_aadhaar_valid` | Indian Aadhaar number validation |
-| `india_pan_valid` | Indian PAN validation |
-
-### European Validators
-
-| Function | Purpose |
-|----------|---------|
-| `spain_dni_valid` | Spanish DNI validation |
-| `spain_nie_valid` | Spanish NIE validation |
-| `netherlands_bsn_valid` | Dutch BSN validation |
-| `poland_pesel_valid` | Polish PESEL validation |
-| `sweden_personnummer_valid` | Swedish personal number validation |
-| `france_insee_valid` | French INSEE number validation |
-| `belgium_rrn_valid` | Belgian national register number validation |
-| `finland_hetu_valid` | Finnish HETU validation |
+| Region | Functions |
+|--------|-----------|
+| **US** | `us_ssn_valid` |
+| **Korea** | `kr_rrn_valid`, `kr_alien_registration_valid`, `kr_corporate_registration_valid`, `kr_business_registration_valid`, `korean_bank_account_valid` |
+| **Japan** | `jp_my_number_valid` |
+| **China / Taiwan** | `cn_national_id_valid`, `tw_national_id_valid` |
+| **India** | `india_aadhaar_valid`, `india_pan_valid` |
+| **Europe** | `spain_dni_valid`, `spain_nie_valid`, `netherlands_bsn_valid`, `poland_pesel_valid`, `sweden_personnummer_valid`, `france_insee_valid`, `belgium_rrn_valid`, `finland_hetu_valid` |
 
 ## Pattern File Format
-
-Each pattern file follows this YAML structure:
 
 ```yaml
 namespace: <namespace>
@@ -247,176 +309,84 @@ description: <description>
 
 patterns:
   - id: <unique_id>
-    location: <country_code>
+    location: <country_code>        # us, kr, jp, cn, tw, in, eu, comm
     category: <category>
-    description: <human_readable_description>
+    description: <description>
     pattern: '<regex_pattern>'
-    mask: "<mask_format>"
-    verification: <verification_function>  # Optional
-    flags:                                  # Optional
+    mask: "<redaction_format>"
+    verification: <function_name>   # optional
+    flags:                          # optional
       - IGNORECASE
     examples:
       match:
-        - "example1"
-        - "example2"
+        - "example_match"
       nomatch:
-        - "invalid1"
-        - "invalid2"
+        - "non_match"
     policy:
       store_raw: false
       action_on_match: redact
       severity: critical
     metadata:
-      note: "Additional information"
-    priority: 100  # Optional
+      note: "Optional notes"
+    priority: 1                     # optional; lower = higher priority
 ```
-
-### Required Fields
-
-- `id`: Unique identifier for the pattern
-- `location`: Country/region code (us, kr, jp, cn, tw, in, eu, co)
-- `category`: Pattern category (ssn, bank, credit_card, phone, email, etc.)
-- `description`: Human-readable description
-- `pattern`: Regular expression pattern
-- `mask`: Masking format for redaction
-- `examples`: Match and nomatch examples
-- `policy`: Data handling policy
-
-### Optional Fields
-
-- `verification`: Name of verification function to apply
-- `flags`: Regex flags (IGNORECASE, MULTILINE, DOTALL, VERBOSE)
-- `priority`: Pattern matching priority (lower = higher priority)
-- `metadata`: Additional information
 
 ## Test Suite
 
-### Coverage
-
-- **1,965+ tests collected** ✓
-- **100% verification function coverage**
-
-### Test Categories
-
-1. **Verification Tests** (`test_verification.py` - 129 tests):
-   - IBAN mod-97 validation
-   - Luhn algorithm
-   - Coordinate validation
-   - Token entropy detection
-   - Timestamp detection
-   - Zipcode validation (US, Korea)
-   - National ID validation (US, KR, CN, TW, JP, IN, EU)
-   - Function registry
-
-2. **Pattern Tests** (`test_patterns.py`):
-   - YAML structure validation
-   - Regex compilation
-   - Match/nomatch examples
-   - Verification function integration
-   - Metadata validation
-   - Pattern coverage
-   - Flag support (IGNORECASE, etc.)
-
-### Running Specific Tests
+| File | Tests | Coverage |
+|------|-------|----------|
+| `test_rerank.py` | 400 | Engine config, sum_example arithmetic (153 entities), 69 sentence cases, edge cases |
+| `test_verification.py` | ~133 | All 59 verification functions |
+| `test_patterns.py` | ~3,000+ | YAML structure, regex compilation, match/nomatch examples |
+| **Total** | **3,500+** | |
 
 ```bash
-# Run verification tests
-pytest tests/test_verification.py
+# Run all
+pytest
 
-# Run pattern structure tests
-pytest tests/test_patterns.py::TestPatternStructure
+# Re-rank only
+pytest tests/test_rerank.py -v
 
-# Run pattern matching tests
-pytest tests/test_patterns.py::TestPatternMatching
+# Filter by entity
+pytest tests/test_rerank.py -k "kr_rrn or us_ssn"
 
-# Run with specific pattern
+# Pattern tests for a specific region
 pytest tests/test_patterns.py -k "credit_card"
 ```
 
-## Keywords
-
-The `keyword/` directory contains context-aware keywords in multiple languages:
-
-- **English**: Primary keywords
-- **Korean (한국어)**: 계좌번호, 주민등록번호, etc.
-- **Japanese (日本語)**: 口座番号, マイナンバー, etc.
-- **Chinese (中文)**: 银行账号, 身份证, etc.
-
-Use keywords to:
-- Reduce false positives
-- Provide context for matches
-- Enable multi-language detection
-- Improve pattern selection
-
-See [keyword/README.md](keyword/README.md) for details.
-
 ## Development
 
-### Adding New Patterns
+### Adding a New Pattern
 
-1. Choose the appropriate directory in `regex/pii/`
-2. Add pattern to existing YAML file or create new file
-3. Include all required fields
-4. Add match and nomatch examples
-5. Run tests: `pytest tests/test_patterns.py`
+1. Add the pattern to the appropriate `regex/pii/<region>/` YAML file
+2. Include all required fields and match/nomatch examples
+3. Run `pytest tests/test_patterns.py`
 
-### Adding Verification Functions
+### Adding a New Re-Rank Entity
 
-1. Add function to `verification/python/verification.py`
-2. Register in `VERIFICATION_FUNCTIONS` dict
-3. Add comprehensive tests to `tests/test_verification.py`
-4. Update documentation
-5. Run tests: `pytest tests/test_verification.py`
+1. Add the entity block to the relevant `re-rank/<region>.yml` with `keyword_scores`, `context_bonus`, `regex_scores`, and a `sum_example`
+2. Add the numeric code to `reference/registry.yml` and the regional `reference/<region>.yml`
+3. Add sentence test cases to `tests/test_rerank.py`
+4. Run `pytest tests/test_rerank.py`
 
-### Code Style
+### Adding a Verification Function
 
-- Follow PEP 8 for Python code
-- Use YAML 1.2 for pattern files
-- Include docstrings for all functions
-- Add type hints where applicable
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add patterns/functions with tests
-4. Ensure all tests pass
-5. Submit a pull request
+1. Add the function to `verification/python/verification.py`
+2. Register it in `VERIFICATION_FUNCTIONS`
+3. Add tests to `tests/test_verification.py`
+4. Run `pytest tests/test_verification.py`
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+Apache License 2.0 — see [LICENSE](LICENSE).
 
 ## Resources
 
-- **Documentation**:
-  - [Verification Functions](verification/README.md)
-  - [Keywords](keyword/README.md)
-  - [Tests](tests/README.md)
-
-- **Pattern Files**:
-  - [US Patterns](regex/pii/us/)
-  - [Korea Patterns](regex/pii/kr/)
-  - [Japan Patterns](regex/pii/jp/)
-  - [Common Patterns](regex/pii/common/)
-  - [Token/Secret Patterns](regex/hash/)
-
-## Statistics
-
-- **Total Patterns**: 160+
-- **Countries Covered**: 7+ (US, KR, JP, CN, TW, IN, EU)
-- **Verification Functions**: 32
-- **Test Cases**: 1,965+
-- **Languages**: Python (more coming)
-- **Pattern Categories**: 15+
-
-## Support
-
-For issues, questions, or contributions:
-- Open an issue on GitHub
-- Submit a pull request
-- Contact the maintainers
+- [Re-Rank Scoring Guide](re-rank/README.md)
+- [Verification Functions](verification/README.md)
+- [Keywords](keyword/README.md)
+- [Tests](tests/README.md)
 
 ---
 
-**Note**: This project is for legitimate use cases such as data protection, compliance, and security. Use responsibly and in accordance with applicable laws and regulations.
+**Note**: For legitimate use cases — data protection, compliance, and security tooling. Use responsibly and in accordance with applicable laws.

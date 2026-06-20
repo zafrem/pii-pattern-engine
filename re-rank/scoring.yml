@@ -1,0 +1,107 @@
+version: "2.0"
+description: >
+  PII rerank scoring engine — summed score model.
+  Each entity is identified by its reference code from reference/registry.yml.
+  Detailed per-entity keyword and regex scores live in the regional files
+  (re-rank/kr.yml, re-rank/jp.yml, …).
+
+# ---------------------------------------------------------------------------
+# Summed Score Formula
+#
+#   keyword_avg  = average of scores for every keyword that matched
+#                  (each keyword score: 0 – 100, defined in regional files)
+#
+#   context_bonus = flat bonus added to keyword_avg when a labeled field
+#                   prefix is detected (e.g. "이름:", "SSN:", "Email:")
+#
+#   regex_score  = score for the regex pattern that matched
+#                  (0 – 50; higher means the pattern is more specific)
+#
+#   final_score  = min( keyword_avg + context_bonus + regex_score , 100 )
+#
+#   Example A — strong keyword + regex match:
+#     entity        : kr_rrn  (code 1002)
+#     keyword_hits  : [주민등록번호=90, 주민번호=90] → avg = 90
+#     context_bonus : "주민등록번호:" → +40  (labeled field found)
+#     regex_score   : rrn_01 → 50
+#     final_score   : min(90 + 40 + 50, 100) = 100 → definite_pii
+#
+#   Example B — generic keyword hits + regex:
+#     entity        : common_email  (code 9001)
+#     keyword_hits  : [mail=30, e-mail=60, email=60, email address=70] → avg = 55
+#     context_bonus : none → 0
+#     regex_score   : email_01 → 50
+#     final_score   : min(55 + 0 + 50, 100) = 100 → definite_pii
+#
+#   Example C — regex only, no keyword:
+#     entity        : us_ssn  (code 5002)
+#     keyword_avg   : 0  (no context keywords found)
+#     regex_score   : ssn_01 → 50
+#     final_score   : 50 → possible_pii
+#
+# ---------------------------------------------------------------------------
+
+algorithm:
+  formula: "final_score = min(keyword_avg + context_bonus + regex_score, max_score)"
+  keyword_aggregation: average
+  max_score: 100
+
+# ---------------------------------------------------------------------------
+# Confidence Thresholds
+# Evaluated top-to-bottom; first matching condition wins.
+# ---------------------------------------------------------------------------
+thresholds:
+  - min_score: 100
+    confidence: 1.00
+    label: definite_pii
+    action: redact
+
+  - min_score: 80
+    confidence: 0.80
+    label: high_confidence_pii
+    action: redact
+
+  - min_score: 60
+    confidence: 0.60
+    label: probable_pii
+    action: flag
+
+  - min_score: 40
+    confidence: 0.40
+    label: possible_pii
+    action: review
+
+  - min_score: 20
+    confidence: 0.20
+    label: low_confidence_pii
+    action: log
+
+  - min_score: 0
+    confidence: 0.00
+    label: not_pii
+    action: pass
+
+# ---------------------------------------------------------------------------
+# Entity Index  (code → regional scoring file)
+# Full keyword/regex scores are in the regional files listed here.
+# ---------------------------------------------------------------------------
+entity_index:
+  kr: re-rank/kr.yml        # 1001 – 1013
+  jp: re-rank/jp.yml        # 2001 – 2016
+  cn: re-rank/cn.yml        # 3001 – 3012
+  tw: re-rank/tw.yml        # 4001 – 4016
+  us: re-rank/us.yml        # 5001 – 5009
+  eu: re-rank/eu.yml        # 6001 – 6054
+  in: re-rank/in.yml        # 7001 – 7009
+  es_fr: re-rank/es_fr.yml  # 8001 – 8056
+  common: re-rank/common.yml # 9001 – 9013
+  tech: re-rank/tech.yml    # 9501 – 9510
+
+# ---------------------------------------------------------------------------
+# Regex score calibration guide (for maintainers)
+#
+#   50  — checksum/algorithm-validated (RRN, SSN, credit card, IBAN)
+#   45  — country-specific structured format (passport, national ID, IBAN variants)
+#   40  — structured but common format (phone, address, date)
+#   30  — broad character-class pattern (name, generic token)
+# ---------------------------------------------------------------------------

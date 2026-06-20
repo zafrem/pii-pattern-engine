@@ -1,0 +1,51 @@
+language: ko
+description: Korean stopwords — particles and postpositions to strip before keyword matching
+
+words:
+  # Subject/topic particles
+  - 은    # topic marker (after consonant)
+  - 는    # topic marker (after vowel)
+  - 이    # subject marker (after consonant)
+  - 가    # subject marker (after vowel)
+
+  # Object particles
+  - 을    # object marker (after consonant)
+  - 를    # object marker (after vowel)
+
+  # Possessive / connective
+  - 의    # possessive (of, 's)
+
+  # Location / direction particles
+  - 에    # at, in, to (location/time)
+  - 에서  # at, from (location of action)
+  - 에게  # to (animate recipient)
+  - 께    # to (honorific recipient)
+  - 로    # by, toward, with (after vowel or ㄹ)
+  - 으로  # by, toward, with (after consonant except ㄹ)
+
+  # Conjunction particles
+  - 와    # and (after vowel)
+  - 과    # and (after consonant)
+  - 하고  # and (colloquial)
+
+  # Adverbial / other particles
+  - 도    # also, too
+  - 만    # only, just
+  - 부터  # from (starting point)
+  - 까지  # until, up to
+  - 마다  # every, each
+  - 보다  # than (comparison)
+  - 처럼  # like, as
+  - 밖에  # except, only (with negative)
+
+  # Common short function words
+  - 및    # and (formal/written)
+  - 또는  # or
+  - 혹은  # or (literary)
+  - 그리고 # and (conjunction)
+  - 하지만 # but
+  - 그러나 # however
+  - 그래서 # so, therefore
+  - 따라서 # therefore
+  - 즉    # that is, namely
+  - 등    # etc., and so on

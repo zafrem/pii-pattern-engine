@@ -1,0 +1,157 @@
+language: es
+description: Spanish stopwords — articles, prepositions, conjunctions, and pronouns to strip before keyword matching
+
+words:
+  # Articles (definite)
+  - el
+  - la
+  - los
+  - las
+  - lo
+
+  # Articles (indefinite)
+  - un
+  - una
+  - unos
+  - unas
+
+  # Prepositions
+  - a
+  - al
+  - de
+  - del
+  - en
+  - con
+  - sin
+  - por
+  - para
+  - sobre
+  - bajo
+  - ante
+  - entre
+  - tras
+  - desde
+  - hasta
+  - hacia
+  - según
+  - mediante
+  - durante
+  - contra
+
+  # Conjunctions
+  - y
+  - e
+  - o
+  - u
+  - pero
+  - sino
+  - mas
+  - ni
+  - que
+  - porque
+  - como
+  - si
+  - aunque
+  - cuando
+  - mientras
+  - donde
+  - pues
+  - luego
+  - así
+  - tanto
+  - sin embargo
+  - no obstante
+  - por tanto
+
+  # Pronouns
+  - yo
+  - me
+  - mi
+  - mí
+  - nosotros
+  - nosotras
+  - nos
+  - nuestro
+  - nuestra
+  - tú
+  - te
+  - ti
+  - tu
+  - vosotros
+  - vosotras
+  - os
+  - usted
+  - ustedes
+  - él
+  - le
+  - lo
+  - su
+  - ella
+  - ellos
+  - ellas
+  - les
+  - sus
+  - se
+  - este
+  - esta
+  - estos
+  - estas
+  - ese
+  - esa
+  - esos
+  - esas
+  - aquel
+  - aquella
+  - aquellos
+  - aquellas
+  - que
+  - quien
+  - quienes
+  - cual
+  - cuales
+
+  # Auxiliaries / common verbs
+  - es
+  - son
+  - era
+  - eran
+  - ser
+  - estar
+  - ha
+  - han
+  - había
+  - haber
+  - hace
+  - hacer
+  - puede
+  - pueden
+  - debe
+  - deben
+  - va
+  - van
+
+  # Adverbs / other function words
+  - no
+  - sí
+  - muy
+  - más
+  - menos
+  - también
+  - tampoco
+  - ya
+  - aún
+  - todavía
+  - siempre
+  - nunca
+  - jamás
+  - aquí
+  - ahí
+  - allí
+  - ahora
+  - entonces
+  - después
+  - antes
+  - bien
+  - mal
+  - solo
+  - etc

@@ -120,32 +120,33 @@ patterns:
 - id: stripe_key_01
   location: comm
   category: token
-  description: Stripe-like API Key (example pattern - use rk_test_ for testing)
-  pattern: rk_(live|test)_[A-Za-z0-9]{24,}
+  description: Stripe API Key — secret (sk_), publishable (pk_), and restricted (rk_) prefixes
+  pattern: (?:rk|sk|pk)_(live|test|demo)_[A-Za-z0-9]{24,}
   verification: high_entropy_token
   priority: 1
-  mask: rk_****_************************
+  mask: '****_****_************************'
   examples:
     match:
-    - rk_test_EXAMPLEKEY1234567890abcdefgh12345
-    - rk_test_Kp7Xm2Lq9Wr4Jn6Tb8Vc3Hs5Fd0Yg1Az
+    - sk_demo_EXAMPLEKEYabcdefgh1234567890demo1
+    - sk_demo_Kp7Xm2Lq9Wr4Jn6Tb8Vc3Hs5Fd0Yg1Az
+    - pk_demo_EXAMPLEKEYabcdefgh1234567890demo1
+    - rk_demo_EXAMPLEKEYabcdefgh1234567890demo1
     nomatch:
-    - rk_test_short
-    - rk_prod_notvalid
+    - sk_demo_short
+    - sk_prod_notvalid
   policy:
     store_raw: false
     action_on_match: redact
     severity: critical
   metadata:
-    provider: Example (Stripe-like pattern)
+    provider: Stripe
     type: API Key
-    note: Example pattern using rk_ prefix. These are FAKE examples for testing only.
   match_type: exactly_matches
   langs:
-    python: rk_(live|test)_[A-Za-z0-9]{24,}
-    go: rk_(live|test)_[A-Za-z0-9]{24,}
-    java: rk_(live|test)_[A-Za-z0-9]{24,}
-    javascript: rk_(live|test)_[A-Za-z0-9]{24,}
+    python: (?:rk|sk|pk)_(live|test|demo)_[A-Za-z0-9]{24,}
+    go: (?:rk|sk|pk)_(live|test|demo)_[A-Za-z0-9]{24,}
+    java: (?:rk|sk|pk)_(live|test|demo)_[A-Za-z0-9]{24,}
+    javascript: (?:rk|sk|pk)_(live|test|demo)_[A-Za-z0-9]{24,}
 - id: jwt_token_01
   location: comm
   category: token

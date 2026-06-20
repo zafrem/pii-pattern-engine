@@ -1,0 +1,93 @@
+language: hi
+description: Hindi stopwords — postpositions, conjunctions, and common function words to strip before keyword matching
+
+words:
+  # Postpositions (case markers — follow the noun)
+  - का    # of, 's (masculine singular)
+  - की    # of, 's (feminine)
+  - के    # of, 's (masculine plural / oblique)
+  - को    # to, for (dative / accusative)
+  - से    # from, with, by
+  - में   # in, inside
+  - पर    # on, at, upon
+  - तक    # until, up to
+  - ने    # ergative marker (past transitive)
+  - पे    # on (colloquial form of पर)
+
+  # Conjunctions
+  - और    # and
+  - या    # or
+  - लेकिन # but
+  - परंतु  # but (formal)
+  - कि    # that (subordinator)
+  - तो    # then, so
+  - अगर   # if
+  - यदि   # if (formal)
+  - क्योंकि # because
+  - इसलिए # therefore
+  - जब    # when
+  - जहाँ  # where
+  - जो    # who, which (relative)
+  - हालाँकि # although
+  - फिर भी # even so
+  - तथा   # and (formal/literary)
+
+  # Pronouns
+  - मैं   # I
+  - मुझे  # me (dative)
+  - मेरा  # my (masculine)
+  - मेरी  # my (feminine)
+  - मेरे  # my (oblique / plural)
+  - हम    # we
+  - हमें  # us (dative)
+  - हमारा # our (masculine)
+  - तुम   # you (informal)
+  - तुम्हें # you (dative, informal)
+  - आप    # you (formal)
+  - आपको  # you (dative, formal)
+  - वह    # he / she / it / that
+  - उसे   # him / her / it (dative)
+  - उसका  # his / her (masculine)
+  - उसकी  # his / her (feminine)
+  - वे    # they / those
+  - उन्हें # them (dative)
+  - यह    # this / he / she (proximal)
+  - इसे   # this (dative)
+  - ये    # these
+  - कौन   # who
+  - क्या  # what; yes/no question marker
+  - कहाँ  # where
+  - कब    # when
+  - कैसे  # how
+  - कितना # how much
+
+  # Auxiliaries / copulas
+  - है    # is (singular present)
+  - हैं   # are (plural/formal present)
+  - था    # was (masculine)
+  - थी    # was (feminine)
+  - थे    # were (masculine plural)
+  - हो    # be / are (subjunctive/imperative)
+  - होना  # to be (infinitive)
+  - होगा  # will be (masculine)
+  - होगी  # will be (feminine)
+  - कर    # do (stem, used in compounds)
+  - करना  # to do (infinitive)
+  - जा    # go (stem, used in compounds)
+
+  # Adverbs / other function words
+  - नहीं  # no, not
+  - भी    # also, too
+  - ही    # only, just, emphasizer
+  - तो    # then, so (discourse marker)
+  - बहुत  # very, much
+  - अब    # now
+  - यहाँ  # here
+  - वहाँ  # there
+  - फिर   # then, again
+  - अभी   # right now
+  - सब    # all
+  - हर    # every, each
+  - कुछ  # some, something
+  - कोई   # some, any, someone
+  - आदि   # etc., and so on

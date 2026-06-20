@@ -1,0 +1,297 @@
+version: "1.0"
+region: Taiwan
+region_code: TW
+code_series: 4001-4099
+description: Internal reference codes for Taiwanese PII entities, mapping regex patterns and keyword categories.
+
+entities:
+
+  tw_name:
+    code: 4001
+    description: Traditional Chinese personal name (繁體中文 2–4 characters)
+    category: name
+    pii_type: personal
+    severity: high
+    regex:
+      - source: regex/pii/tw/other.yml
+        pattern_id: chinese_name_01
+        pattern: '[一-鿿]{2,4}'
+        verification: chinese_name_valid
+        mask: '***'
+    keyword:
+      - source: keyword/personal.yml
+        category: name
+        relevant_terms: [姓名, 名字, 全名, name]
+        relevant_contexts: ["姓名:", "名字:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: name
+
+  tw_national_id:
+    code: 4002
+    description: Taiwan National Identification Card number (身分證號碼, letter + 9 digits)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/tw/identification.yml
+        pattern_id: national_id_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [身份證, 身分證, 身份證號碼, 國民身分證, id card]
+        relevant_contexts: ["身分證號:", "國民身分證:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  tw_passport:
+    code: 4003
+    description: Taiwanese passport number (護照號碼)
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/tw/identification.yml
+        pattern_id: passport_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [護照, 護照號碼, passport, passport number]
+        relevant_contexts: ["護照號碼:", "Passport:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  tw_phone_mobile:
+    code: 4004
+    description: Taiwanese mobile phone number (09XX-XXX-XXX)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/tw/phone.yml
+        pattern_id: mobile_01
+      - source: regex/pii/tw/phone.yml
+        pattern_id: mobile_02
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [手機, 電話號碼, 聯絡電話, mobile, phone]
+        relevant_contexts: ["手機:", "電話:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  tw_phone_landline:
+    code: 4005
+    description: Taiwanese landline phone number (area code + 7–8 digits)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/tw/phone.yml
+        pattern_id: landline_01
+      - source: regex/pii/tw/phone.yml
+        pattern_id: landline_02
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [電話, 固定電話, 座機, telephone]
+        relevant_contexts: ["電話:", "Tel:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  tw_address:
+    code: 4006
+    description: Taiwanese physical address (city/county + district + road + number)
+    category: address
+    pii_type: location
+    severity: high
+    regex:
+      - source: regex/pii/tw/other.yml
+        pattern_id: address_simple_01
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [地址, 住址, 通訊地址, address]
+        relevant_contexts: ["地址:", "住址:"]
+      - source: keyword/address.yml
+        category: address_cn
+    rerank:
+      source: re-rank/scoring.yml
+      category: address
+
+  tw_business_id:
+    code: 4007
+    description: Taiwan Business Uniform Number (統一編號, 8 digits)
+    category: business
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/tw/other.yml
+        pattern_id: business_id_01
+        pattern: '[0-9]{8}'
+        mask: '********'
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [統一編號, 公司統編, 統編]
+        relevant_contexts: ["統一編號:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  tw_bank_bank_of_taiwan:
+    code: 4008
+    description: Bank of Taiwan (臺灣銀行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/tw/banks.yml
+        pattern_id: bank_of_taiwan_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [臺灣銀行, 台灣銀行, 帳號, 帳戶]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  tw_bank_first_bank:
+    code: 4009
+    description: First Bank (第一銀行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/tw/banks.yml
+        pattern_id: first_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [第一銀行, 第一商業銀行]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  tw_bank_hua_nan:
+    code: 4010
+    description: Hua Nan Bank (華南銀行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/tw/banks.yml
+        pattern_id: hua_nan_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [華南銀行, 華南商業銀行]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  tw_bank_chang_hwa:
+    code: 4011
+    description: Chang Hwa Bank (彰化銀行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/tw/banks.yml
+        pattern_id: chang_hwa_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [彰化銀行, 彰化商業銀行]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  tw_bank_shanghai:
+    code: 4012
+    description: Shanghai Commercial and Savings Bank (上海銀行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/tw/banks.yml
+        pattern_id: shanghai_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [上海銀行, 上海商業儲蓄銀行]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  tw_bank_taipei_fubon:
+    code: 4013
+    description: Taipei Fubon Bank (台北富邦銀行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/tw/banks.yml
+        pattern_id: taipei_fubon_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [台北富邦銀行, 富邦銀行]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  tw_bank_ctbc:
+    code: 4014
+    description: CTBC Bank (中國信託銀行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/tw/banks.yml
+        pattern_id: ctbc_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [中國信託, 中信銀行, CTBC]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  tw_bank_esun:
+    code: 4015
+    description: E.SUN Bank (玉山銀行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/tw/banks.yml
+        pattern_id: esun_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [玉山銀行, E.SUN]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  tw_bank_cooperative:
+    code: 4016
+    description: Taiwan Cooperative Bank (合作金庫銀行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/tw/banks.yml
+        pattern_id: taiwan_cooperative_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [合作金庫, 合庫銀行]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban

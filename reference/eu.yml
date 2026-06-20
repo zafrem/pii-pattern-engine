@@ -1,0 +1,770 @@
+version: "1.0"
+region: European Union
+region_code: EU
+code_series: 6001-6099
+description: Internal reference codes for EU PII entities, mapping regex patterns and keyword categories.
+
+entities:
+
+  # ── National ID Numbers ──────────────────────────────────────────────────
+
+  eu_id_germany:
+    code: 6001
+    description: German national ID (Personalausweis), 10 alphanumeric characters
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: germany_personalausweis_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [personalausweis, national id, id card, ausweis]
+        relevant_contexts: ["Ausweis:", "ID Number:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  eu_id_france:
+    code: 6002
+    description: French INSEE / NIR social security number (15 digits)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: france_insee_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [nir, insee, numéro de sécurité sociale, cni]
+        relevant_contexts: ["NIR:", "INSEE:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  eu_id_italy:
+    code: 6003
+    description: Italian Codice Fiscale (16-char tax code)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: italy_codice_fiscale_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [codice fiscale, fiscal code, cf]
+        relevant_contexts: ["Codice Fiscale:", "CF:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  eu_id_spain_dni:
+    code: 6004
+    description: Spanish DNI (Documento Nacional de Identidad, 8 digits + letter)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: spain_dni_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [dni, documento nacional de identidad, national id]
+        relevant_contexts: ["DNI:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  eu_id_spain_nie:
+    code: 6005
+    description: Spanish NIE (Número de Identificación de Extranjero, X-NNNNNNN-L)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: spain_nie_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [nie, número de identificación de extranjero, foreigner id]
+        relevant_contexts: ["NIE:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  eu_id_netherlands:
+    code: 6006
+    description: Dutch BSN (Burgerservicenummer, 9-digit citizen service number)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: netherlands_bsn_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [bsn, burgerservicenummer, citizen service number]
+        relevant_contexts: ["BSN:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  eu_id_belgium:
+    code: 6007
+    description: Belgian National Registration Number (RRN, 11 digits)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: belgium_rrn_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [rrn, rijksregisternummer, national registration]
+        relevant_contexts: ["RRN:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  eu_id_poland:
+    code: 6008
+    description: Polish PESEL (11-digit universal electronic population register system)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: poland_pesel_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [pesel, numer pesel]
+        relevant_contexts: ["PESEL:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  eu_id_sweden:
+    code: 6009
+    description: Swedish Personnummer (10/12-digit personal identity number)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: sweden_personnummer_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [personnummer, personal identity number]
+        relevant_contexts: ["Personnummer:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  eu_id_denmark:
+    code: 6010
+    description: Danish CPR number (Central Person Register, DDMMYY-NNNN)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: denmark_cpr_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [cpr, cpr-nummer, central person register]
+        relevant_contexts: ["CPR:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  eu_id_portugal:
+    code: 6011
+    description: Portuguese NIF (Número de Identificação Fiscal, 9 digits)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: portugal_nif_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [nif, número de identificação fiscal, tax id]
+        relevant_contexts: ["NIF:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  eu_id_austria:
+    code: 6012
+    description: Austrian Sozialversicherungsnummer (social security number, 10 digits)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: austria_sozialversicherungsnummer_01
+    keyword:
+      - source: keyword/identification.yml
+        category: ssn
+        relevant_terms: [sozialversicherungsnummer, svnr, social security, sv-nummer]
+        relevant_contexts: ["SVNR:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ssn
+
+  eu_id_finland:
+    code: 6013
+    description: Finnish HETU (Henkilötunnus / personal identity code, DDMMYY±NNNL)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: finland_hetu_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [hetu, henkilötunnus, personal identity code]
+        relevant_contexts: ["HETU:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  eu_id_uk_nino:
+    code: 6014
+    description: UK National Insurance Number (NINO, AA NNNNNN A)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/eu/identification.yml
+        pattern_id: uk_nino_01
+    keyword:
+      - source: keyword/identification.yml
+        category: ssn
+        relevant_terms: [nino, national insurance, ni number, national insurance number]
+        relevant_contexts: ["NINO:", "NI Number:", "National Insurance:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ssn
+
+  # ── Passports ────────────────────────────────────────────────────────────
+
+  eu_passport_germany:
+    code: 6015
+    description: German passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/eu/passport.yml
+        pattern_id: passport_germany_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [reisepass, passport, pass]
+        relevant_contexts: ["Reisepass:", "Passport:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  eu_passport_france:
+    code: 6016
+    description: French passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/eu/passport.yml
+        pattern_id: passport_france_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [passeport, passport]
+        relevant_contexts: ["Passeport:", "Passport:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  eu_passport_italy:
+    code: 6017
+    description: Italian passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/eu/passport.yml
+        pattern_id: passport_italy_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [passaporto, passport]
+        relevant_contexts: ["Passaporto:", "Passport:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  eu_passport_spain:
+    code: 6018
+    description: Spanish passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/eu/passport.yml
+        pattern_id: passport_spain_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [pasaporte, passport]
+        relevant_contexts: ["Pasaporte:", "Passport:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  eu_passport_uk:
+    code: 6019
+    description: UK passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/eu/passport.yml
+        pattern_id: passport_uk_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [passport, passport number]
+        relevant_contexts: ["Passport:", "Passport Number:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  eu_passport_netherlands:
+    code: 6020
+    description: Dutch passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/eu/passport.yml
+        pattern_id: passport_netherlands_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [paspoort, passport]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  eu_passport_belgium:
+    code: 6021
+    description: Belgian passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/eu/passport.yml
+        pattern_id: passport_belgium_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [passeport, passport, reispas]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  eu_passport_sweden:
+    code: 6022
+    description: Swedish passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/eu/passport.yml
+        pattern_id: passport_sweden_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [pass, passnummer, passport]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  eu_passport_poland:
+    code: 6023
+    description: Polish passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/eu/passport.yml
+        pattern_id: passport_poland_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [paszport, passport]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  eu_passport_austria:
+    code: 6024
+    description: Austrian passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/eu/passport.yml
+        pattern_id: passport_austria_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [reisepass, passport]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  eu_passport_portugal:
+    code: 6025
+    description: Portuguese passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/eu/passport.yml
+        pattern_id: passport_portugal_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [passaporte, passport]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  eu_passport_ireland:
+    code: 6026
+    description: Irish passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/eu/passport.yml
+        pattern_id: passport_ireland_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [passport, pas]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  # ── VAT Numbers ──────────────────────────────────────────────────────────
+
+  eu_vat_germany:
+    code: 6030
+    description: German VAT number (Umsatzsteuer-Identifikationsnummer, DE + 9 digits)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/eu/vat.yml
+        pattern_id: vat_germany_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [vat, ust-idnr, umsatzsteuer, mwst]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  eu_vat_france:
+    code: 6031
+    description: French VAT number (FR + 2 chars + 9 digits)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/eu/vat.yml
+        pattern_id: vat_france_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [vat, tva, numéro de tva]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  eu_vat_italy:
+    code: 6032
+    description: Italian VAT number (IT + 11 digits)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/eu/vat.yml
+        pattern_id: vat_italy_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [vat, partita iva, iva]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  eu_vat_spain:
+    code: 6033
+    description: Spanish VAT number (ES + letter/digit + 7 digits + letter/digit)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/eu/vat.yml
+        pattern_id: vat_spain_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [vat, nif, cif, iva]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  eu_vat_netherlands:
+    code: 6034
+    description: Dutch VAT number (NL + 9 digits + B + 2 digits)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/eu/vat.yml
+        pattern_id: vat_netherlands_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [vat, btw, btw-nummer]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  eu_vat_belgium:
+    code: 6035
+    description: Belgian VAT number (BE + 10 digits)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/eu/vat.yml
+        pattern_id: vat_belgium_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [vat, btw, tva]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  eu_vat_austria:
+    code: 6036
+    description: Austrian VAT number (ATU + 8 digits)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/eu/vat.yml
+        pattern_id: vat_austria_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [vat, ust-idnr, uid]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  eu_vat_poland:
+    code: 6037
+    description: Polish VAT number (NIP, PL + 10 digits)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/eu/vat.yml
+        pattern_id: vat_poland_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [vat, nip, vat ue]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  eu_vat_sweden:
+    code: 6038
+    description: Swedish VAT number (SE + 12 digits)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/eu/vat.yml
+        pattern_id: vat_sweden_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [vat, momsregistreringsnummer, moms]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  eu_vat_ireland:
+    code: 6039
+    description: Irish VAT number (IE + 7–8 chars)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/eu/vat.yml
+        pattern_id: vat_ireland_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [vat, vat number]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  eu_vat_portugal:
+    code: 6040
+    description: Portuguese VAT number (NIF/NIPC, PT + 9 digits)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/eu/vat.yml
+        pattern_id: vat_portugal_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [vat, nif, nipc, iva]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  eu_vat_greece:
+    code: 6041
+    description: Greek VAT number (AFM, EL + 9 digits)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/eu/vat.yml
+        pattern_id: vat_greece_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [vat, afm, arithmos forologikou]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  # ── IBAN ─────────────────────────────────────────────────────────────────
+
+  iban:
+    code: 6050
+    description: Generic IBAN (International Bank Account Number, CC + 2 check + up to 30 chars)
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/iban.yml
+        pattern_id: iban_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [iban, international bank account, sepa, bic, swift]
+        relevant_contexts: ["IBAN:", "BIC/SWIFT:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  iban_de:
+    code: 6051
+    description: German IBAN (DE + 2 check + 18 digits)
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/iban.yml
+        pattern_id: iban_de_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [iban, kontonummer, konto]
+        relevant_contexts: ["IBAN:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  iban_fr:
+    code: 6052
+    description: French IBAN (FR + 2 check + 23 chars)
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/iban.yml
+        pattern_id: iban_fr_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [iban, numéro de compte, rib]
+        relevant_contexts: ["IBAN:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  iban_gb:
+    code: 6053
+    description: UK IBAN (GB + 2 check + 22 chars)
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/iban.yml
+        pattern_id: iban_gb_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [iban, sort code, account number]
+        relevant_contexts: ["IBAN:", "Sort Code:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  iban_it:
+    code: 6054
+    description: Italian IBAN (IT + 2 check + 23 chars)
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/iban.yml
+        pattern_id: iban_it_01
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [iban, conto corrente, codice iban]
+        relevant_contexts: ["IBAN:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban

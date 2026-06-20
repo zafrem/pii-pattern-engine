@@ -1,0 +1,224 @@
+version: "2.0"
+region: Tech / Tokens
+region_code: TECH
+code_series: 9501-9510
+engine: re-rank/scoring.yml
+reference: reference/tech.yml
+
+entities:
+
+  9501:
+    entity: tech_generic_token
+    keyword_scores:
+      token: 65
+      secret: 70
+      api key: 75
+      auth token: 75
+      bearer: 70
+      credential: 70
+    context_bonus:
+      "Token:": 30
+      "Secret:": 30
+      "Bearer:": 30
+    regex_scores:
+      generic_token_01: 30     # high-entropy char class — broad
+    sum_example:
+      keyword_hits: [75, 70, 65]
+      keyword_avg: 70
+      context_bonus: 30
+      regex_score: 30
+      final_score: 100         # 70+30+30 = 130 → capped
+      label: definite_pii
+
+  9502:
+    entity: tech_aws_access_key
+    keyword_scores:
+      aws: 70
+      access key: 80
+      aws_access_key_id: 90
+      amazon: 65
+      akia: 85
+    context_bonus:
+      "AWS_ACCESS_KEY_ID:": 40
+      "Access Key:": 30
+    regex_scores:
+      aws_access_key_01: 60    # AKIA prefix + fixed 16-char format — very distinctive
+    sum_example:
+      keyword_hits: [80, 90, 85]
+      keyword_avg: 85
+      context_bonus: 40
+      regex_score: 60
+      final_score: 100
+      label: definite_pii
+
+  9503:
+    entity: tech_aws_secret_key
+    keyword_scores:
+      aws: 70
+      secret key: 80
+      aws_secret_access_key: 90
+      secret access key: 85
+    context_bonus:
+      "AWS_SECRET_ACCESS_KEY:": 40
+      "Secret Key:": 30
+    regex_scores:
+      aws_secret_key_01: 60    # 40-char base64 — regex alone signals probable_pii
+    sum_example:
+      keyword_hits: [80, 90, 85]
+      keyword_avg: 85
+      context_bonus: 40
+      regex_score: 60
+      final_score: 100
+      label: definite_pii
+
+  9504:
+    entity: tech_github_token
+    keyword_scores:
+      github: 70
+      github token: 85
+      personal access token: 85
+      pat: 75
+      ghp: 85
+      gho: 85
+    context_bonus:
+      "GITHUB_TOKEN:": 40
+      "GH_TOKEN:": 40
+    regex_scores:
+      github_token_01: 60      # gh[pousr]_ prefix + 36+ chars — very distinctive
+    sum_example:
+      keyword_hits: [85, 85, 85]
+      keyword_avg: 85
+      context_bonus: 40
+      regex_score: 60
+      final_score: 100
+      label: definite_pii
+
+  9505:
+    entity: tech_stripe_key
+    keyword_scores:
+      stripe: 75
+      stripe key: 85
+      stripe api: 85
+      payment key: 75
+      sk_live: 90
+      sk_test: 85
+    context_bonus:
+      "STRIPE_KEY:": 40
+      "STRIPE_SECRET:": 40
+    regex_scores:
+      stripe_key_01: 60        # (rk|sk|pk)_(live|test)_ prefix — very distinctive
+    sum_example:
+      keyword_hits: [85, 85, 90]
+      keyword_avg: 87
+      context_bonus: 40
+      regex_score: 60
+      final_score: 100
+      label: definite_pii
+
+  9506:
+    entity: tech_jwt_token
+    keyword_scores:
+      jwt: 80
+      json web token: 85
+      bearer: 70
+      authorization: 65
+      auth token: 70
+    context_bonus:
+      "Authorization:": 25
+      "Bearer:": 30
+      "JWT:": 35
+    regex_scores:
+      jwt_token_01: 55         # eyJ header + 3-part structure — fairly distinctive
+    sum_example:
+      keyword_hits: [80, 85, 70]
+      keyword_avg: 78
+      context_bonus: 35
+      regex_score: 55
+      final_score: 100
+      label: definite_pii
+
+  9507:
+    entity: tech_slack_token
+    keyword_scores:
+      slack: 70
+      slack token: 85
+      bot token: 80
+      xoxb: 90
+      xoxp: 90
+    context_bonus:
+      "SLACK_TOKEN:": 40
+      "SLACK_BOT_TOKEN:": 40
+    regex_scores:
+      slack_token_01: 60       # xox[bpsa]- prefix — very distinctive
+    sum_example:
+      keyword_hits: [85, 90, 90]
+      keyword_avg: 88
+      context_bonus: 40
+      regex_score: 60
+      final_score: 100
+      label: definite_pii
+
+  9508:
+    entity: tech_google_api_key
+    keyword_scores:
+      google api: 80
+      api key: 75
+      google key: 80
+      gcp key: 80
+      aiza: 85
+    context_bonus:
+      "GOOGLE_API_KEY:": 40
+      "API_KEY:": 30
+    regex_scores:
+      google_api_key_01: 60    # AIza prefix + exactly 35 chars — very distinctive
+    sum_example:
+      keyword_hits: [80, 80, 85]
+      keyword_avg: 82
+      context_bonus: 40
+      regex_score: 60
+      final_score: 100
+      label: definite_pii
+
+  9509:
+    entity: tech_generic_api_key
+    keyword_scores:
+      api key: 75
+      apikey: 75
+      api_key: 80
+      secret: 70
+      access token: 70
+    context_bonus:
+      "API_KEY:": 30
+      "api_key:": 30
+      "apikey:": 30
+    regex_scores:
+      generic_api_key_01: 30   # broad key=value pattern
+    sum_example:
+      keyword_hits: [75, 80, 70]
+      keyword_avg: 75
+      context_bonus: 30
+      regex_score: 30
+      final_score: 100         # 75+30+30 = 135 → capped
+      label: definite_pii
+
+  9510:
+    entity: tech_private_key
+    keyword_scores:
+      private key: 85
+      pem: 75
+      rsa: 70
+      ssl key: 80
+      certificate: 65
+      begin private key: 90
+    context_bonus:
+      "BEGIN PRIVATE KEY:": 45
+      "BEGIN RSA PRIVATE KEY:": 45
+    regex_scores:
+      private_key_01: 65       # -----BEGIN...PRIVATE KEY----- block — unmistakable
+    sum_example:
+      keyword_hits: [85, 90, 80]
+      keyword_avg: 85
+      context_bonus: 45
+      regex_score: 65
+      final_score: 100
+      label: definite_pii

@@ -1,0 +1,310 @@
+version: "1.0"
+region: Korea
+region_code: KR
+code_series: 1001-1099
+description: Internal reference codes for Korean PII entities, mapping regex patterns and keyword categories.
+
+entities:
+
+  kr_name:
+    code: 1001
+    description: Korean personal name (Hangul 2–5 characters)
+    category: name
+    pii_type: personal
+    severity: low
+    regex:
+      - source: regex/pii/kr/other.yml
+        pattern_id: name_01
+        pattern: '[가-힣]{2,5}'
+        verification: korean_name_valid
+    keyword:
+      - source: keyword/personal.yml
+        category: name
+        relevant_terms: [이름, 성명, 성함]
+        relevant_contexts: ["이름:", "성명:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: name
+
+  kr_rrn:
+    code: 1002
+    description: Korean Resident Registration Number (주민등록번호, YYMMDD-GNNNNNN)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/kr/rrn.yml
+        pattern_id: rrn_01
+        pattern: '[0-9]{2}[01][0-9][0-3][0-9]-?[1-4][0-9]{6}'
+        verification: kr_rrn_valid
+        mask: '******-*******'
+    keyword:
+      - source: keyword/identification.yml
+        category: rrn
+        relevant_terms: [주민등록번호, 주민번호, rrn, resident registration]
+        relevant_contexts: ["주민등록번호:", "RRN:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  kr_alien_registration:
+    code: 1003
+    description: Korean Alien Registration Number (외국인등록번호, 7th digit 5–8)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/kr/rrn.yml
+        pattern_id: alien_registration_01
+        pattern: '[0-9]{2}[01][0-9][0-3][0-9]-?[5-8][0-9]{6}'
+        verification: kr_alien_registration_valid
+        mask: '******-*******'
+    keyword:
+      - source: keyword/identification.yml
+        category: rrn
+        relevant_terms: [외국인등록번호, alien registration, 외국인]
+        relevant_contexts: ["외국인등록번호:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  kr_passport:
+    code: 1004
+    description: Korean passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/kr/identification.yml
+        pattern_id: passport_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [여권, 여권번호, passport, passport number]
+        relevant_contexts: ["여권번호:", "Passport:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  kr_driver_license:
+    code: 1005
+    description: Korean driver's license number (운전면허증)
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/kr/identification.yml
+        pattern_id: driver_license_01
+    keyword:
+      - source: keyword/identification.yml
+        category: drivers_license
+        relevant_terms: [운전면허, 운전면허증, 면허증, driver license]
+        relevant_contexts: ["운전면허번호:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  kr_phone_mobile:
+    code: 1006
+    description: Korean mobile phone number (010/011/016/017/018/019-XXXX-XXXX)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/kr/phone.yml
+        pattern_id: mobile_01
+      - source: regex/pii/kr/phone.yml
+        pattern_id: mobile_02
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [전화번호, 휴대폰, 핸드폰, 전번, mobile, phone number]
+        relevant_contexts: ["전화번호:", "휴대폰:", "Mobile:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  kr_phone_landline:
+    code: 1007
+    description: Korean landline phone number (02/031–099-XXXX-XXXX)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/kr/phone.yml
+        pattern_id: landline_01
+      - source: regex/pii/kr/phone.yml
+        pattern_id: landline_02
+      - source: regex/pii/kr/phone.yml
+        pattern_id: landline_03
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [전화, 전화번호, telephone, phone]
+        relevant_contexts: ["전화:", "Tel:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  kr_address:
+    code: 1008
+    description: Korean physical address (province + city/district + street)
+    category: address
+    pii_type: location
+    severity: high
+    regex:
+      - source: regex/pii/kr/other.yml
+        pattern_id: address_01
+        verification: korean_address_valid
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [주소, address]
+        relevant_contexts: ["주소:"]
+      - source: keyword/address.yml
+        category: address_kr
+    rerank:
+      source: re-rank/scoring.yml
+      category: address
+
+  kr_bank_account:
+    code: 1009
+    description: Korean bank account numbers (15 major banks)
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_01
+        notes: Kookmin Bank (KB)
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_02
+        notes: Shinhan Bank
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_03
+        notes: Woori Bank
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_04
+        notes: Hana Bank
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_05
+        notes: NH NongHyup Bank
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_06
+        notes: IBK Industrial Bank
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_07
+        notes: KDB Korea Development Bank
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_08
+        notes: Busan Bank
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_09
+        notes: Daegu Bank
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_10
+        notes: Gwangju Bank
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_11
+        notes: Jeju Bank
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_12
+        notes: Jeonbuk Bank
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_13
+        notes: Kakao Bank
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_14
+        notes: K Bank
+      - source: regex/pii/kr/banks.yml
+        pattern_id: bank_account_15
+        notes: Toss Bank
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [계좌, 계좌번호, 은행, 통장, 예금주, 송금]
+        relevant_contexts: ["계좌번호:", "예금주:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  kr_business_registration:
+    code: 1010
+    description: Korean Business Registration Number (사업자등록번호, NNN-NN-NNNNN)
+    category: business
+    pii_type: organizational
+    severity: high
+    regex:
+      - source: regex/pii/kr/other.yml
+        pattern_id: business_registration_01
+        pattern: '[0-9]{3}-[0-9]{2}-[0-9]{5}'
+        verification: kr_business_registration_valid
+        mask: '***-**-****#'
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [사업자등록번호, 사업자번호]
+        relevant_contexts: ["사업자등록번호:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  kr_corporate_registration:
+    code: 1011
+    description: Korean Corporate Registration Number (법인등록번호, NNNNNN-NNNNNNN)
+    category: business
+    pii_type: organizational
+    severity: high
+    regex:
+      - source: regex/pii/kr/other.yml
+        pattern_id: corporate_registration_01
+        pattern: '[0-9]{6}-[0-9]{7}'
+        verification: kr_corporate_registration_valid
+        mask: '******-******#'
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [법인등록번호, 법인번호]
+        relevant_contexts: ["법인등록번호:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  kr_personal_customs_code:
+    code: 1012
+    description: Korean Personal Customs Clearance Code (PCCC, P + 12 digits)
+    category: identification
+    pii_type: government_id
+    severity: medium
+    regex:
+      - source: regex/pii/kr/other.yml
+        pattern_id: personal_customs_code_01
+        pattern: '[pP][0-9]{12}'
+        verification: kr_pccc_valid
+        mask: 'P************'
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [개인통관고유부호, pccc, 통관코드]
+        relevant_contexts: ["개인통관고유부호:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  kr_vehicle_registration:
+    code: 1013
+    description: Korean vehicle registration number
+    category: identification
+    pii_type: government_id
+    severity: medium
+    regex:
+      - source: regex/pii/kr/vehicle.yml
+        notes: No patterns defined yet
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [차량번호, 차번호판, 번호판]
+        relevant_contexts: ["차량번호:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn

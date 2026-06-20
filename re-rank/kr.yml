@@ -1,0 +1,313 @@
+version: "2.0"
+region: Korea
+region_code: KR
+code_series: 1001-1013
+engine: re-rank/scoring.yml
+reference: reference/kr.yml
+
+# Scoring formula: final_score = min(keyword_avg + context_bonus + regex_score, 100)
+# keyword_scores : 0–100  (higher = stronger PII indicator)
+# context_bonus  : flat points added when a labeled field prefix is detected
+# regex_scores   : 0–50   (50 = checksum-validated, 30 = broad pattern)
+
+entities:
+
+  1001:
+    entity: kr_name
+    keyword_scores:
+      이름: 50
+      성명: 60
+      성함: 55
+      이름란: 55
+      name: 40
+      full name: 55
+    context_bonus:
+      "이름:": 20
+      "성명:": 20
+      "Name:": 15
+    regex_scores:
+      name_01: 30              # broad Hangul char-class → lower specificity
+    sum_example:
+      keyword_hits: [50, 60]
+      keyword_avg: 55
+      context_bonus: 20
+      regex_score: 30
+      final_score: 100         # 55+20+30 = 105 → capped to 100
+      label: definite_pii
+
+  1002:
+    entity: kr_rrn
+    keyword_scores:
+      주민등록번호: 90
+      주민번호: 90
+      rrn: 80
+      resident registration: 85
+      住民登録番号: 75
+    context_bonus:
+      "주민등록번호:": 40
+      "RRN:": 35
+    regex_scores:
+      rrn_01: 50               # checksum-validated → max regex score
+    sum_example:
+      keyword_hits: [90, 90]
+      keyword_avg: 90
+      context_bonus: 40
+      regex_score: 50
+      final_score: 100         # capped
+      label: definite_pii
+
+  1003:
+    entity: kr_alien_registration
+    keyword_scores:
+      외국인등록번호: 90
+      외국인등록: 85
+      외국인: 60
+      alien registration: 85
+      등록번호: 65
+    context_bonus:
+      "외국인등록번호:": 40
+    regex_scores:
+      alien_registration_01: 50
+    sum_example:
+      keyword_hits: [90, 85]
+      keyword_avg: 87
+      context_bonus: 40
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  1004:
+    entity: kr_passport
+    keyword_scores:
+      여권: 80
+      여권번호: 90
+      passport: 75
+      passport number: 85
+      travel document: 70
+    context_bonus:
+      "여권번호:": 35
+      "Passport:": 30
+    regex_scores:
+      passport_01: 45
+    sum_example:
+      keyword_hits: [80, 90]
+      keyword_avg: 85
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  1005:
+    entity: kr_driver_license
+    keyword_scores:
+      운전면허: 80
+      운전면허증: 85
+      면허증: 75
+      면허번호: 80
+      driver license: 75
+      drivers license: 75
+    context_bonus:
+      "운전면허번호:": 35
+      "Driver's License:": 30
+    regex_scores:
+      driver_license_01: 45
+    sum_example:
+      keyword_hits: [80, 85]
+      keyword_avg: 82
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  1006:
+    entity: kr_phone_mobile
+    keyword_scores:
+      전화번호: 70
+      휴대폰: 70
+      핸드폰: 70
+      전번: 60
+      전화: 55
+      mobile: 55
+      phone number: 65
+      cell: 50
+    context_bonus:
+      "전화번호:": 25
+      "휴대폰:": 25
+      "Mobile:": 20
+    regex_scores:
+      mobile_01: 40
+      mobile_02: 40
+    sum_example:
+      keyword_hits: [70, 70, 65]
+      keyword_avg: 68
+      context_bonus: 25
+      regex_score: 40
+      final_score: 100         # 68+25+40 = 133 → capped
+      label: definite_pii
+
+  1007:
+    entity: kr_phone_landline
+    keyword_scores:
+      전화: 55
+      전화번호: 70
+      유선전화: 65
+      직통: 55
+      telephone: 55
+      phone: 50
+    context_bonus:
+      "전화:": 20
+      "Tel:": 20
+    regex_scores:
+      landline_01: 40
+      landline_02: 40
+      landline_03: 40
+    sum_example:
+      keyword_hits: [55, 70]
+      keyword_avg: 62
+      context_bonus: 20
+      regex_score: 40
+      final_score: 100         # 62+20+40 = 122 → capped
+      label: definite_pii
+
+  1008:
+    entity: kr_address
+    keyword_scores:
+      주소: 55
+      거주지: 60
+      자택: 60
+      주소지: 60
+      address: 45
+      home address: 55
+    context_bonus:
+      "주소:": 25
+      "Address:": 20
+    regex_scores:
+      address_01: 40
+    sum_example:
+      keyword_hits: [55, 60]
+      keyword_avg: 57
+      context_bonus: 25
+      regex_score: 40
+      final_score: 100         # 57+25+40 = 122 → capped
+      label: definite_pii
+
+  1009:
+    entity: kr_bank_account
+    keyword_scores:
+      계좌번호: 80
+      계좌: 70
+      은행: 55
+      통장: 65
+      예금주: 75
+      송금: 60
+      무통장: 65
+      account number: 70
+      bank account: 70
+    context_bonus:
+      "계좌번호:": 30
+      "예금주:": 30
+      "Account:": 25
+    regex_scores:
+      bank_account_01: 45      # KB
+      bank_account_02: 45      # Shinhan
+      bank_account_03: 45      # Woori
+      bank_account_04: 45      # Hana
+      bank_account_05: 45      # NH
+      bank_account_06: 45      # IBK
+      bank_account_07: 45      # KDB
+      bank_account_08: 45      # Busan
+      bank_account_09: 45      # Daegu
+      bank_account_10: 45      # Gwangju
+      bank_account_11: 45      # Jeju
+      bank_account_12: 45      # Jeonbuk
+      bank_account_13: 45      # Kakao
+      bank_account_14: 45      # K Bank
+      bank_account_15: 45      # Toss
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  1010:
+    entity: kr_business_registration
+    keyword_scores:
+      사업자등록번호: 90
+      사업자번호: 85
+      사업자등록: 80
+      business registration: 80
+      사업자: 65
+    context_bonus:
+      "사업자등록번호:": 40
+    regex_scores:
+      business_registration_01: 45
+    sum_example:
+      keyword_hits: [90, 85]
+      keyword_avg: 87
+      context_bonus: 40
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  1011:
+    entity: kr_corporate_registration
+    keyword_scores:
+      법인등록번호: 90
+      법인번호: 85
+      법인등록: 80
+      corporate registration: 80
+      법인: 60
+    context_bonus:
+      "법인등록번호:": 40
+    regex_scores:
+      corporate_registration_01: 45
+    sum_example:
+      keyword_hits: [90, 85]
+      keyword_avg: 87
+      context_bonus: 40
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  1012:
+    entity: kr_personal_customs_code
+    keyword_scores:
+      개인통관고유부호: 90
+      통관코드: 80
+      pccc: 85
+      개인통관: 80
+      customs code: 75
+    context_bonus:
+      "개인통관고유부호:": 40
+    regex_scores:
+      personal_customs_code_01: 45
+    sum_example:
+      keyword_hits: [90, 85]
+      keyword_avg: 87
+      context_bonus: 40
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  1013:
+    entity: kr_vehicle_registration
+    keyword_scores:
+      차량번호: 80
+      번호판: 75
+      차번호판: 75
+      자동차등록번호: 85
+      vehicle registration: 75
+      license plate: 70
+    context_bonus:
+      "차량번호:": 30
+    regex_scores:
+      default: 40              # pattern not yet defined in regex/pii/kr/vehicle.yml
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 40
+      final_score: 100         # 77+30+40 = 147 → capped
+      label: definite_pii

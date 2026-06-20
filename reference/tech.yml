@@ -1,0 +1,187 @@
+version: "1.0"
+region: Tech / Tokens
+region_code: TECH
+code_series: 9501-9599
+description: Internal reference codes for technical secrets and API tokens, mapping regex patterns and keyword categories.
+
+entities:
+
+  tech_generic_token:
+    code: 9501
+    description: Generic high-entropy secret token (32–64 hex/base64 chars)
+    category: secret
+    pii_type: credential
+    severity: critical
+    regex:
+      - source: regex/hash/tokens.yml
+        pattern_id: generic_token_01
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [token, secret, key, api key, auth token, bearer]
+        relevant_contexts: ["Token:", "Secret:", "Bearer:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ip_address
+
+  tech_aws_access_key:
+    code: 9502
+    description: AWS Access Key ID (AKIA prefix + 16 uppercase alphanumeric chars)
+    category: secret
+    pii_type: credential
+    severity: critical
+    regex:
+      - source: regex/hash/tokens.yml
+        pattern_id: aws_access_key_01
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [aws, access key, aws_access_key_id, amazon]
+        relevant_contexts: ["AWS_ACCESS_KEY_ID:", "Access Key:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ip_address
+
+  tech_aws_secret_key:
+    code: 9503
+    description: AWS Secret Access Key (40 base64 chars)
+    category: secret
+    pii_type: credential
+    severity: critical
+    regex:
+      - source: regex/hash/tokens.yml
+        pattern_id: aws_secret_key_01
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [aws, secret key, aws_secret_access_key, secret access key]
+        relevant_contexts: ["AWS_SECRET_ACCESS_KEY:", "Secret Key:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ip_address
+
+  tech_github_token:
+    code: 9504
+    description: GitHub personal access token (ghp_/gho_/ghs_/ghr_ + 36 alphanumeric chars)
+    category: secret
+    pii_type: credential
+    severity: critical
+    regex:
+      - source: regex/hash/tokens.yml
+        pattern_id: github_token_01
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [github, github token, personal access token, pat, ghp]
+        relevant_contexts: ["GITHUB_TOKEN:", "GH_TOKEN:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ip_address
+
+  tech_stripe_key:
+    code: 9505
+    description: Stripe API key (sk_live_/sk_test_/pk_live_/pk_test_ prefix)
+    category: secret
+    pii_type: credential
+    severity: critical
+    regex:
+      - source: regex/hash/tokens.yml
+        pattern_id: stripe_key_01
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [stripe, stripe key, payment key, stripe api]
+        relevant_contexts: ["STRIPE_KEY:", "STRIPE_SECRET:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ip_address
+
+  tech_jwt_token:
+    code: 9506
+    description: JSON Web Token (eyJ base64-header.base64-payload.signature)
+    category: secret
+    pii_type: credential
+    severity: high
+    regex:
+      - source: regex/hash/tokens.yml
+        pattern_id: jwt_token_01
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [jwt, json web token, bearer, authorization, auth token]
+        relevant_contexts: ["Authorization:", "Bearer:", "JWT:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ip_address
+
+  tech_slack_token:
+    code: 9507
+    description: Slack API token (xox[bpsa]-... prefix)
+    category: secret
+    pii_type: credential
+    severity: critical
+    regex:
+      - source: regex/hash/tokens.yml
+        pattern_id: slack_token_01
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [slack, slack token, bot token, xoxb]
+        relevant_contexts: ["SLACK_TOKEN:", "SLACK_BOT_TOKEN:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ip_address
+
+  tech_google_api_key:
+    code: 9508
+    description: Google API key (AIza prefix + 35 alphanumeric chars)
+    category: secret
+    pii_type: credential
+    severity: critical
+    regex:
+      - source: regex/hash/tokens.yml
+        pattern_id: google_api_key_01
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [google api, api key, google key, gcp key]
+        relevant_contexts: ["GOOGLE_API_KEY:", "API_KEY:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ip_address
+
+  tech_generic_api_key:
+    code: 9509
+    description: Generic API key pattern (api_key/apikey/api-key = value)
+    category: secret
+    pii_type: credential
+    severity: high
+    regex:
+      - source: regex/hash/tokens.yml
+        pattern_id: generic_api_key_01
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [api key, apikey, api_key, secret, token]
+        relevant_contexts: ["API_KEY:", "api_key:", "apikey:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ip_address
+
+  tech_private_key:
+    code: 9510
+    description: PEM private key block (-----BEGIN ... PRIVATE KEY-----)
+    category: secret
+    pii_type: credential
+    severity: critical
+    regex:
+      - source: regex/hash/tokens.yml
+        pattern_id: private_key_01
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [private key, pem, rsa, ssl key, certificate]
+        relevant_contexts: ["BEGIN PRIVATE KEY:", "BEGIN RSA PRIVATE KEY:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ip_address

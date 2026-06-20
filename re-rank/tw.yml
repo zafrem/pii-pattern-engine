@@ -1,0 +1,327 @@
+version: "2.0"
+region: Taiwan
+region_code: TW
+code_series: 4001-4016
+engine: re-rank/scoring.yml
+reference: reference/tw.yml
+
+entities:
+
+  4001:
+    entity: tw_name
+    keyword_scores:
+      姓名: 60
+      名字: 55
+      全名: 60
+      name: 40
+      full name: 55
+    context_bonus:
+      "姓名:": 20
+      "名字:": 20
+    regex_scores:
+      chinese_name_01: 30
+    sum_example:
+      keyword_hits: [60, 55]
+      keyword_avg: 57
+      context_bonus: 20
+      regex_score: 30
+      final_score: 100
+      label: definite_pii
+
+  4002:
+    entity: tw_national_id
+    keyword_scores:
+      身分證: 85
+      身份證: 85
+      身分證號碼: 90
+      國民身分證: 90
+      id card: 70
+      national id: 70
+    context_bonus:
+      "身分證號:": 40
+      "國民身分證:": 40
+    regex_scores:
+      national_id_01: 50
+    sum_example:
+      keyword_hits: [90, 90]
+      keyword_avg: 90
+      context_bonus: 40
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  4003:
+    entity: tw_passport
+    keyword_scores:
+      護照: 80
+      護照號碼: 90
+      護照號: 85
+      passport: 75
+      passport number: 85
+    context_bonus:
+      "護照號碼:": 35
+      "Passport:": 30
+    regex_scores:
+      passport_01: 45
+    sum_example:
+      keyword_hits: [80, 90]
+      keyword_avg: 85
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  4004:
+    entity: tw_phone_mobile
+    keyword_scores:
+      手機: 65
+      手機號碼: 75
+      聯絡電話: 70
+      電話: 55
+      mobile: 55
+      phone: 50
+    context_bonus:
+      "手機:": 25
+      "電話:": 20
+    regex_scores:
+      mobile_01: 40
+      mobile_02: 40
+    sum_example:
+      keyword_hits: [75, 70, 65]
+      keyword_avg: 70
+      context_bonus: 25
+      regex_score: 40
+      final_score: 100         # 70+25+40 = 135 → capped
+      label: definite_pii
+
+  4005:
+    entity: tw_phone_landline
+    keyword_scores:
+      電話: 55
+      固定電話: 65
+      座機: 65
+      電話號碼: 70
+      telephone: 55
+    context_bonus:
+      "電話:": 20
+      "Tel:": 20
+    regex_scores:
+      landline_01: 40
+      landline_02: 40
+    sum_example:
+      keyword_hits: [55, 65]
+      keyword_avg: 60
+      context_bonus: 20
+      regex_score: 40
+      final_score: 100         # 60+20+40 = 120 → capped
+      label: definite_pii
+
+  4006:
+    entity: tw_address
+    keyword_scores:
+      地址: 55
+      住址: 60
+      通訊地址: 65
+      居住地址: 65
+      address: 45
+    context_bonus:
+      "地址:": 25
+      "住址:": 25
+    regex_scores:
+      address_simple_01: 40
+    sum_example:
+      keyword_hits: [55, 60]
+      keyword_avg: 57
+      context_bonus: 25
+      regex_score: 40
+      final_score: 100         # 57+25+40 = 122 → capped
+      label: definite_pii
+
+  4007:
+    entity: tw_business_id
+    keyword_scores:
+      統一編號: 90
+      公司統編: 85
+      統編: 80
+      business id: 75
+      uniform number: 80
+    context_bonus:
+      "統一編號:": 40
+    regex_scores:
+      business_id_01: 40       # 8 digits, no checksum in pattern
+    sum_example:
+      keyword_hits: [90, 85]
+      keyword_avg: 87
+      context_bonus: 40
+      regex_score: 40
+      final_score: 100         # 87+40+40 = 167 → capped
+      label: definite_pii
+
+  4008:
+    entity: tw_bank_bank_of_taiwan
+    keyword_scores:
+      臺灣銀行: 80
+      台灣銀行: 80
+      帳號: 75
+      帳戶號碼: 80
+      account number: 70
+    context_bonus:
+      "帳號:": 30
+    regex_scores:
+      bank_of_taiwan_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  4009:
+    entity: tw_bank_first_bank
+    keyword_scores:
+      第一銀行: 80
+      第一商業銀行: 80
+      帳號: 75
+      帳戶號碼: 80
+    context_bonus:
+      "帳號:": 30
+    regex_scores:
+      first_bank_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  4010:
+    entity: tw_bank_hua_nan
+    keyword_scores:
+      華南銀行: 80
+      華南商業銀行: 80
+      帳號: 75
+    context_bonus:
+      "帳號:": 30
+    regex_scores:
+      hua_nan_bank_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  4011:
+    entity: tw_bank_chang_hwa
+    keyword_scores:
+      彰化銀行: 80
+      彰化商業銀行: 80
+      帳號: 75
+    context_bonus:
+      "帳號:": 30
+    regex_scores:
+      chang_hwa_bank_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  4012:
+    entity: tw_bank_shanghai
+    keyword_scores:
+      上海銀行: 80
+      上海商業儲蓄銀行: 80
+      帳號: 75
+    context_bonus:
+      "帳號:": 30
+    regex_scores:
+      shanghai_bank_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  4013:
+    entity: tw_bank_taipei_fubon
+    keyword_scores:
+      台北富邦銀行: 80
+      富邦銀行: 75
+      富邦: 60
+      帳號: 75
+    context_bonus:
+      "帳號:": 30
+    regex_scores:
+      taipei_fubon_bank_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  4014:
+    entity: tw_bank_ctbc
+    keyword_scores:
+      中國信託: 80
+      中信銀行: 80
+      CTBC: 70
+      帳號: 75
+    context_bonus:
+      "帳號:": 30
+    regex_scores:
+      ctbc_bank_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  4015:
+    entity: tw_bank_esun
+    keyword_scores:
+      玉山銀行: 80
+      E.SUN: 70
+      玉山: 60
+      帳號: 75
+    context_bonus:
+      "帳號:": 30
+    regex_scores:
+      esun_bank_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  4016:
+    entity: tw_bank_cooperative
+    keyword_scores:
+      合作金庫: 80
+      合庫銀行: 80
+      合庫: 65
+      帳號: 75
+    context_bonus:
+      "帳號:": 30
+    regex_scores:
+      taiwan_cooperative_bank_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii

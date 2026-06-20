@@ -1,0 +1,226 @@
+version: "1.0"
+region: China
+region_code: CN
+code_series: 3001-3099
+description: Internal reference codes for Chinese PII entities, mapping regex patterns and keyword categories.
+
+entities:
+
+  cn_name:
+    code: 3001
+    description: Simplified Chinese personal name (汉字 2–4 characters)
+    category: name
+    pii_type: personal
+    severity: high
+    regex:
+      - source: regex/pii/cn/other.yml
+        pattern_id: chinese_name_01
+        pattern: '[一-鿿]{2,4}'
+        verification: chinese_name_valid
+        mask: '***'
+    keyword:
+      - source: keyword/personal.yml
+        category: name
+        relevant_terms: [姓名, 名字, 全名, name, full name]
+        relevant_contexts: ["姓名:", "名字:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: name
+
+  cn_national_id:
+    code: 3002
+    description: Chinese Resident Identity Card number (居民身份证号, 18 digits)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/cn/identification.yml
+        pattern_id: national_id_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [身份证, 居民身份证, 身份证号, 身份证号码, id card]
+        relevant_contexts: ["身份证号:", "身份证号码:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  cn_passport:
+    code: 3003
+    description: Chinese passport number (护照号码)
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/cn/identification.yml
+        pattern_id: passport_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [护照, 护照号码, 护照号, passport]
+        relevant_contexts: ["护照号码:", "Passport:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  cn_phone_mobile:
+    code: 3004
+    description: Chinese mobile phone number (1XX-XXXX-XXXX, 11 digits)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/cn/phone.yml
+        pattern_id: mobile_01
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [手机, 电话, 联系电话, 手机号, mobile, phone]
+        relevant_contexts: ["手机:", "电话:", "联系电话:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  cn_phone_landline:
+    code: 3005
+    description: Chinese landline phone number (area code + 7–8 digit number)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/cn/phone.yml
+        pattern_id: landline_01
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [电话, 固定电话, 座机, telephone]
+        relevant_contexts: ["电话:", "Tel:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  cn_address:
+    code: 3006
+    description: Chinese physical address (province + city + district + street)
+    category: address
+    pii_type: location
+    severity: high
+    regex:
+      - source: regex/pii/cn/other.yml
+        pattern_id: address_01
+        verification: chinese_address_valid
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [地址, 住址, 通讯地址, address]
+        relevant_contexts: ["地址:", "住址:"]
+      - source: keyword/address.yml
+        category: address_cn
+    rerank:
+      source: re-rank/scoring.yml
+      category: address
+
+  cn_social_credit:
+    code: 3007
+    description: Chinese Unified Social Credit Code (统一社会信用代码, 18 alphanumeric chars)
+    category: business
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/cn/other.yml
+        pattern_id: social_credit_01
+        pattern: '[0-9A-Z]{18}'
+        mask: '******************'
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [统一社会信用代码, 社会信用代码, 信用代码]
+        relevant_contexts: ["统一社会信用代码:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  cn_bank_icbc:
+    code: 3008
+    description: Industrial and Commercial Bank of China (ICBC / 工商银行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/cn/banks.yml
+        pattern_id: icbc_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [工商银行, 工行, ICBC, 账号, 卡号]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  cn_bank_ccb:
+    code: 3009
+    description: China Construction Bank (CCB / 建设银行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/cn/banks.yml
+        pattern_id: ccb_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [建设银行, 建行, CCB]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  cn_bank_abc:
+    code: 3010
+    description: Agricultural Bank of China (ABC / 农业银行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/cn/banks.yml
+        pattern_id: abc_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [农业银行, 农行, ABC]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  cn_bank_boc:
+    code: 3011
+    description: Bank of China (BOC / 中国银行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/cn/banks.yml
+        pattern_id: boc_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [中国银行, 中行, BOC]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  cn_bank_cmb:
+    code: 3012
+    description: China Merchants Bank (CMB / 招商银行) account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/cn/banks.yml
+        pattern_id: cmb_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [招商银行, 招行, CMB]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban

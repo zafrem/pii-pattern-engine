@@ -297,7 +297,7 @@ class TestHighEntropyToken:
         """Test valid high entropy tokens."""
         valid_tokens = [
             "ghp_1234567890abcdefghijklmnopqrstuvwxyz",  # GitHub token-like
-            "sk_test_4eC39HqLyjWDarjtT1zdp7dc",  # Stripe test key-like
+            "sk_demo_4eC39HqLyjWDarjtT1zdp7dc",  # Stripe-format demo key
             "xoxb-1234567890123-1234567890123-abcdefghijklmnopqrstuvwx",  # Slack-like
             "AIzaSyD-1234567890abcdefghijklmnopqrstuv",  # Google API key-like
             (

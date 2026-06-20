@@ -1,0 +1,299 @@
+version: "1.0"
+region: Japan
+region_code: JP
+code_series: 2001-2099
+description: Internal reference codes for Japanese PII entities, mapping regex patterns and keyword categories.
+
+entities:
+
+  jp_name_kanji:
+    code: 2001
+    description: Japanese personal name written in Kanji (漢字 2–4 characters)
+    category: name
+    pii_type: personal
+    severity: high
+    regex:
+      - source: regex/pii/jp/other.yml
+        pattern_id: japanese_name_kanji_01
+        pattern: '[一-鿿]{2,4}'
+        verification: japanese_name_kanji_valid
+        mask: '***'
+    keyword:
+      - source: keyword/personal.yml
+        category: name
+        relevant_terms: [名前, 氏名, 姓名, full name, name]
+        relevant_contexts: ["氏名:", "名前:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: name
+
+  jp_name_hiragana:
+    code: 2002
+    description: Japanese personal name written in Hiragana (ひらがな 2–8 characters)
+    category: name
+    pii_type: personal
+    severity: high
+    regex:
+      - source: regex/pii/jp/other.yml
+        pattern_id: japanese_name_hiragana_01
+        pattern: '[ぁ-ゟ]{2,8}'
+        mask: '***'
+    keyword:
+      - source: keyword/personal.yml
+        category: name
+        relevant_terms: [名前, 氏名, ふりがな, よみがな]
+        relevant_contexts: ["ふりがな:", "よみがな:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: name
+
+  jp_name_katakana:
+    code: 2003
+    description: Japanese personal name written in Katakana (カタカナ 2–8 characters)
+    category: name
+    pii_type: personal
+    severity: high
+    regex:
+      - source: regex/pii/jp/other.yml
+        pattern_id: japanese_name_katakana_01
+        pattern: '[゠-ヿ]{2,8}'
+        mask: '***'
+    keyword:
+      - source: keyword/personal.yml
+        category: name
+        relevant_terms: [名前, 氏名, フリガナ, カタカナ]
+        relevant_contexts: ["フリガナ:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: name
+
+  jp_my_number:
+    code: 2004
+    description: Japanese Individual Number / My Number (マイナンバー, 12-digit national ID)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/jp/identification.yml
+        pattern_id: my_number_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [マイナンバー, 個人番号, 個人番号カード, my number]
+        relevant_contexts: ["マイナンバー:", "個人番号:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: jp_my_number
+
+  jp_passport:
+    code: 2005
+    description: Japanese passport number (旅券番号)
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/jp/identification.yml
+        pattern_id: passport_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [旅券, パスポート, パスポート番号, 旅券番号]
+        relevant_contexts: ["パスポート番号:", "旅券番号:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  jp_driver_license:
+    code: 2006
+    description: Japanese driver's license number (運転免許証番号, 12 digits)
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/jp/identification.yml
+        pattern_id: driver_license_01
+    keyword:
+      - source: keyword/identification.yml
+        category: drivers_license
+        relevant_terms: [運転免許, 運転免許証, 免許証]
+        relevant_contexts: ["運転免許証番号:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  jp_phone_mobile:
+    code: 2007
+    description: Japanese mobile phone number (070/080/090-XXXX-XXXX)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/jp/phone.yml
+        pattern_id: mobile_01
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [携帯, 電話番号, 携帯電話, 電話, phone, mobile]
+        relevant_contexts: ["携帯番号:", "電話番号:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  jp_phone_landline:
+    code: 2008
+    description: Japanese landline phone number
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/jp/phone.yml
+        pattern_id: landline_01
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [電話, 固定電話, 電話番号, telephone]
+        relevant_contexts: ["電話:", "Tel:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  jp_address:
+    code: 2009
+    description: Japanese physical address (prefecture + city/ward + street + number)
+    category: address
+    pii_type: location
+    severity: high
+    regex:
+      - source: regex/pii/jp/other.yml
+        pattern_id: address_simple_01
+        verification: japanese_address_valid
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [住所, 住居, 番地, address]
+        relevant_contexts: ["住所:"]
+      - source: keyword/address.yml
+        category: address_jp
+    rerank:
+      source: re-rank/scoring.yml
+      category: address
+
+  jp_bank_account_generic:
+    code: 2010
+    description: Generic Japanese bank account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/jp/banks.yml
+        pattern_id: generic_japanese_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [口座, 銀行, 振込, 預金, 通帳, 名義, 受取人]
+        relevant_contexts: ["口座番号:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  jp_bank_mizuho:
+    code: 2011
+    description: Mizuho Bank account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/jp/banks.yml
+        pattern_id: mizuho_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [みずほ銀行, みずほ, Mizuho, 口座番号]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  jp_bank_smbc:
+    code: 2012
+    description: Sumitomo Mitsui Banking Corporation account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/jp/banks.yml
+        pattern_id: smbc_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [三井住友銀行, SMBC, 三井住友]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  jp_bank_mufg:
+    code: 2013
+    description: Mitsubishi UFJ Financial Group bank account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/jp/banks.yml
+        pattern_id: mufg_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [三菱UFJ銀行, MUFG, 三菱UFJ]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  jp_bank_resona:
+    code: 2014
+    description: Resona Bank account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/jp/banks.yml
+        pattern_id: resona_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [りそな銀行, Resona]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  jp_bank_seven:
+    code: 2015
+    description: Seven Bank account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/jp/banks.yml
+        pattern_id: seven_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [セブン銀行, Seven Bank]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  jp_bank_rakuten:
+    code: 2016
+    description: Rakuten Bank account number
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/jp/banks.yml
+        pattern_id: rakuten_bank_account_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [楽天銀行, Rakuten Bank]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban

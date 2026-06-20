@@ -1,0 +1,176 @@
+version: "1.0"
+region: United States
+region_code: US
+code_series: 5001-5099
+description: Internal reference codes for US PII entities, mapping regex patterns and keyword categories.
+
+entities:
+
+  us_name:
+    code: 5001
+    description: English personal name (First Last pattern)
+    category: name
+    pii_type: personal
+    severity: low
+    regex:
+      - source: regex/pii/common/name.yml
+        pattern_id: name_en_01
+    keyword:
+      - source: keyword/personal.yml
+        category: name
+        relevant_terms: [name, full name, first name, last name, given name, surname]
+        relevant_contexts: ["Name:", "Full Name:", "First Name:", "Last Name:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: name
+
+  us_ssn:
+    code: 5002
+    description: US Social Security Number (NNN-NN-NNNN)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/us/ssn.yml
+        pattern_id: ssn_01
+        pattern: '[0-9]{3}-?[0-9]{2}-?[0-9]{4}'
+        verification: us_ssn_valid
+        mask: '***-**-****'
+    keyword:
+      - source: keyword/identification.yml
+        category: ssn
+        relevant_terms: [ssn, social security, social security number, ss#, tin, itin, taxpayer id]
+        relevant_contexts: ["SSN:", "Social Security Number:", "Tax ID:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ssn
+
+  us_itin:
+    code: 5003
+    description: US Individual Taxpayer Identification Number (9XX-XX-XXXX)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/us/ssn.yml
+        pattern_id: itin_01
+        pattern: '9[0-9]{2}(?:-[0-9]{2}-[0-9]{4}|[0-9]{6})'
+        mask: '***-**-****'
+    keyword:
+      - source: keyword/identification.yml
+        category: ssn
+        relevant_terms: [itin, individual taxpayer, tin, taxpayer id]
+        relevant_contexts: ["ITIN:", "Tax ID:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ssn
+
+  us_passport:
+    code: 5004
+    description: US passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/us/identification.yml
+        pattern_id: passport_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [passport, passport number, passport no, travel document]
+        relevant_contexts: ["Passport:", "Passport Number:", "Passport #:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  us_driver_license_ca:
+    code: 5005
+    description: California driver's license number (1 letter + 7 digits)
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/us/identification.yml
+        pattern_id: driver_license_ca_01
+    keyword:
+      - source: keyword/identification.yml
+        category: drivers_license
+        relevant_terms: [driver license, drivers license, dl, dl number, license number]
+        relevant_contexts: ["Driver's License:", "DL#:", "License No:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  us_medicare:
+    code: 5006
+    description: US Medicare Beneficiary Identifier (MBI, 11 chars alphanumeric)
+    category: identification
+    pii_type: medical
+    severity: critical
+    regex:
+      - source: regex/pii/us/identification.yml
+        pattern_id: medicare_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [medicare, mbi, medicare id, beneficiary]
+        relevant_contexts: ["Medicare:", "MBI:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  us_phone:
+    code: 5007
+    description: US phone number (NXX-NXX-XXXX)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/us/phone.yml
+        pattern_id: phone_01
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [phone, telephone, mobile, cell, tel, phone number, contact number]
+        relevant_contexts: ["Phone:", "Tel:", "Mobile:", "Cell:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  us_address:
+    code: 5008
+    description: US physical address (street number + street name + city + state + ZIP)
+    category: address
+    pii_type: location
+    severity: medium
+    regex:
+      - source: regex/pii/us/other.yml
+        pattern_id: address_01
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [address, street, city, state, province, country]
+        relevant_contexts: ["Address:", "Street:", "City:"]
+      - source: keyword/address.yml
+        category: address_us
+    rerank:
+      source: re-rank/scoring.yml
+      category: address
+
+  us_ein:
+    code: 5009
+    description: US Employer Identification Number (EIN, NN-NNNNNNN)
+    category: financial
+    pii_type: organizational
+    severity: high
+    regex:
+      - source: regex/pii/us/other.yml
+        pattern_id: ein_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [ein, employer id, employer identification, fein, federal tax id]
+        relevant_contexts: ["EIN:", "Employer ID:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ssn

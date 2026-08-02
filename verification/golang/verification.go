@@ -66,6 +66,15 @@ var (
 		"korean_address_valid":            KoreanAddressValid,
 		"japanese_address_valid":          JapaneseAddressValid,
 		"chinese_address_valid":           ChineseAddressValid,
+		"imei_valid":                      ImeiValid,
+		"mac_address_valid":               MacAddressValid,
+		"latitude_valid":                  LatitudeValid,
+		"longitude_valid":                 LongitudeValid,
+		"jp_driver_license_valid":         JpDriverLicenseValid,
+		"kr_driver_license_valid":         KrDriverLicenseValid,
+		"kr_pccc_valid":                   KrPcccValid,
+		"kr_vehicle_registration_valid":   KrVehicleRegistrationValid,
+		"us_address_valid":                UsAddressValid,
 	}
 
 	mu sync.RWMutex
@@ -107,17 +116,17 @@ var CHINESE_SURNAMES = map[string]struct{}{
 	"徐": {}, "孙": {}, "马": {}, "朱": {}, "胡": {}, "郭": {}, "何": {}, "林": {}, "高": {}, "罗": {},
 	"郑": {}, "梁": {}, "谢": {}, "宋": {}, "唐": {}, "许": {}, "邓": {}, "冯": {}, "韩": {}, "曹": {},
 	"曾": {}, "彭": {}, "萧": {}, "蔡": {}, "潘": {}, "田": {}, "董": {}, "袁": {}, "于": {}, "余": {},
-	"叶": {}, "蔣": {}, "杜": {}, "苏": {}, "魏": {}, "程": {}, "吕": {}, "丁": {}, "沈": {}, "任": {},
+	"叶": {}, "蒋": {}, "杜": {}, "苏": {}, "魏": {}, "程": {}, "吕": {}, "丁": {}, "沈": {}, "任": {},
 	"姚": {}, "卢": {}, "傅": {}, "钟": {}, "姜": {}, "崔": {}, "谭": {}, "廖": {}, "范": {}, "汪": {},
 	"陆": {}, "金": {}, "石": {}, "戴": {}, "贾": {}, "韦": {}, "夏": {}, "邱": {}, "方": {}, "侯": {},
 	"邹": {}, "熊": {}, "孟": {}, "秦": {}, "白": {}, "江": {}, "阎": {}, "薛": {}, "尹": {}, "段": {},
 	"雷": {}, "黎": {}, "史": {}, "龙": {}, "陶": {}, "贺": {}, "顾": {}, "毛": {}, "郝": {}, "龚": {},
 	"邵": {}, "万": {}, "钱": {}, "严": {}, "赖": {}, "覃": {}, "洪": {}, "武": {}, "莫": {}, "孔": {},
 	"張": {}, "劉": {}, "陳": {}, "楊": {}, "黃": {}, "趙": {}, "吳": {}, "許": {}, "鄭": {}, "謝": {},
-	"鄧": {}, "馮": {}, "韓": {}, "蕭": {}, "葉": {}, "蔣": {}, "蘇": {}, "魏": {}, "呂": {}, "瀋": {},
-	"盧": {}, "傅": {}, "鐘": {}, "薑": {}, "譚": {}, "廖": {}, "範": {}, "陸": {}, "賈": {}, "鄒": {},
-	"閻": {}, "龍": {}, "陶": {}, "賀": {}, "顧": {}, "郝": {}, "龔": {}, "萬": {}, "錢": {}, "嚴": {},
-	"賴": {}, "覃": {}, "欧阳": {}, "歐陽": {}, "司马": {}, "司馬": {}, "上官": {}, "诸葛": {}, "諸葛": {},
+	"鄧": {}, "馮": {}, "韓": {}, "蕭": {}, "葉": {}, "蔣": {}, "蘇": {}, "呂": {}, "瀋": {},
+	"盧": {}, "鐘": {}, "薑": {}, "譚": {}, "範": {}, "陸": {}, "賈": {}, "鄒": {},
+	"閻": {}, "龍": {}, "賀": {}, "顧": {}, "龔": {}, "萬": {}, "錢": {}, "嚴": {},
+	"賴": {}, "欧阳": {}, "歐陽": {}, "司马": {}, "司馬": {}, "上官": {}, "诸葛": {}, "諸葛": {},
 	"东方": {}, "東方": {}, "皇甫": {}, "尉迟": {}, "尉遲": {}, "公孙": {}, "公孫": {}, "令狐": {}, "慕容": {},
 	"轩辕": {}, "軒轅": {}, "夏侯": {}, "司徒": {}, "独孤": {}, "獨孤": {},
 }
@@ -315,6 +324,10 @@ func Luhn(value string) bool {
 }
 
 var dmsRegex = regexp.MustCompile(`(?i)(\d{1,3})°\s*(\d{1,2})′\s*(\d{1,2}(?:\.\d+)?)″\s*([NSEW])`)
+
+var krVehicleRe = regexp.MustCompile(`^(\d{2,3})([가나다라마거너더러머버서어저고노도로모보소오조구누두루무부수우주하허호바사아자배])(\d{4})$`)
+
+var usStateAbbrsRe = regexp.MustCompile(`\b([A-Z]{2})\b`)
 
 func DmsCoordinate(value string) bool {
 	match := dmsRegex.FindStringSubmatch(value)
@@ -1739,3 +1752,190 @@ func ChineseAddressValid(value string) bool {
 	}
 	return false
 }
+
+func ImeiValid(value string) bool {
+	var digits strings.Builder
+	for _, r := range value {
+		if unicode.IsDigit(r) {
+			digits.WriteRune(r)
+		}
+	}
+	s := digits.String()
+	if len(s) != 15 {
+		return false
+	}
+	allSame := true
+	for i := 1; i < 15; i++ {
+		if s[i] != s[0] {
+			allSame = false
+			break
+		}
+	}
+	if allSame {
+		return false
+	}
+	return Luhn(s)
+}
+
+func MacAddressValid(value string) bool {
+	mac := strings.ToUpper(strings.NewReplacer(":", "", "-", "", " ", "").Replace(value))
+	if len(mac) != 12 {
+		return false
+	}
+	for _, r := range mac {
+		if !((r >= '0' && r <= '9') || (r >= 'A' && r <= 'F')) {
+			return false
+		}
+	}
+	return mac != "FFFFFFFFFFFF" && mac != "000000000000"
+}
+
+func LatitudeValid(value string) bool {
+	lat, err := strconv.ParseFloat(strings.TrimSpace(value), 64)
+	if err != nil {
+		return false
+	}
+	return lat >= -90.0 && lat <= 90.0
+}
+
+func LongitudeValid(value string) bool {
+	lon, err := strconv.ParseFloat(strings.TrimSpace(value), 64)
+	if err != nil {
+		return false
+	}
+	return lon >= -180.0 && lon <= 180.0
+}
+
+func JpDriverLicenseValid(value string) bool {
+	var digits strings.Builder
+	for _, r := range value {
+		if unicode.IsDigit(r) {
+			digits.WriteRune(r)
+		}
+	}
+	s := digits.String()
+	if len(s) != 12 {
+		return false
+	}
+	regionCode, _ := strconv.Atoi(s[0:2])
+	if regionCode < 10 {
+		return false
+	}
+	weights := []int{5, 4, 3, 2, 7, 6, 5, 4, 3, 2}
+	total := 0
+	for i, w := range weights {
+		total += int(s[i]-'0') * w
+	}
+	remainder := total % 11
+	expectedCheck := 0
+	if remainder > 1 {
+		expectedCheck = 11 - remainder
+	}
+	return int(s[10]-'0') == expectedCheck
+}
+
+func KrDriverLicenseValid(value string) bool {
+	var digits strings.Builder
+	for _, r := range value {
+		if unicode.IsDigit(r) {
+			digits.WriteRune(r)
+		}
+	}
+	s := digits.String()
+	if len(s) != 10 && len(s) != 12 {
+		return false
+	}
+	allSame := true
+	for i := 1; i < len(s); i++ {
+		if s[i] != s[0] {
+			allSame = false
+			break
+		}
+	}
+	if allSame {
+		return false
+	}
+	regionCode, _ := strconv.Atoi(s[0:2])
+	validRegions := map[int]struct{}{
+		11: {}, 12: {}, 13: {}, 14: {}, 15: {}, 16: {}, 17: {}, 18: {}, 19: {},
+		20: {}, 21: {}, 22: {}, 23: {}, 24: {}, 25: {}, 26: {}, 28: {},
+	}
+	_, ok := validRegions[regionCode]
+	return ok
+}
+
+func KrPcccValid(value string) bool {
+	if len(value) != 13 {
+		return false
+	}
+	if value[0] != 'P' && value[0] != 'p' {
+		return false
+	}
+	for _, r := range value[1:] {
+		if !unicode.IsDigit(r) {
+			return false
+		}
+	}
+	return true
+}
+
+func KrVehicleRegistrationValid(value string) bool {
+	val := strings.ReplaceAll(value, " ", "")
+	return krVehicleRe.MatchString(val)
+}
+
+var usStates = []string{
+	"Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado",
+	"Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho",
+	"Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana",
+	"Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota",
+	"Mississippi", "Missouri", "Montana", "Nebraska", "Nevada",
+	"New Hampshire", "New Jersey", "New Mexico", "New York",
+	"North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon",
+	"Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
+	"Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington",
+	"West Virginia", "Wisconsin", "Wyoming",
+}
+
+var usStateAbbrs = map[string]struct{}{
+	"AL": {}, "AK": {}, "AZ": {}, "AR": {}, "CA": {}, "CO": {}, "CT": {}, "DE": {}, "FL": {}, "GA": {},
+	"HI": {}, "ID": {}, "IL": {}, "IN": {}, "IA": {}, "KS": {}, "KY": {}, "LA": {}, "ME": {}, "MD": {},
+	"MA": {}, "MI": {}, "MN": {}, "MS": {}, "MO": {}, "MT": {}, "NE": {}, "NV": {}, "NH": {}, "NJ": {},
+	"NM": {}, "NY": {}, "NC": {}, "ND": {}, "OH": {}, "OK": {}, "OR": {}, "PA": {}, "RI": {}, "SC": {},
+	"SD": {}, "TN": {}, "TX": {}, "UT": {}, "VT": {}, "VA": {}, "WA": {}, "WV": {}, "WI": {}, "WY": {},
+}
+
+func UsAddressValid(value string) bool {
+	trimmed := strings.TrimSpace(value)
+
+	// Standalone exact match — full state name or abbreviation
+	upperTrimmed := strings.ToUpper(trimmed)
+	if _, ok := usStateAbbrs[upperTrimmed]; ok {
+		return true
+	}
+	for _, state := range usStates {
+		if strings.EqualFold(trimmed, state) {
+			return true
+		}
+	}
+
+	// State name contained anywhere in the address
+	lower := strings.ToLower(value)
+	for _, state := range usStates {
+		if strings.Contains(lower, strings.ToLower(state)) {
+			return true
+		}
+	}
+
+	// Two-letter abbreviation with word boundary (e.g. "Los Angeles, CA 90001")
+	for _, match := range usStateAbbrsRe.FindAllString(strings.ToUpper(value), -1) {
+		if _, ok := usStateAbbrs[match]; ok {
+			return true
+		}
+	}
+
+	return false
+}
+
+// suppress unused import warning — fmt is kept for callers that may use it
+var _ = fmt.Sprintf

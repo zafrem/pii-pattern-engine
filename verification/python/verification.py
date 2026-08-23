@@ -731,6 +731,250 @@ def not_timestamp(value: str) -> bool:
     return True
 
 
+def korean_zipcode_valid(value: str) -> bool:
+    """
+    Verify Korean postal code is valid.
+    """
+    digits_only = "".join(c for c in value if c.isdigit())
+    if len(digits_only) != 5:
+        return False
+    if not ("0" <= digits_only[0] <= "6"):
+        return False
+
+    # Reject sequential patterns (12345, 54321, etc.)
+    is_sequential_up = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) + 1
+        for i in range(1, len(digits_only))
+    )
+    is_sequential_down = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) - 1
+        for i in range(1, len(digits_only))
+    )
+
+    if is_sequential_up or is_sequential_down:
+        return False
+
+    # Reject all same digit (00000, 11111, etc.)
+    if len(set(digits_only)) == 1:
+        return False
+
+    # Accept as likely valid postal code
+    return True
+
+
+def us_zipcode_valid(value: str) -> bool:
+    """
+    Verify US postal code is valid.
+
+    Checks against us_zipcodes.csv if available, otherwise uses heuristics.
+    """
+    # Remove any separators to get raw digits first
+    digits_only = "".join(c for c in value if c.isdigit())
+
+    # 1. Data-driven check if data exists
+    valid_zips = _load_data_file("us_zipcodes.csv")
+    if valid_zips:
+        # If we have 5 digits, check exact match
+        if len(digits_only) == 5:
+            return digits_only in valid_zips
+        # If we have 9 digits (ZIP+4), check if the base 5-digit zip is valid
+        elif len(digits_only) == 9:
+            return digits_only[:5] in valid_zips
+
+        # If length is weird but data is present, we might want to fail?
+        # But let's fall back to heuristics just in case regex matched something else
+
+    # 2. Heuristic fallback
+    # US ZIP can be 5 digits or 9 digits (ZIP+4)
+    if len(digits_only) not in [5, 9]:
+        return False
+
+    # Check the first 5 digits (the base ZIP code)
+    base_zip = digits_only[:5]
+
+    # Reject sequential patterns in base ZIP (12345, 54321, etc.)
+    is_sequential_up = all(
+        int(base_zip[i]) == int(base_zip[i - 1]) + 1 for i in range(1, len(base_zip))
+    )
+    is_sequential_down = all(
+        int(base_zip[i]) == int(base_zip[i - 1]) - 1 for i in range(1, len(base_zip))
+    )
+
+    if is_sequential_up or is_sequential_down:
+        return False
+
+    # Reject all same digit in base ZIP (00000, 11111, etc.)
+    if len(set(base_zip)) == 1:
+        return False
+
+    return True
+
+
+def jp_zipcode_valid(value: str) -> bool:
+    """
+    Verify Japanese postal code is valid.
+
+    Checks against jp_zipcodes.csv if available, otherwise uses heuristics.
+    Japanese postal codes are 7 digits, often formatted as XXX-XXXX.
+    """
+    # Normalize: remove hyphen
+    digits_only = value.replace("-", "").replace("−", "").replace("‐", "")
+    digits_only = "".join(c for c in digits_only if c.isdigit())
+
+    if len(digits_only) != 7:
+        return False
+
+    # 1. Data-driven check if data exists
+    valid_zips = _load_data_file("jp_zipcodes.csv")
+    if valid_zips:
+        # Try with hyphen format (stored format)
+        hyphen_format = f"{digits_only[:3]}-{digits_only[3:]}"
+        return hyphen_format in valid_zips or digits_only in valid_zips
+
+    # 2. Heuristic fallback
+    # Reject all same digit (0000000, 1111111, etc.)
+    if len(set(digits_only)) == 1:
+        return False
+
+    # Reject sequential patterns (1234567, 7654321)
+    is_sequential_up = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) + 1
+        for i in range(1, len(digits_only))
+    )
+    is_sequential_down = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) - 1
+        for i in range(1, len(digits_only))
+    )
+    if is_sequential_up or is_sequential_down:
+        return False
+
+    # Valid Japanese postal code prefixes range from 001 to 999
+    # but 000 and 999 are not assigned to any prefecture
+    prefix = int(digits_only[:3])
+    if prefix == 0 or prefix >= 999:
+        return False
+
+    return True
+
+
+def cn_zipcode_valid(value: str) -> bool:
+    """
+    Verify Chinese postal code is valid.
+
+    Checks against cn_zipcodes.csv if available, otherwise uses heuristics.
+    Chinese postal codes are 6 digits (e.g., 100000).
+    """
+    digits_only = "".join(c for c in value if c.isdigit())
+
+    if len(digits_only) != 6:
+        return False
+
+    # 1. Data-driven check if data exists
+    valid_zips = _load_data_file("cn_zipcodes.csv")
+    if valid_zips:
+        return digits_only in valid_zips
+
+    # 2. Heuristic fallback
+    # Reject all same digit (000000, 111111, etc.)
+    if len(set(digits_only)) == 1:
+        return False
+
+    # Reject sequential patterns (123456, 654321)
+    is_sequential_up = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) + 1
+        for i in range(1, len(digits_only))
+    )
+    is_sequential_down = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) - 1
+        for i in range(1, len(digits_only))
+    )
+    if is_sequential_up or is_sequential_down:
+        return False
+
+    # Chinese postal codes: first 2 digits range 01-86
+    first_two = int(digits_only[:2])
+    if first_two < 1 or first_two > 86:
+        return False
+
+    return True
+
+
+def tw_zipcode_valid(value: str) -> bool:
+    """
+    Verify Taiwan postal code is valid.
+
+    Checks against tw_zipcodes.csv if available, otherwise uses heuristics.
+    Taiwan postal codes are 3 or 5 digits (e.g., 100 or 10041).
+    """
+    digits_only = "".join(c for c in value if c.isdigit())
+
+    if len(digits_only) not in [3, 5]:
+        return False
+
+    # 1. Data-driven check if data exists
+    valid_zips = _load_data_file("tw_zipcodes.csv")
+    if valid_zips:
+        # Check exact match, or for 5-digit check if first 3 digits are valid
+        if digits_only in valid_zips:
+            return True
+        if len(digits_only) == 5 and digits_only[:3] in valid_zips:
+            return True
+        return False
+
+    # 2. Heuristic fallback
+    # Reject all same digit
+    if len(set(digits_only)) == 1:
+        return False
+
+    # Taiwan postal codes: first digit 1-9, valid range roughly 100-983
+    first_digit = int(digits_only[0])
+    if first_digit == 0:
+        return False
+
+    return True
+
+
+def in_pincode_valid(value: str) -> bool:
+    """
+    Verify Indian PIN code is valid.
+
+    Checks against in_pincodes.csv if available, otherwise uses heuristics.
+    Indian PIN codes are 6 digits starting with 1-9 (e.g., 110001).
+    """
+    digits_only = "".join(c for c in value if c.isdigit())
+
+    if len(digits_only) != 6:
+        return False
+
+    # First digit must be 1-9
+    if digits_only[0] == "0":
+        return False
+
+    # 1. Data-driven check if data exists
+    valid_pins = _load_data_file("in_pincodes.csv")
+    if valid_pins:
+        return digits_only in valid_pins
+
+    # 2. Heuristic fallback
+    # Reject all same digit (111111, 222222, etc.)
+    if len(set(digits_only)) == 1:
+        return False
+
+    # Reject sequential patterns (123456, 654321)
+    is_sequential_up = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) + 1
+        for i in range(1, len(digits_only))
+    )
+    is_sequential_down = all(
+        int(digits_only[i]) == int(digits_only[i - 1]) - 1
+        for i in range(1, len(digits_only))
+    )
+    if is_sequential_up or is_sequential_down:
+        return False
+
+    return True
+
+
 def korean_bank_account_valid(value: str) -> bool:
     """
     Verify Korean bank account is valid and not a timestamp.
@@ -3406,6 +3650,13 @@ def longitude_valid(value: str) -> bool:
 
 # Registry of verification functions
 VERIFICATION_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
+    # Zipcode / postal code verification
+    "korean_zipcode_valid": korean_zipcode_valid,
+    "us_zipcode_valid": us_zipcode_valid,
+    "jp_zipcode_valid": jp_zipcode_valid,
+    "cn_zipcode_valid": cn_zipcode_valid,
+    "tw_zipcode_valid": tw_zipcode_valid,
+    "in_pincode_valid": in_pincode_valid,
     "iban_mod97": iban_mod97,
     "luhn": luhn,
     "dms_coordinate": dms_coordinate,

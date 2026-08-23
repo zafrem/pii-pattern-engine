@@ -106,3 +106,28 @@ patterns:
     severity: medium
   match_type: exactly_matches
 
+- id: zipcode_01
+  location: kr
+  category: other
+  description: Korean Zipcode (5 digits)
+  pattern: '\b[0-4][0-9]{4}\b'
+  verification: korean_zipcode_valid
+  mask: '#####'
+  examples:
+    match:
+    - '06164'
+    - '40000'
+    nomatch:
+    - '50000'
+    - '1234'
+    - '123456'
+  policy:
+    store_raw: true
+    action_on_match: report
+    severity: low
+  match_type: exactly_matches
+  langs:
+    python: '\b[0-4][0-9]{4}\b'
+    go: '\b[0-4][0-9]{4}\b'
+    java: '\b[0-4][0-9]{4}\b'
+    javascript: '\b[0-4][0-9]{4}\b'

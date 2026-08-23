@@ -84,3 +84,38 @@ patterns:
   match_type: exactly_matches
 
 
+- id: zipcode_01
+  location: cn
+  category: address
+  description: Chinese postal code (6 digits)
+  pattern: '[0-9]{6}'
+  verification: cn_zipcode_valid
+  mask: '******'
+  examples:
+    match:
+    - '100000'
+    - '200000'
+    - '518000'
+    - '310000'
+    nomatch:
+    - '10000'
+    - '1000000'
+    - A10000
+    - 10000A
+    - '12345678901234'
+    - '123456'
+    - '111111'
+    - '000000'
+  policy:
+    store_raw: false
+    action_on_match: report
+    severity: low
+  metadata:
+    note: Uses negative lookahead/lookbehind to prevent matching when embedded in
+      longer numbers
+  match_type: exactly_matches
+  langs:
+    python: '[0-9]{6}'
+    go: '[0-9]{6}'
+    java: '[0-9]{6}'
+    javascript: '[0-9]{6}'

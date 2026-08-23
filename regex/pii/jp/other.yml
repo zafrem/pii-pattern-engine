@@ -113,3 +113,34 @@ patterns:
     note: Matches Japanese names in Kanji with known surname prefixes. Uses surname
       verification to reduce false positives.
   match_type: exactly_matches
+- id: zipcode_01
+  location: jp
+  category: address
+  description: Japanese postal code (XXX-XXXX)
+  pattern: '[0-9]{3}-?[0-9]{4}'
+  verification: jp_zipcode_valid
+  mask: '***-****'
+  examples:
+    match:
+    - 100-0001
+    - 150-0002
+    - '5300001'
+    nomatch:
+    - 12-34567
+    - 1234-567
+    - '12345678'
+    - '1111111'
+    - '0000000'
+    - 999-1234
+    - '9998765'
+  policy:
+    store_raw: false
+    action_on_match: report
+    severity: low
+  priority: 150
+  match_type: exactly_matches
+  langs:
+    python: '[0-9]{3}-?[0-9]{4}'
+    go: '[0-9]{3}-?[0-9]{4}'
+    java: '[0-9]{3}-?[0-9]{4}'
+    javascript: '[0-9]{3}-?[0-9]{4}'

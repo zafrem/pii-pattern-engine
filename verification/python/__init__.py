@@ -27,6 +27,12 @@ from .verification import (
     us_address_valid,
     japanese_address_valid,
     chinese_address_valid,
+    korean_zipcode_valid,
+    us_zipcode_valid,
+    jp_zipcode_valid,
+    cn_zipcode_valid,
+    tw_zipcode_valid,
+    in_pincode_valid,
 )
 
 __all__ = [
@@ -52,4 +58,10 @@ __all__ = [
     "us_address_valid",
     "japanese_address_valid",
     "chinese_address_valid",
+    "korean_zipcode_valid",
+    "us_zipcode_valid",
+    "jp_zipcode_valid",
+    "cn_zipcode_valid",
+    "tw_zipcode_valid",
+    "in_pincode_valid",
 ]

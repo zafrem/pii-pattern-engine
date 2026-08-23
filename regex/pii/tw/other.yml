@@ -25,11 +25,6 @@ patterns:
     severity: medium
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{8}'
-    go: '[0-9]{8}'
-    java: '[0-9]{8}'
-    javascript: '[0-9]{8}'
 
 - id: chinese_name_01
   location: tw
@@ -60,16 +55,11 @@ patterns:
     note: Matches Traditional Chinese names with known surname prefixes. Uses surname
       verification to reduce false positives.
   match_type: exactly_matches
-  langs:
-    python: '[一-鿿]{2,4}'
-    go: '[一-鿿]{2,4}'
-    java: '[一-鿿]{2,4}'
-    javascript: '[一-鿿]{2,4}'
 - id: address_simple_01
   location: tw
   category: address
   description: Taiwan address in Traditional Chinese (city, district, road, number)
-  pattern: '[一-鿿]{1,}(?:市|縣)[一-鿿]{1,}(?:區|鄉|鎮|市)[一-鿿a-zA-Z0-9]+(?:路|街|大道)(?:[一二三四五六七八九十\d]+段)?(?:\d+巷)?(?:\d+弄)?(?:\d+(?:-\d+)?(?:之\d+)?號)'
+  pattern: '[一-鿿]{1,}(?:市|縣)[一-鿿]{1,}(?:區|鄉|鎮|市)[一-鿿a-zA-Z0-9]+(?:路|街|大道)(?:[一二三四五六七八九十0-9]+段)?(?:[0-9]+巷)?(?:[0-9]+弄)?(?:[0-9]+(?:-[0-9]+)?(?:之[0-9]+)?號)'
   mask: '***市***區***路***號'
   examples:
     match:
@@ -94,8 +84,3 @@ patterns:
   metadata:
     note: 'Simplified Taiwan address pattern. Matches: city/county + district + road + optional section/lane/alley + house number with 號.'
   match_type: exactly_matches
-  langs:
-    python: '[一-鿿]{1,}(?:市|縣)[一-鿿]{1,}(?:區|鄉|鎮|市)[一-鿿a-zA-Z0-9]+(?:路|街|大道)(?:[一二三四五六七八九十\d]+段)?(?:\d+巷)?(?:\d+弄)?(?:\d+(?:-\d+)?(?:之\d+)?號)'
-    go: '[一-鿿]{1,}(?:市|縣)[一-鿿]{1,}(?:區|鄉|鎮|市)[一-鿿a-zA-Z0-9]+(?:路|街|大道)(?:[一二三四五六七八九十\d]+段)?(?:\d+巷)?(?:\d+弄)?(?:\d+(?:-\d+)?(?:之\d+)?號)'
-    java: '[一-鿿]{1,}(?:市|縣)[一-鿿]{1,}(?:區|鄉|鎮|市)[一-鿿a-zA-Z0-9]+(?:路|街|大道)(?:[一二三四五六七八九十\d]+段)?(?:\d+巷)?(?:\d+弄)?(?:\d+(?:-\d+)?(?:之\d+)?號)'
-    javascript: '[一-鿿]{1,}(?:市|縣)[一-鿿]{1,}(?:區|鄉|鎮|市)[一-鿿a-zA-Z0-9]+(?:路|街|大道)(?:[一二三四五六七八九十\d]+段)?(?:\d+巷)?(?:\d+弄)?(?:\d+(?:-\d+)?(?:之\d+)?號)'

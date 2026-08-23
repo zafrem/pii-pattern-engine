@@ -29,11 +29,6 @@ patterns:
     note: Japan's individual number system introduced in 2015. Uses checksum verification.
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{4}-?[0-9]{4}-?[0-9]{4}'
-    go: '[0-9]{4}-?[0-9]{4}-?[0-9]{4}'
-    java: '[0-9]{4}-?[0-9]{4}-?[0-9]{4}'
-    javascript: '[0-9]{4}-?[0-9]{4}-?[0-9]{4}'
 - id: passport_01
   location: jp
   category: passport
@@ -60,11 +55,6 @@ patterns:
     action_on_match: redact
     severity: critical
   match_type: exactly_matches
-  langs:
-    python: '[A-Z]{2}[0-9]{7}'
-    go: '[A-Z]{2}[0-9]{7}'
-    java: '[A-Z]{2}[0-9]{7}'
-    javascript: '[A-Z]{2}[0-9]{7}'
 - id: driver_license_01
   location: jp
   category: other
@@ -91,8 +81,3 @@ patterns:
     severity: high
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{4}-?[0-9]{2}-?[0-9]{6}'
-    go: '[0-9]{4}-?[0-9]{2}-?[0-9]{6}'
-    java: '[0-9]{4}-?[0-9]{2}-?[0-9]{6}'
-    javascript: '[0-9]{4}-?[0-9]{2}-?[0-9]{6}'

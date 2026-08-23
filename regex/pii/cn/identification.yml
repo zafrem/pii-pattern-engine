@@ -33,11 +33,6 @@ patterns:
     note: '18 digits: area(6) + birth date(8) + sequence(3) + check digit(1, can be
       X). Uses checksum verification.'
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{17}[0-9X]'
-    go: '[0-9]{17}[0-9X]'
-    java: '[0-9]{17}[0-9X]'
-    javascript: '[0-9]{17}[0-9X]'
 - id: passport_01
   location: cn
   category: passport
@@ -68,8 +63,3 @@ patterns:
   metadata:
     note: E for regular passport, G for diplomatic/service passport
   match_type: exactly_matches
-  langs:
-    python: '[EG][0-9]{8}'
-    go: '[EG][0-9]{8}'
-    java: '[EG][0-9]{8}'
-    javascript: '[EG][0-9]{8}'

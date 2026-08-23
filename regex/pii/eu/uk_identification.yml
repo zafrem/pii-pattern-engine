@@ -22,8 +22,3 @@ patterns:
       action_on_match: redact
       severity: critical
     match_type: exactly_matches
-    langs:
-      python: '[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[A-D]'
-      go: '[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[A-D]'
-      java: '[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[A-D]'
-      javascript: '[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[A-D]'

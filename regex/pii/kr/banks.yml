@@ -5,7 +5,7 @@ patterns:
   location: kr
   category: bank
   description: Korean Kookmin Bank account number (국민은행)
-  pattern: (?:110|120|150|190|830)[- ]?[0-9]{3}[- ]?[0-9]{6,7}
+  pattern: '(?:110|120|150|190|830)[- ]?[0-9]{3}[- ]?[0-9]{6,7}'
   verification: korean_bank_account_valid
   mask: '***-***-*******'
   examples:
@@ -28,16 +28,11 @@ patterns:
       + 6-7 digits with optional separators'
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: (?:110|120|150|190|830)[- ]?[0-9]{3}[- ]?[0-9]{6,7}
-    go: (?:110|120|150|190|830)[- ]?[0-9]{3}[- ]?[0-9]{6,7}
-    java: (?:110|120|150|190|830)[- ]?[0-9]{3}[- ]?[0-9]{6,7}
-    javascript: (?:110|120|150|190|830)[- ]?[0-9]{3}[- ]?[0-9]{6,7}
 - id: bank_account_02
   location: kr
   category: bank
   description: Korean Shinhan Bank account number (신한은행)
-  pattern: (?:110)-?[0-9]{3}-?[0-9]{6,7}
+  pattern: '(?:110)-?[0-9]{3}-?[0-9]{6,7}'
   mask: '***-***-*******'
   examples:
     match:
@@ -56,16 +51,11 @@ patterns:
   verification: korean_bank_account_valid
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: (?:110)-?[0-9]{3}-?[0-9]{6,7}
-    go: (?:110)-?[0-9]{3}-?[0-9]{6,7}
-    java: (?:110)-?[0-9]{3}-?[0-9]{6,7}
-    javascript: (?:110)-?[0-9]{3}-?[0-9]{6,7}
 - id: bank_account_03
   location: kr
   category: bank
   description: Korean Woori Bank account number (우리은행)
-  pattern: (?:1002)-?[0-9]{3}-?[0-9]{6,7}
+  pattern: '(?:1002)-?[0-9]{3}-?[0-9]{6,7}'
   mask: '****-***-*******'
   examples:
     match:
@@ -84,11 +74,6 @@ patterns:
   verification: korean_bank_account_valid
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: (?:1002)-?[0-9]{3}-?[0-9]{6,7}
-    go: (?:1002)-?[0-9]{3}-?[0-9]{6,7}
-    java: (?:1002)-?[0-9]{3}-?[0-9]{6,7}
-    javascript: (?:1002)-?[0-9]{3}-?[0-9]{6,7}
 - id: bank_account_04
   location: kr
   category: bank
@@ -114,16 +99,11 @@ patterns:
       timestamps and datetimes.'
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{3}-?[0-9]{6}-?[0-9]{4,5}'
-    go: '[0-9]{3}-?[0-9]{6}-?[0-9]{4,5}'
-    java: '[0-9]{3}-?[0-9]{6}-?[0-9]{4,5}'
-    javascript: '[0-9]{3}-?[0-9]{6}-?[0-9]{4,5}'
 - id: bank_account_05
   location: kr
   category: bank
   description: Korean Nonghyup Bank account number (농협은행)
-  pattern: (?:301)-?[0-9]{4}-?[0-9]{4}-?[0-9]{2}
+  pattern: '(?:301)-?[0-9]{4}-?[0-9]{4}-?[0-9]{2}'
   mask: '***-****-****-**'
   examples:
     match:
@@ -142,11 +122,6 @@ patterns:
   verification: korean_bank_account_valid
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: (?:301)-?[0-9]{4}-?[0-9]{4}-?[0-9]{2}
-    go: (?:301)-?[0-9]{4}-?[0-9]{4}-?[0-9]{2}
-    java: (?:301)-?[0-9]{4}-?[0-9]{4}-?[0-9]{2}
-    javascript: (?:301)-?[0-9]{4}-?[0-9]{4}-?[0-9]{2}
 - id: bank_account_06
   location: kr
   category: bank
@@ -171,11 +146,6 @@ patterns:
       to reject timestamps.'
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{3}-?[0-9]{6}-?[0-9]{2}-?[0-9]{3}'
-    go: '[0-9]{3}-?[0-9]{6}-?[0-9]{2}-?[0-9]{3}'
-    java: '[0-9]{3}-?[0-9]{6}-?[0-9]{2}-?[0-9]{3}'
-    javascript: '[0-9]{3}-?[0-9]{6}-?[0-9]{2}-?[0-9]{3}'
 - id: bank_account_07
   location: kr
   category: bank
@@ -200,11 +170,6 @@ patterns:
       total.'
   priority: 50
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{3}-[0-9]{2}-[0-9]{6}'
-    go: '[0-9]{3}-[0-9]{2}-[0-9]{6}'
-    java: '[0-9]{3}-[0-9]{2}-[0-9]{6}'
-    javascript: '[0-9]{3}-[0-9]{2}-[0-9]{6}'
 - id: bank_account_08
   location: kr
   category: bank
@@ -230,11 +195,6 @@ patterns:
       timestamps.'
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{3}-?[0-9]{5}-?[0-9]{2}-?[0-9]{3}'
-    go: '[0-9]{3}-?[0-9]{5}-?[0-9]{2}-?[0-9]{3}'
-    java: '[0-9]{3}-?[0-9]{5}-?[0-9]{2}-?[0-9]{3}'
-    javascript: '[0-9]{3}-?[0-9]{5}-?[0-9]{2}-?[0-9]{3}'
 - id: bank_account_09
   location: kr
   category: bank
@@ -258,11 +218,6 @@ patterns:
   verification: generic_number_not_timestamp
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{3}-?[0-9]{4}-?[0-9]{4}-?[0-9]{2}'
-    go: '[0-9]{3}-?[0-9]{4}-?[0-9]{4}-?[0-9]{2}'
-    java: '[0-9]{3}-?[0-9]{4}-?[0-9]{4}-?[0-9]{2}'
-    javascript: '[0-9]{3}-?[0-9]{4}-?[0-9]{4}-?[0-9]{2}'
 - id: bank_account_10
   location: kr
   category: bank
@@ -286,11 +241,6 @@ patterns:
   verification: generic_number_not_timestamp
   priority: 40
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{3}-[0-9]{2}-[0-9]{6}-[0-9]'
-    go: '[0-9]{3}-[0-9]{2}-[0-9]{6}-[0-9]'
-    java: '[0-9]{3}-[0-9]{2}-[0-9]{6}-[0-9]'
-    javascript: '[0-9]{3}-[0-9]{2}-[0-9]{6}-[0-9]'
 - id: bank_account_11
   location: kr
   category: bank
@@ -314,11 +264,6 @@ patterns:
   verification: generic_number_not_timestamp
   priority: 40
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{3}-[0-9]{3}-[0-9]{6}'
-    go: '[0-9]{3}-[0-9]{3}-[0-9]{6}'
-    java: '[0-9]{3}-[0-9]{3}-[0-9]{6}'
-    javascript: '[0-9]{3}-[0-9]{3}-[0-9]{6}'
 - id: bank_account_12
   location: kr
   category: bank
@@ -342,11 +287,6 @@ patterns:
   verification: generic_number_not_timestamp
   priority: 50
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{3}-[0-9]{2}-[0-9]{6}'
-    go: '[0-9]{3}-[0-9]{2}-[0-9]{6}'
-    java: '[0-9]{3}-[0-9]{2}-[0-9]{6}'
-    javascript: '[0-9]{3}-[0-9]{2}-[0-9]{6}'
 - id: bank_account_13
   location: kr
   category: bank
@@ -370,16 +310,11 @@ patterns:
     note: 'Jeju Bank account format: XX-XXXXXX-XX. Uses verification to reject timestamps.'
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{2}-?[0-9]{6}-?[0-9]{2}'
-    go: '[0-9]{2}-?[0-9]{6}-?[0-9]{2}'
-    java: '[0-9]{2}-?[0-9]{6}-?[0-9]{2}'
-    javascript: '[0-9]{2}-?[0-9]{6}-?[0-9]{2}'
 - id: bank_account_14
   location: kr
   category: bank
   description: Korean Kakao Bank account number (카카오뱅크)
-  pattern: 3333-?[0-9]{2}-?[0-9]{7}
+  pattern: '3333-?[0-9]{2}-?[0-9]{7}'
   mask: '****-**-*******'
   examples:
     match:
@@ -398,16 +333,11 @@ patterns:
   verification: korean_bank_account_valid
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: 3333-?[0-9]{2}-?[0-9]{7}
-    go: 3333-?[0-9]{2}-?[0-9]{7}
-    java: 3333-?[0-9]{2}-?[0-9]{7}
-    javascript: 3333-?[0-9]{2}-?[0-9]{7}
 - id: bank_account_15
   location: kr
   category: bank
   description: Korean digital bank account (K Bank / Toss Bank)
-  pattern: 100-?[0-9]{3}-?[0-9]{6}
+  pattern: '100-?[0-9]{3}-?[0-9]{6}'
   mask: '***-***-******'
   examples:
     match:
@@ -427,8 +357,3 @@ patterns:
   verification: korean_bank_account_valid
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: 100-?[0-9]{3}-?[0-9]{6}
-    go: 100-?[0-9]{3}-?[0-9]{6}
-    java: 100-?[0-9]{3}-?[0-9]{6}
-    javascript: 100-?[0-9]{3}-?[0-9]{6}

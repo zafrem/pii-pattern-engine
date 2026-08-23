@@ -21,8 +21,3 @@ patterns:
       action_on_match: report
       severity: medium
     match_type: exactly_matches
-    langs:
-      python: '[1-9][0-9]{12}'
-      go: '[1-9][0-9]{12}'
-      java: '[1-9][0-9]{12}'
-      javascript: '[1-9][0-9]{12}'

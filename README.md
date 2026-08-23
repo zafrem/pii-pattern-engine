@@ -8,7 +8,7 @@ PII Pattern Engine provides:
 - **Regex Patterns**: 204 patterns for PII detection across US, Korea, Japan, China, Taiwan, India, EU, Spain, France, and common international formats
 - **Re-Rank Scoring System**: Confidence scoring engine that combines keyword signals, field-label context, and regex evidence into a single 0–100 score
 - **Reference Registry**: Stable numeric codes (1001–9510) for all 153 PII entity types — safe for use in logs, configs, and APIs
-- **Verification Functions**: 59 Python functions for checksum validation and data quality checks
+- **Verification Functions**: 55 checksum/validation functions, implemented identically in Python, Go, Java, and JavaScript (behavioral parity is verified against the shared pattern examples)
 - **Keyword Mappings**: Context-aware keywords in multiple languages for improved accuracy
 - **Comprehensive Tests**: 3,500+ automated tests ensuring accuracy and reliability
 
@@ -62,7 +62,7 @@ pii-pattern-engine/
 │
 ├── verification/                 # Validation functions (multi-language)
 │   ├── python/
-│   │   ├── verification.py      # 59 verification functions
+│   │   ├── verification.py      # 55 verification functions
 │   │   └── __init__.py
 │   ├── golang/
 │   │   ├── verification.go
@@ -99,10 +99,21 @@ pii-pattern-engine/
 ### Installation
 
 ```bash
-git clone https://github.com/yourusername/pii-pattern-engine.git
+git clone https://github.com/zafrem/pii-pattern-engine.git
 cd pii-pattern-engine
-pip install -r tests/requirements.txt
+
+# Install as an editable library (pulls in the runtime dependency, PyYAML)
+pip install -e .
+
+# Optional extras
+pip install -e ".[test]"     # test runner (pytest, google-re2)
+pip install -e ".[vector]"   # optional ML/vector Korean name verification
 ```
+
+The verification code loads its data (`datas/`, `keyword/`, …) relative to the
+project root. An editable install (`pip install -e .`) works out of the box. For
+a non-editable install where the data ships outside the package, point the
+engine at the data with the `PII_PATTERN_ENGINE_ROOT` environment variable.
 
 ### Running Tests
 
@@ -277,7 +288,7 @@ Regional detail files (`reference/kr.yml`, `reference/eu.yml`, etc.) provide per
 
 ## Verification Functions
 
-59 functions for advanced validation beyond regex:
+55 functions for advanced validation beyond regex (available in Python, Go, Java, and JavaScript):
 
 ### Core
 
@@ -312,7 +323,7 @@ patterns:
     location: <country_code>        # us, kr, jp, cn, tw, in, eu, comm
     category: <category>
     description: <description>
-    pattern: '<regex_pattern>'
+    pattern: '<regex_pattern>'      # single source of truth; RE2-compatible
     mask: "<redaction_format>"
     verification: <function_name>   # optional
     flags:                          # optional
@@ -328,15 +339,33 @@ patterns:
       severity: critical
     metadata:
       note: "Optional notes"
+    match_type: exactly_matches     # exactly_matches | contains
     priority: 1                     # optional; lower = higher priority
 ```
+
+Every pattern is written for **cross-engine portability**, so the same `pattern`
+string runs identically on Python `re`, Go (RE2), Java, and JavaScript:
+
+- **No engine-specific constructs** — no backreferences, lookaround, inline
+  flags, named groups, `\p{...}`, or POSIX classes. This keeps patterns inside
+  the RE2 subset (enforced by `tests/test_patterns.py::TestPatternRE2`), which
+  also guarantees linear-time matching (ReDoS safety) on every engine.
+- **Explicit ASCII character classes** instead of `\d` and `\s`. `\d`/`\s` are
+  Unicode-aware in Python (and partly in JS) but ASCII-only in Go/Java, so a
+  bare `\d` would match fullwidth `０-９` or Arabic-Indic digits in Python only.
+  Patterns use `[0-9]` and `[\t\n\f\r ]` so digit/whitespace matching is
+  byte-for-byte identical across languages. (`\b` is used only next to ASCII
+  characters, where all engines agree.)
+
+Because the regex is identical across languages, each pattern carries a single
+`pattern` field rather than per-language copies.
 
 ## Test Suite
 
 | File | Tests | Coverage |
 |------|-------|----------|
 | `test_rerank.py` | 400 | Engine config, sum_example arithmetic (153 entities), 69 sentence cases, edge cases |
-| `test_verification.py` | ~133 | All 59 verification functions |
+| `test_verification.py` | ~133 | All 55 verification functions |
 | `test_patterns.py` | ~3,000+ | YAML structure, regex compilation, match/nomatch examples |
 | **Total** | **3,500+** | |
 

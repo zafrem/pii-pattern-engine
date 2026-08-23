@@ -21,11 +21,6 @@ patterns:
       action_on_match: report
       severity: low
     match_type: exactly_matches
-    langs:
-      python: '([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})'
-      go: '([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})'
-      java: '([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})'
-      javascript: '([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})'
 
   - id: imei_01
     location: comm
@@ -45,8 +40,3 @@ patterns:
       action_on_match: report
       severity: medium
     match_type: exactly_matches
-    langs:
-      python: '\b[0-9]{15}\b'
-      go: '\b[0-9]{15}\b'
-      java: '\b[0-9]{15}\b'
-      javascript: '\b[0-9]{15}\b'

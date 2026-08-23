@@ -1,0 +1,206 @@
+version: "2.0"
+region: United States
+region_code: US
+code_series: 5001-5009
+engine: re-rank/scoring.yml
+reference: reference/us.yml
+
+entities:
+
+  5001:
+    entity: us_name
+    keyword_scores:
+      name: 40
+      full name: 55
+      first name: 55
+      last name: 55
+      given name: 55
+      surname: 55
+    context_bonus:
+      "Name:": 15
+      "Full Name:": 20
+      "First Name:": 20
+    regex_scores:
+      name_en_01: 30           # broad First Last pattern
+    sum_example:
+      keyword_hits: [40, 55, 55]
+      keyword_avg: 50
+      context_bonus: 20
+      regex_score: 30
+      final_score: 100
+      label: definite_pii
+
+  5002:
+    entity: us_ssn
+    keyword_scores:
+      ssn: 85
+      social security: 85
+      social security number: 90
+      ss#: 80
+      ss no: 75
+      tin: 60
+      itin: 65
+      taxpayer id: 65
+    context_bonus:
+      "SSN:": 35
+      "Social Security Number:": 40
+      "Tax ID:": 25
+    regex_scores:
+      ssn_01: 50               # checksum-validated
+    sum_example:
+      keyword_hits: [85, 90]
+      keyword_avg: 87
+      context_bonus: 40
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  5003:
+    entity: us_itin
+    keyword_scores:
+      itin: 85
+      individual taxpayer: 80
+      tin: 65
+      taxpayer id: 70
+    context_bonus:
+      "ITIN:": 35
+      "Tax ID:": 25
+    regex_scores:
+      itin_01: 50
+    sum_example:
+      keyword_hits: [85, 80]
+      keyword_avg: 82
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  5004:
+    entity: us_passport
+    keyword_scores:
+      passport: 75
+      passport number: 85
+      passport no: 85
+      travel document: 70
+    context_bonus:
+      "Passport:": 30
+      "Passport Number:": 35
+    regex_scores:
+      passport_01: 45
+    sum_example:
+      keyword_hits: [75, 85]
+      keyword_avg: 80
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  5005:
+    entity: us_driver_license_ca
+    keyword_scores:
+      driver license: 75
+      drivers license: 75
+      dl: 65
+      dl number: 70
+      license number: 65
+    context_bonus:
+      "Driver's License:": 30
+      "DL#:": 30
+    regex_scores:
+      driver_license_ca_01: 45
+    sum_example:
+      keyword_hits: [75, 75]
+      keyword_avg: 75
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  5006:
+    entity: us_medicare
+    keyword_scores:
+      medicare: 85
+      mbi: 80
+      medicare id: 85
+      beneficiary: 65
+      medicare number: 85
+    context_bonus:
+      "Medicare:": 35
+      "MBI:": 35
+    regex_scores:
+      medicare_01: 45
+    sum_example:
+      keyword_hits: [85, 80]
+      keyword_avg: 82
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  5007:
+    entity: us_phone
+    keyword_scores:
+      phone: 55
+      telephone: 55
+      mobile: 55
+      cell: 50
+      tel: 50
+      phone number: 65
+      contact number: 60
+    context_bonus:
+      "Phone:": 20
+      "Tel:": 20
+      "Mobile:": 20
+    regex_scores:
+      phone_01: 40
+    sum_example:
+      keyword_hits: [55, 65, 60]
+      keyword_avg: 60
+      context_bonus: 20
+      regex_score: 40
+      final_score: 100         # 60+20+40 = 120 → capped
+      label: definite_pii
+
+  5008:
+    entity: us_address
+    keyword_scores:
+      address: 50
+      street: 45
+      home address: 55
+      mailing address: 55
+      city: 30
+      state: 25
+    context_bonus:
+      "Address:": 20
+      "Street:": 15
+    regex_scores:
+      address_01: 40
+    sum_example:
+      keyword_hits: [50, 55, 55]
+      keyword_avg: 53
+      context_bonus: 20
+      regex_score: 40
+      final_score: 100         # 53+20+40 = 113 → capped
+      label: definite_pii
+
+  5009:
+    entity: us_ein
+    keyword_scores:
+      ein: 85
+      employer id: 80
+      employer identification: 85
+      fein: 80
+      federal tax id: 80
+      tax identification: 75
+    context_bonus:
+      "EIN:": 35
+      "Employer ID:": 35
+    regex_scores:
+      ein_01: 45
+    sum_example:
+      keyword_hits: [85, 85]
+      keyword_avg: 85
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii

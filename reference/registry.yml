@@ -1,0 +1,195 @@
+version: "1.0"
+description: >
+  Master internal reference code registry.
+  Each key is a canonical entity name; each value is its unique numeric code.
+  Codes are stable identifiers used across regex, keyword, and re-rank systems.
+
+# ---------------------------------------------------------------------------
+# Code Series
+#   1001 – 1099   Korea          (KR)   → reference/kr.yml
+#   2001 – 2099   Japan          (JP)   → reference/jp.yml
+#   3001 – 3099   China          (CN)   → reference/cn.yml
+#   4001 – 4099   Taiwan         (TW)   → reference/tw.yml
+#   5001 – 5099   United States  (US)   → reference/us.yml
+#   6001 – 6099   European Union (EU)   → reference/eu.yml
+#   7001 – 7099   India          (IN)   → reference/in.yml
+#   8001 – 8049   Spain          (ES)   → reference/es_fr.yml
+#   8051 – 8099   France         (FR)   → reference/es_fr.yml
+#   9001 – 9099   Common/Intl    (COMM) → reference/common.yml
+#   9501 – 9599   Tech/Tokens    (TECH) → reference/tech.yml
+# ---------------------------------------------------------------------------
+
+# ── Korea (KR) ──────────────────────────────────────────────────────────────
+kr_name:                      1001
+kr_rrn:                       1002
+kr_alien_registration:        1003
+kr_passport:                  1004
+kr_driver_license:            1005
+kr_phone_mobile:              1006
+kr_phone_landline:            1007
+kr_address:                   1008
+kr_bank_account:              1009
+kr_business_registration:     1010
+kr_corporate_registration:    1011
+kr_personal_customs_code:     1012
+kr_vehicle_registration:      1013
+
+# ── Japan (JP) ──────────────────────────────────────────────────────────────
+jp_name_kanji:                2001
+jp_name_hiragana:             2002
+jp_name_katakana:             2003
+jp_my_number:                 2004
+jp_passport:                  2005
+jp_driver_license:            2006
+jp_phone_mobile:              2007
+jp_phone_landline:            2008
+jp_address:                   2009
+jp_bank_account_generic:      2010
+jp_bank_mizuho:               2011
+jp_bank_smbc:                 2012
+jp_bank_mufg:                 2013
+jp_bank_resona:               2014
+jp_bank_seven:                2015
+jp_bank_rakuten:              2016
+
+# ── China (CN) ──────────────────────────────────────────────────────────────
+cn_name:                      3001
+cn_national_id:               3002
+cn_passport:                  3003
+cn_phone_mobile:              3004
+cn_phone_landline:            3005
+cn_address:                   3006
+cn_social_credit:             3007
+cn_bank_icbc:                 3008
+cn_bank_ccb:                  3009
+cn_bank_abc:                  3010
+cn_bank_boc:                  3011
+cn_bank_cmb:                  3012
+
+# ── Taiwan (TW) ─────────────────────────────────────────────────────────────
+tw_name:                      4001
+tw_national_id:               4002
+tw_passport:                  4003
+tw_phone_mobile:              4004
+tw_phone_landline:            4005
+tw_address:                   4006
+tw_business_id:               4007
+tw_bank_bank_of_taiwan:       4008
+tw_bank_first_bank:           4009
+tw_bank_hua_nan:              4010
+tw_bank_chang_hwa:            4011
+tw_bank_shanghai:             4012
+tw_bank_taipei_fubon:         4013
+tw_bank_ctbc:                 4014
+tw_bank_esun:                 4015
+tw_bank_cooperative:          4016
+
+# ── United States (US) ──────────────────────────────────────────────────────
+us_name:                      5001
+us_ssn:                       5002
+us_itin:                      5003
+us_passport:                  5004
+us_driver_license_ca:         5005
+us_medicare:                  5006
+us_phone:                     5007
+us_address:                   5008
+us_ein:                       5009
+
+# ── European Union (EU) ─────────────────────────────────────────────────────
+eu_id_germany:                6001
+eu_id_france:                 6002
+eu_id_italy:                  6003
+eu_id_spain_dni:              6004
+eu_id_spain_nie:              6005
+eu_id_netherlands:            6006
+eu_id_belgium:                6007
+eu_id_poland:                 6008
+eu_id_sweden:                 6009
+eu_id_denmark:                6010
+eu_id_portugal:               6011
+eu_id_austria:                6012
+eu_id_finland:                6013
+eu_id_uk_nino:                6014
+eu_passport_germany:          6015
+eu_passport_france:           6016
+eu_passport_italy:            6017
+eu_passport_spain:            6018
+eu_passport_uk:               6019
+eu_passport_netherlands:      6020
+eu_passport_belgium:          6021
+eu_passport_sweden:           6022
+eu_passport_poland:           6023
+eu_passport_austria:          6024
+eu_passport_portugal:         6025
+eu_passport_ireland:          6026
+eu_vat_germany:               6030
+eu_vat_france:                6031
+eu_vat_italy:                 6032
+eu_vat_spain:                 6033
+eu_vat_netherlands:           6034
+eu_vat_belgium:               6035
+eu_vat_austria:               6036
+eu_vat_poland:                6037
+eu_vat_sweden:                6038
+eu_vat_ireland:               6039
+eu_vat_portugal:              6040
+eu_vat_greece:                6041
+iban:                         6050
+iban_de:                      6051
+iban_fr:                      6052
+iban_gb:                      6053
+iban_it:                      6054
+
+# ── India (IN) ──────────────────────────────────────────────────────────────
+in_aadhaar:                   7001
+in_pan:                       7002
+in_passport:                  7003
+in_voter_id:                  7004
+in_driving_license:           7005
+in_phone_mobile:              7006
+in_phone_landline:            7007
+in_ifsc:                      7008
+in_gst:                       7009
+
+# ── Spain (ES) ──────────────────────────────────────────────────────────────
+es_dni:                       8001
+es_nie:                       8002
+es_passport:                  8003
+es_cif:                       8004
+es_phone_mobile:              8005
+es_phone_landline:            8006
+
+# ── France (FR) ─────────────────────────────────────────────────────────────
+fr_nir:                       8051
+fr_cni:                       8052
+fr_passport:                  8053
+fr_phone:                     8054
+fr_phone_international:       8055
+fr_phone_formatted:           8056
+
+# ── Common / International (COMM) ───────────────────────────────────────────
+common_email:                 9001
+common_name_en:               9002
+common_date_iso:              9003
+common_date_slash:            9004
+common_ipv4:                  9005
+common_ipv6:                  9006
+common_url:                   9007
+common_credit_card_visa:      9008
+common_credit_card_mastercard: 9009
+common_credit_card_amex:      9010
+common_credit_card_discover:  9011
+common_credit_card_jcb:       9012
+common_credit_card_diners:    9013
+
+# ── Tech / Tokens (TECH) ────────────────────────────────────────────────────
+tech_generic_token:           9501
+tech_aws_access_key:          9502
+tech_aws_secret_key:          9503
+tech_github_token:            9504
+tech_stripe_key:              9505
+tech_jwt_token:               9506
+tech_slack_token:             9507
+tech_google_api_key:          9508
+tech_generic_api_key:         9509
+tech_private_key:             9510

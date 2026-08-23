@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pii-pattern-engine"
+version = "2.0.0"
+description = "Regex patterns, verification functions, and a re-rank scoring system for detecting PII across multiple languages and regions."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "Apache-2.0" }
+authors = [{ name = "zafrem" }]
+keywords = ["pii", "regex", "privacy", "compliance", "data-protection", "redaction"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Security",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+# ML/vector-based Korean name verification (optional; disabled by default)
+vector = ["numpy>=1.21", "scipy>=1.7"]
+# Everything needed to run the test suite
+test = ["pytest>=7.0.0", "google-re2>=1.0", "pyyaml>=6.0"]
+
+[project.urls]
+Homepage = "https://github.com/zafrem/pii-pattern-engine"
+Repository = "https://github.com/zafrem/pii-pattern-engine"
+
+# The importable Python code lives under verification/python/.
+# Data (datas/, keyword/, regex/, re-rank/, reference/) is resolved at runtime
+# relative to the project root; for an editable install (`pip install -e .`)
+# this works out of the box. For a non-editable install where the data ships
+# outside the package, set the PII_PATTERN_ENGINE_ROOT environment variable.
+[tool.setuptools]
+packages = ["verification", "verification.python"]

@@ -1,0 +1,169 @@
+version: "1.0"
+region: India
+region_code: IN
+code_series: 7001-7099
+description: Internal reference codes for Indian PII entities, mapping regex patterns and keyword categories.
+
+entities:
+
+  in_aadhaar:
+    code: 7001
+    description: Indian Aadhaar number (12-digit unique identification number)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/in/identification.yml
+        pattern_id: aadhaar_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [aadhaar, aadhar, uid, unique identification, uidai]
+        relevant_contexts: ["Aadhaar:", "UID:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  in_pan:
+    code: 7002
+    description: Indian PAN card number (Permanent Account Number, AAAAA9999A)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/in/identification.yml
+        pattern_id: pan_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [pan, pan card, permanent account number, income tax]
+        relevant_contexts: ["PAN:", "PAN Card:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ssn
+
+  in_passport:
+    code: 7003
+    description: Indian passport number (letter + 7 digits)
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/in/identification.yml
+        pattern_id: passport_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [passport, passport number, travel document]
+        relevant_contexts: ["Passport:", "Passport Number:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  in_voter_id:
+    code: 7004
+    description: Indian Voter ID / EPIC (Electoral Photo Identity Card, 3 letters + 7 digits)
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/in/identification.yml
+        pattern_id: voter_id_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [voter id, epic, voter card, election card, eci]
+        relevant_contexts: ["Voter ID:", "EPIC:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  in_driving_license:
+    code: 7005
+    description: Indian driving license number (state code + 2 digits + year + 7 digits)
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/in/identification.yml
+        pattern_id: driving_license_01
+    keyword:
+      - source: keyword/identification.yml
+        category: drivers_license
+        relevant_terms: [driving license, driver license, dl, driving licence]
+        relevant_contexts: ["DL:", "Driving License:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  in_phone_mobile:
+    code: 7006
+    description: Indian mobile phone number (6–9 prefix + 9 digits, 10 total)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/in/phone.yml
+        pattern_id: mobile_01
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [mobile, phone, contact number, cell, tel]
+        relevant_contexts: ["Mobile:", "Phone:", "Contact:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  in_phone_landline:
+    code: 7007
+    description: Indian landline phone number (STD code + 6–8 digits)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/in/phone.yml
+        pattern_id: landline_01
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [telephone, phone, landline, tel, std]
+        relevant_contexts: ["Phone:", "Tel:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  in_ifsc:
+    code: 7008
+    description: Indian IFSC code (Indian Financial System Code, 4 letters + 0 + 6 chars)
+    category: financial
+    pii_type: financial
+    severity: high
+    regex:
+      - source: regex/pii/in/other.yml
+        pattern_id: ifsc_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [ifsc, ifsc code, indian financial system, bank code, routing]
+        relevant_contexts: ["IFSC:", "IFSC Code:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: iban
+
+  in_gst:
+    code: 7009
+    description: Indian GST number (Goods and Services Tax, 15 alphanumeric chars)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/in/other.yml
+        pattern_id: gst_01
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [gst, gstin, goods and services tax, gst number]
+        relevant_contexts: ["GST:", "GSTIN:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ssn

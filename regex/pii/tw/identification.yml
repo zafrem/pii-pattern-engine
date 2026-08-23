@@ -33,11 +33,6 @@ patterns:
     note: First letter indicates birth location (A-Z except I,O,W), 2nd digit indicates
       gender (1=male, 2=female). Uses checksum verification.
   match_type: exactly_matches
-  langs:
-    python: '[A-Z][0-9]{9}'
-    go: '[A-Z][0-9]{9}'
-    java: '[A-Z][0-9]{9}'
-    javascript: '[A-Z][0-9]{9}'
 - id: passport_01
   location: tw
   category: passport
@@ -62,8 +57,3 @@ patterns:
     severity: critical
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{9}'
-    go: '[0-9]{9}'
-    java: '[0-9]{9}'
-    javascript: '[0-9]{9}'

@@ -1,0 +1,252 @@
+version: "2.0"
+regions:
+  - name: Spain
+    region_code: ES
+    code_series: 8001-8049
+  - name: France
+    region_code: FR
+    code_series: 8051-8099
+engine: re-rank/scoring.yml
+reference: reference/es_fr.yml
+
+entities:
+
+  # ── Spain (ES) ─────────────────────────────────────────────────────────
+
+  8001:
+    entity: es_dni
+    keyword_scores:
+      dni: 85
+      documento nacional de identidad: 90
+      nif: 80
+      carnet de identidad: 80
+    context_bonus:
+      "DNI:": 35
+      "NIF:": 30
+    regex_scores:
+      dni_01: 50
+    sum_example:
+      keyword_hits: [85, 90]
+      keyword_avg: 87
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  8002:
+    entity: es_nie
+    keyword_scores:
+      nie: 85
+      número de identificación de extranjero: 90
+      tarjeta de residencia: 80
+    context_bonus:
+      "NIE:": 35
+    regex_scores:
+      nie_01: 50
+    sum_example:
+      keyword_hits: [85, 90]
+      keyword_avg: 87
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  8003:
+    entity: es_passport
+    keyword_scores:
+      pasaporte: 85
+      passport: 75
+      número de pasaporte: 85
+    context_bonus:
+      "Pasaporte:": 35
+      "Passport:": 30
+    regex_scores:
+      passport_01: 45
+    sum_example:
+      keyword_hits: [85, 75]
+      keyword_avg: 80
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  8004:
+    entity: es_cif
+    keyword_scores:
+      cif: 85
+      código de identificación fiscal: 90
+      nif empresa: 80
+    context_bonus:
+      "CIF:": 35
+    regex_scores:
+      cif_01: 50
+    sum_example:
+      keyword_hits: [85, 90]
+      keyword_avg: 87
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  8005:
+    entity: es_phone_mobile
+    keyword_scores:
+      teléfono: 55
+      móvil: 65
+      celular: 60
+      número de teléfono: 65
+      contacto: 50
+    context_bonus:
+      "Teléfono:": 25
+      "Móvil:": 25
+    regex_scores:
+      mobile_01: 40
+      mobile_02: 40
+    sum_example:
+      keyword_hits: [65, 65, 55]
+      keyword_avg: 62
+      context_bonus: 25
+      regex_score: 40
+      final_score: 100         # 62+25+40 = 127 → capped
+      label: definite_pii
+
+  8006:
+    entity: es_phone_landline
+    keyword_scores:
+      teléfono: 55
+      fijo: 65
+      número fijo: 65
+      tel: 50
+    context_bonus:
+      "Teléfono:": 20
+      "Tel:": 20
+    regex_scores:
+      landline_01: 40
+    sum_example:
+      keyword_hits: [55, 65]
+      keyword_avg: 60
+      context_bonus: 20
+      regex_score: 40
+      final_score: 100         # 60+20+40 = 120 → capped
+      label: definite_pii
+
+  # ── France (FR) ──────────────────────────────────────────────────────────
+
+  8051:
+    entity: fr_nir
+    keyword_scores:
+      nir: 85
+      insee: 80
+      numéro de sécurité sociale: 90
+      numéro ss: 85
+      sécurité sociale: 80
+    context_bonus:
+      "NIR:": 35
+      "INSEE:": 35
+    regex_scores:
+      nir_01: 50               # 15-digit checksum-validated
+    sum_example:
+      keyword_hits: [85, 90]
+      keyword_avg: 87
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  8052:
+    entity: fr_cni
+    keyword_scores:
+      cni: 85
+      carte nationale d'identité: 90
+      carte d'identité: 85
+      pièce d'identité: 75
+    context_bonus:
+      "CNI:": 35
+      "Carte d'identité:": 35
+    regex_scores:
+      cni_01: 45
+    sum_example:
+      keyword_hits: [85, 90]
+      keyword_avg: 87
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  8053:
+    entity: fr_passport
+    keyword_scores:
+      passeport: 85
+      passport: 75
+      numéro de passeport: 85
+    context_bonus:
+      "Passeport:": 35
+      "Passport:": 30
+    regex_scores:
+      passport_01: 45
+    sum_example:
+      keyword_hits: [85, 75]
+      keyword_avg: 80
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  8054:
+    entity: fr_phone
+    keyword_scores:
+      téléphone: 55
+      portable: 60
+      mobile: 55
+      tél: 50
+      numéro de téléphone: 65
+    context_bonus:
+      "Téléphone:": 20
+      "Tél:": 20
+    regex_scores:
+      phone_01: 40
+    sum_example:
+      keyword_hits: [60, 65, 55]
+      keyword_avg: 60
+      context_bonus: 20
+      regex_score: 40
+      final_score: 100         # 60+20+40 = 120 → capped
+      label: definite_pii
+
+  8055:
+    entity: fr_phone_international
+    keyword_scores:
+      téléphone: 55
+      +33: 70
+      international: 55
+      portable: 60
+    context_bonus:
+      "Téléphone:": 20
+    regex_scores:
+      phone_international_01: 40
+    sum_example:
+      keyword_hits: [70, 60, 55]
+      keyword_avg: 62
+      context_bonus: 20
+      regex_score: 40
+      final_score: 100         # 62+20+40 = 122 → capped
+      label: definite_pii
+
+  8056:
+    entity: fr_phone_formatted
+    keyword_scores:
+      téléphone: 55
+      numéro: 50
+      tél: 50
+      portable: 60
+    context_bonus:
+      "Téléphone:": 20
+    regex_scores:
+      phone_formatted_01: 40
+    sum_example:
+      keyword_hits: [55, 60, 50]
+      keyword_avg: 55
+      context_bonus: 20
+      regex_score: 40
+      final_score: 100         # 55+20+40 = 115 → capped
+      label: definite_pii

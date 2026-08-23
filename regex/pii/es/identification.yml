@@ -5,7 +5,7 @@ patterns:
   location: es
   category: other
   description: Spanish DNI (8 digits + letter)
-  pattern: \d{8}[A-Z]
+  pattern: '[0-9]{8}[A-Z]'
   verification: spain_dni_valid
   mask: '********-*'
   examples:
@@ -27,16 +27,11 @@ patterns:
       the letter.
   priority: 200
   match_type: exactly_matches
-  langs:
-    python: \d{8}[A-Z]
-    go: \d{8}[A-Z]
-    java: \d{8}[A-Z]
-    javascript: \d{8}[A-Z]
 - id: nie_01
   location: es
   category: other
   description: Spanish NIE (foreigner ID - letter + 7 digits + letter)
-  pattern: '[XYZ]\d{7}[A-Z]'
+  pattern: '[XYZ][0-9]{7}[A-Z]'
   verification: spain_nie_valid
   mask: '*-*******-*'
   examples:
@@ -58,16 +53,11 @@ patterns:
       Uses mod-23 checksum.
   priority: 200
   match_type: exactly_matches
-  langs:
-    python: '[XYZ]\d{7}[A-Z]'
-    go: '[XYZ]\d{7}[A-Z]'
-    java: '[XYZ]\d{7}[A-Z]'
-    javascript: '[XYZ]\d{7}[A-Z]'
 - id: passport_01
   location: es
   category: passport
   description: Spanish passport number (3 letters + 6 digits)
-  pattern: '[A-Z]{3}\d{6}'
+  pattern: '[A-Z]{3}[0-9]{6}'
   mask: '*********'
   examples:
     match:
@@ -86,16 +76,11 @@ patterns:
     note: Spanish Pasaporte number.
   priority: 180
   match_type: exactly_matches
-  langs:
-    python: '[A-Z]{3}\d{6}'
-    go: '[A-Z]{3}\d{6}'
-    java: '[A-Z]{3}\d{6}'
-    javascript: '[A-Z]{3}\d{6}'
 - id: cif_01
   location: es
   category: other
   description: Spanish CIF (Business tax ID - letter + 7 digits + control character)
-  pattern: '[A-HJKLMNPQSVW]\d{7}[0-9A-J]'
+  pattern: '[A-HJKLMNPQSVW][0-9]{7}[0-9A-J]'
   mask: '*-*******-*'
   examples:
     match:
@@ -114,8 +99,3 @@ patterns:
     note: Spanish CIF (Código de Identificación Fiscal) for businesses.
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: '[A-HJKLMNPQSVW]\d{7}[0-9A-J]'
-    go: '[A-HJKLMNPQSVW]\d{7}[0-9A-J]'
-    java: '[A-HJKLMNPQSVW]\d{7}[0-9A-J]'
-    javascript: '[A-HJKLMNPQSVW]\d{7}[0-9A-J]'

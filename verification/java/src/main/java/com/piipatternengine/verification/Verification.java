@@ -42,10 +42,27 @@ public class Verification {
         "佐藤", "鈴木", "高橋", "田中", "伊藤", "渡辺", "山本", "中村", "小林", "加藤", "吉田", "山田", "佐々木", "山口", "松本", "井上", "木村", "林", "斎藤", "清水", "山崎", "森", "阿部", "池田", "橋本", "山下", "石川", "中島", "前田", "藤田", "小川", "後藤", "岡田", "長谷川", "村上", "近藤", "石井", "斉藤", "坂本", "遠藤", "青木", "藤井", "西村", "福田", "太田", "三浦", "藤原", "岡本", "松田", "中川", "原田", "小野", "竹内", "金子", "和田", "中野", "原", "田村", "安藤", "河野", "上田", "大野", "高木", "工藤", "内田", "丸山", "今井", "酒井", "宮崎", "横山", "関", "堀", "島", "谷", "浜", "沢", "杉"
     ));
 
+    // Common English surnames
+    public static final Set<String> ENGLISH_SURNAMES = new HashSet<>(Arrays.asList(
+        "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
+        "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
+        "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson",
+        "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", "Walker",
+        "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill",
+        "Flores", "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell",
+        "Mitchell", "Carter", "Roberts", "Gomez", "Phillips", "Evans", "Turner",
+        "Diaz", "Parker", "Cruz", "Edwards", "Collins", "Reyes", "Stewart", "Morris",
+        "Morales", "Murphy", "Cook", "Rogers", "Gutierrez", "Ortiz", "Morgan", "Cooper",
+        "Peterson", "Bailey", "Reed", "Kelly", "Howard", "Ramos", "Kim", "Cox", "Ward",
+        "Richardson", "Watson", "Brooks", "Chavez", "Wood", "James", "Bennett", "Gray",
+        "Mendoza", "Ruiz", "Hughes", "Price", "Alvarez", "Castillo", "Sanders", "Patel",
+        "Myers", "Long", "Ross", "Foster", "Jimenez"
+    ));
+
     // Chinese non-name keywords
     public static final Set<String> CHINESE_NON_NAME_KEYWORDS = new HashSet<>(Arrays.asList(
         "王国", "王朝", "王牌", "王者", "李子", "张开", "张力", "张贴", "黄金", "黄色", "黄油", "黄土", "黄瓜", "黄油", "黄河", "黄昏", "高度", "高级", "高中", "高速", "高考", "高峰", "高手", "高端", "周围", "周期", "周末", "周年", "周边", "周到", "马上", "马路", "马力", "朱红", "曹操", "白色", "白天", "白云", "白金", "白菜", "金属", "金融", "金额", "金钱", "金牌", "田地", "田野", "田园", "石头", "石油", "石材", "方法", "方案", "方向", "方式", "方面", "方便", "任务", "任何", "任意", "任命", "程度", "程序", "江山", "江南", "江河", "余额", "余下", "于是", "何时", "何处", "何必",
-        "电话", "電話", "邮箱", "郵箱", "地址", "姓名", "信息", "資訊", "联系", "聯繫", "手机", "手機", "号码", "號碼", "传真", "傳真", "邮件", "郵件", "密码", "密碼", "账号", "帳號", "注册", "註冊", "登录", "登錄", "确认", "確認", "验证", "驗證", "性别", "性別", "生日", "职业", "職業", "公司", "部门", "部門"
+        "电话", "電話", "邮箱", "郵箱", "地址", "姓名", "信息", "資訊", "联系", "聯繫", "手机", "手機", "号码", "號碼", "传真", "傳真", "邮件", "郵件", "密码", "密碼", "账号", "帳號", "注册", "註冊", "登录", "登錄", "确认", "確認", "验证", "驗證", "性别", "性別", "生日", "职业", "職業", "公司", "部门", "部門", "任務"
     ));
 
     // Korean non-name keywords
@@ -65,8 +82,6 @@ public class Verification {
         registerVerificationFunction("dms_coordinate", Verification::dmsCoordinate);
         registerVerificationFunction("high_entropy_token", Verification::highEntropyToken);
         registerVerificationFunction("not_timestamp", Verification::notTimestamp);
-        registerVerificationFunction("korean_zipcode_valid", Verification::koreanZipcodeValid);
-        registerVerificationFunction("us_zipcode_valid", Verification::usZipcodeValid);
         registerVerificationFunction("korean_bank_account_valid", Verification::koreanBankAccountValid);
         registerVerificationFunction("generic_number_not_timestamp", Verification::genericNumberNotTimestamp);
         registerVerificationFunction("contains_letter", Verification::containsLetter);
@@ -86,10 +101,6 @@ public class Verification {
         registerVerificationFunction("kr_rrn_valid", Verification::krRrnValid);
         registerVerificationFunction("kr_alien_registration_valid", Verification::krAlienRegistrationValid);
         registerVerificationFunction("kr_corporate_registration_valid", Verification::krCorporateRegistrationValid);
-        registerVerificationFunction("jp_zipcode_valid", Verification::jpZipcodeValid);
-        registerVerificationFunction("cn_zipcode_valid", Verification::cnZipcodeValid);
-        registerVerificationFunction("tw_zipcode_valid", Verification::twZipcodeValid);
-        registerVerificationFunction("in_pincode_valid", Verification::inPincodeValid);
         registerVerificationFunction("jp_my_number_valid", Verification::jpMyNumberValid);
         registerVerificationFunction("spain_dni_valid", Verification::spainDniValid);
         registerVerificationFunction("spain_nie_valid", Verification::spainNieValid);
@@ -108,6 +119,19 @@ public class Verification {
         registerVerificationFunction("google_api_key_valid", Verification::googleApiKeyValid);
         registerVerificationFunction("crypto_btc_valid", Verification::cryptoBtcValid);
         registerVerificationFunction("crypto_eth_valid", Verification::cryptoEthValid);
+        registerVerificationFunction("english_name_valid", Verification::englishNameValid);
+        registerVerificationFunction("korean_address_valid", Verification::koreanAddressValid);
+        registerVerificationFunction("japanese_address_valid", Verification::japaneseAddressValid);
+        registerVerificationFunction("chinese_address_valid", Verification::chineseAddressValid);
+        registerVerificationFunction("us_address_valid", Verification::usAddressValid);
+        registerVerificationFunction("imei_valid", Verification::imeiValid);
+        registerVerificationFunction("mac_address_valid", Verification::macAddressValid);
+        registerVerificationFunction("jp_driver_license_valid", Verification::jpDriverLicenseValid);
+        registerVerificationFunction("kr_driver_license_valid", Verification::krDriverLicenseValid);
+        registerVerificationFunction("kr_pccc_valid", Verification::krPcccValid);
+        registerVerificationFunction("kr_vehicle_registration_valid", Verification::krVehicleRegistrationValid);
+        registerVerificationFunction("latitude_valid", Verification::latitudeValid);
+        registerVerificationFunction("longitude_valid", Verification::longitudeValid);
     }
 
     /**
@@ -272,8 +296,8 @@ public class Verification {
             if (allowedChars.indexOf(c) == -1) return false;
         }
 
-        // Normalize for entropy calculation: lowercase and treat separators as spaces
-        String normalized = value.toLowerCase().replace('-', ' ').replace('_', ' ');
+        // Normalize separators to spaces before entropy calculation
+        String normalized = value.replace('-', ' ').replace('_', ' ').replace('|', ' ');
 
         Map<Character, Integer> counts = new HashMap<>();
         for (char c : normalized.toCharArray()) {
@@ -287,7 +311,7 @@ public class Verification {
             entropy -= p * (Math.log(p) / Math.log(2));
         }
 
-        return entropy >= 4.0;
+        return entropy >= 4.5;
     }
 
     /**
@@ -332,165 +356,6 @@ public class Verification {
                 }
             } catch (Exception e) {}
         }
-
-        return true;
-    }
-
-    /**
-     * Verify Korean postal code is valid.
-     */
-    public static boolean koreanZipcodeValid(String value) {
-        Set<String> validZips = loadDataFile("kr_zipcodes.csv");
-        if (!validZips.isEmpty()) {
-            return validZips.contains(value) || validZips.contains(value.replace("-", ""));
-        }
-
-        String digitsOnly = value.replaceAll("\\D", "");
-        if (digitsOnly.length() != 5) return false;
-
-        boolean isSequentialUp = true;
-        boolean isSequentialDown = true;
-        for (int i = 1; i < digitsOnly.length(); i++) {
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) + 1) isSequentialUp = false;
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) - 1) isSequentialDown = false;
-        }
-
-        if (isSequentialUp || isSequentialDown) return false;
-
-        Set<Character> distinctDigits = new HashSet<>();
-        for (char c : digitsOnly.toCharArray()) distinctDigits.add(c);
-        if (distinctDigits.size() == 1) return false;
-
-        return true;
-    }
-
-    /**
-     * Verify US postal code is valid.
-     */
-    public static boolean usZipcodeValid(String value) {
-        String digitsOnly = value.replaceAll("\\D", "");
-        Set<String> validZips = loadDataFile("us_zipcodes.csv");
-        if (!validZips.isEmpty()) {
-            if (digitsOnly.length() == 5) return validZips.contains(digitsOnly);
-            else if (digitsOnly.length() == 9) return validZips.contains(digitsOnly.substring(0, 5));
-        }
-
-        if (digitsOnly.length() != 5 && digitsOnly.length() != 9) return false;
-
-        String baseZip = digitsOnly.substring(0, 5);
-        boolean isSequentialUp = true;
-        boolean isSequentialDown = true;
-        for (int i = 1; i < baseZip.length(); i++) {
-            if (Character.getNumericValue(baseZip.charAt(i)) != Character.getNumericValue(baseZip.charAt(i - 1)) + 1) isSequentialUp = false;
-            if (Character.getNumericValue(baseZip.charAt(i)) != Character.getNumericValue(baseZip.charAt(i - 1)) - 1) isSequentialDown = false;
-        }
-        if (isSequentialUp || isSequentialDown) return false;
-
-        Set<Character> distinctDigits = new HashSet<>();
-        for (char c : baseZip.toCharArray()) distinctDigits.add(c);
-        if (distinctDigits.size() == 1) return false;
-
-        return true;
-    }
-
-    /**
-     * Verify Japanese postal code is valid.
-     */
-    public static boolean jpZipcodeValid(String value) {
-        String digitsOnly = value.replaceAll("[^0-9]", "");
-        if (digitsOnly.length() != 7) return false;
-
-        Set<String> validZips = loadDataFile("jp_zipcodes.csv");
-        if (!validZips.isEmpty()) {
-            String hyphenFormat = digitsOnly.substring(0, 3) + "-" + digitsOnly.substring(3);
-            return validZips.contains(hyphenFormat) || validZips.contains(digitsOnly);
-        }
-
-        Set<Character> distinctDigits = new HashSet<>();
-        for (char c : digitsOnly.toCharArray()) distinctDigits.add(c);
-        if (distinctDigits.size() == 1) return false;
-
-        boolean isSequentialUp = true;
-        boolean isSequentialDown = true;
-        for (int i = 1; i < digitsOnly.length(); i++) {
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) + 1) isSequentialUp = false;
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) - 1) isSequentialDown = false;
-        }
-        if (isSequentialUp || isSequentialDown) return false;
-
-        return true;
-    }
-
-    /**
-     * Verify Chinese postal code is valid.
-     */
-    public static boolean cnZipcodeValid(String value) {
-        String digitsOnly = value.replaceAll("\\D", "");
-        if (digitsOnly.length() != 6) return false;
-
-        Set<String> validZips = loadDataFile("cn_zipcodes.csv");
-        if (!validZips.isEmpty()) return validZips.contains(digitsOnly);
-
-        Set<Character> distinctDigits = new HashSet<>();
-        for (char c : digitsOnly.toCharArray()) distinctDigits.add(c);
-        if (distinctDigits.size() == 1) return false;
-
-        boolean isSequentialUp = true;
-        boolean isSequentialDown = true;
-        for (int i = 1; i < digitsOnly.length(); i++) {
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) + 1) isSequentialUp = false;
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) - 1) isSequentialDown = false;
-        }
-        if (isSequentialUp || isSequentialDown) return false;
-
-        int firstTwo = Integer.parseInt(digitsOnly.substring(0, 2));
-        return firstTwo >= 1 && firstTwo <= 86;
-    }
-
-    /**
-     * Verify Taiwan postal code is valid.
-     */
-    public static boolean twZipcodeValid(String value) {
-        String digitsOnly = value.replaceAll("\\D", "");
-        if (digitsOnly.length() != 3 && digitsOnly.length() != 5) return false;
-
-        Set<String> validZips = loadDataFile("tw_zipcodes.csv");
-        if (!validZips.isEmpty()) {
-            if (validZips.contains(digitsOnly)) return true;
-            if (digitsOnly.length() == 5 && validZips.contains(digitsOnly.substring(0, 3))) return true;
-            return false;
-        }
-
-        Set<Character> distinctDigits = new HashSet<>();
-        for (char c : digitsOnly.toCharArray()) distinctDigits.add(c);
-        if (distinctDigits.size() == 1) return false;
-
-        int firstDigit = Character.getNumericValue(digitsOnly.charAt(0));
-        return firstDigit != 0;
-    }
-
-    /**
-     * Verify Indian PIN code is valid.
-     */
-    public static boolean inPincodeValid(String value) {
-        String digitsOnly = value.replaceAll("\\D", "");
-        if (digitsOnly.length() != 6) return false;
-        if (digitsOnly.charAt(0) == '0') return false;
-
-        Set<String> validPins = loadDataFile("in_pincodes.csv");
-        if (!validPins.isEmpty()) return validPins.contains(digitsOnly);
-
-        Set<Character> distinctDigits = new HashSet<>();
-        for (char c : digitsOnly.toCharArray()) distinctDigits.add(c);
-        if (distinctDigits.size() == 1) return false;
-
-        boolean isSequentialUp = true;
-        boolean isSequentialDown = true;
-        for (int i = 1; i < digitsOnly.length(); i++) {
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) + 1) isSequentialUp = false;
-            if (Character.getNumericValue(digitsOnly.charAt(i)) != Character.getNumericValue(digitsOnly.charAt(i - 1)) - 1) isSequentialDown = false;
-        }
-        if (isSequentialUp || isSequentialDown) return false;
 
         return true;
     }
@@ -1460,5 +1325,233 @@ public class Verification {
         if (value.length() != 42) return false;
         if (!value.startsWith("0x")) return false;
         return value.matches("^0x[0-9a-fA-F]{40}$");
+    }
+
+    /**
+     * Verify English name format (First Last or First Middle Last).
+     */
+    public static boolean englishNameValid(String value) {
+        if (value == null) return false;
+        String[] parts = value.trim().split("\\s+");
+        if (parts.length < 2 || parts.length > 4) return false;
+
+        for (String p : parts) {
+            if (p.isEmpty() || !Character.isUpperCase(p.charAt(0))) return false;
+        }
+
+        String firstName = parts[0];
+        String lastName = parts[parts.length - 1];
+
+        Set<String> validSurnames = loadDataFile("en_surnames.csv");
+        if (validSurnames.isEmpty()) validSurnames = ENGLISH_SURNAMES;
+
+        Set<String> validGivenNames = loadDataFile("en_given_names.csv");
+        boolean isCommonGiven = !validGivenNames.isEmpty() && validGivenNames.contains(firstName);
+        boolean isCommonSurname = validSurnames.contains(lastName);
+
+        if (isCommonGiven && isCommonSurname) return true;
+        if ((isCommonGiven || isCommonSurname) && lastName.length() >= 2 && lastName.length() <= 15) return true;
+
+        if (parts.length == 2 && firstName.matches("[A-Za-z]+") && lastName.matches("[A-Za-z]+")) {
+            if (firstName.length() >= 2 && lastName.length() >= 2) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Verify Korean address contains a known administrative province.
+     */
+    public static boolean koreanAddressValid(String value) {
+        String[] provinces = {
+            "서울특별시", "경기도", "부산광역시", "인천광역시", "대구광역시", "대전광역시",
+            "광주광역시", "울산광역시", "세종특별자치시", "강원도", "충청북도", "충청남도",
+            "전라북도", "전라남도", "경상북도", "경상남도", "제주특별자치도"
+        };
+        for (String p : provinces) {
+            if (value.contains(p)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Verify Japanese address contains a known prefecture.
+     */
+    public static boolean japaneseAddressValid(String value) {
+        String[] prefectures = {
+            "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
+            "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
+            "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
+            "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
+            "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
+            "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
+            "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"
+        };
+        for (String p : prefectures) {
+            if (value.contains(p)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Verify Chinese address contains a known province.
+     */
+    public static boolean chineseAddressValid(String value) {
+        String[] provinces = {
+            "北京市", "天津市", "河北省", "山西省", "内蒙古自治区", "辽宁省", "吉林省",
+            "黑龙江省", "上海市", "江苏省", "浙江省", "安徽省", "福建省", "江西省",
+            "山东省", "河南省", "湖北省", "湖南省", "广东省", "广西壮族自治区", "海南省",
+            "重庆市", "四川省", "贵州省", "云南省", "西藏自治区", "陕西省", "甘肃省",
+            "青海省", "宁夏回族自治区", "新疆维吾尔自治区", "香港特别行政区", "澳门特别行政区", "台湾省"
+        };
+        for (String p : provinces) {
+            if (value.contains(p)) return true;
+        }
+        return false;
+    }
+
+    // US state data (used by usAddressValid)
+    private static final Set<String> US_STATES = new HashSet<>(Arrays.asList(
+        "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
+        "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
+        "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan",
+        "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire",
+        "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
+        "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
+        "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia",
+        "Wisconsin", "Wyoming"
+    ));
+
+    private static final Set<String> US_STATE_ABBRS = new HashSet<>(Arrays.asList(
+        "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN",
+        "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV",
+        "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN",
+        "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+    ));
+
+    private static final Pattern US_STATE_ABBR_RE = Pattern.compile("\\b[A-Z]{2}\\b");
+
+    /**
+     * Verify US address contains a valid state name or abbreviation.
+     */
+    public static boolean usAddressValid(String value) {
+        String trimmed = value.trim();
+        String upperTrimmed = trimmed.toUpperCase();
+
+        // Standalone exact match — full state name or abbreviation
+        if (US_STATE_ABBRS.contains(upperTrimmed)) return true;
+        for (String state : US_STATES) {
+            if (trimmed.equalsIgnoreCase(state)) return true;
+        }
+
+        // State name contained anywhere in the address
+        String lower = value.toLowerCase();
+        for (String state : US_STATES) {
+            if (lower.contains(state.toLowerCase())) return true;
+        }
+
+        // Two-letter abbreviation with word boundary (e.g. "Los Angeles, CA 90001")
+        Matcher m = US_STATE_ABBR_RE.matcher(value.toUpperCase());
+        while (m.find()) {
+            if (US_STATE_ABBRS.contains(m.group())) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Verify 15-digit IMEI using the Luhn algorithm.
+     */
+    public static boolean imeiValid(String value) {
+        String digits = value.replaceAll("\\D", "");
+        if (digits.length() != 15) return false;
+        Set<Character> distinct = new HashSet<>();
+        for (char c : digits.toCharArray()) distinct.add(c);
+        if (distinct.size() == 1) return false;
+        return luhn(digits);
+    }
+
+    /**
+     * Verify MAC address format and common exclusion rules.
+     */
+    public static boolean macAddressValid(String value) {
+        String mac = value.replace(":", "").replace("-", "").replace(" ", "").toUpperCase();
+        if (mac.length() != 12) return false;
+        if (mac.equals("FFFFFFFFFFFF") || mac.equals("000000000000")) return false;
+        return true;
+    }
+
+    /**
+     * Verify Japanese Driver's License Number (12 digits, modulus-11 check digit).
+     */
+    public static boolean jpDriverLicenseValid(String value) {
+        String digits = value.replaceAll("\\D", "");
+        if (digits.length() != 12) return false;
+        int regionCode = Integer.parseInt(digits.substring(0, 2));
+        if (regionCode < 10) return false;
+        int[] weights = {5, 4, 3, 2, 7, 6, 5, 4, 3, 2};
+        int total = 0;
+        for (int i = 0; i < 10; i++) {
+            total += Character.getNumericValue(digits.charAt(i)) * weights[i];
+        }
+        int remainder = total % 11;
+        int expectedCheck = (remainder <= 1) ? 0 : 11 - remainder;
+        return Character.getNumericValue(digits.charAt(10)) == expectedCheck;
+    }
+
+    /**
+     * Verify Korean Driver's License Number (10 or 12 digits with a valid region code).
+     */
+    public static boolean krDriverLicenseValid(String value) {
+        String digits = value.replaceAll("\\D", "");
+        if (digits.length() != 10 && digits.length() != 12) return false;
+        Set<Character> distinct = new HashSet<>();
+        for (char c : digits.toCharArray()) distinct.add(c);
+        if (distinct.size() == 1) return false;
+        int regionCode = Integer.parseInt(digits.substring(0, 2));
+        Set<Integer> validRegions = new HashSet<>(Arrays.asList(
+            11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28));
+        return validRegions.contains(regionCode);
+    }
+
+    /**
+     * Verify Korean Personal Customs Clearance Code (PCCC): P + 12 digits.
+     */
+    public static boolean krPcccValid(String value) {
+        if (value == null || value.length() != 13) return false;
+        if (Character.toUpperCase(value.charAt(0)) != 'P') return false;
+        return value.substring(1).matches("\\d{12}");
+    }
+
+    /**
+     * Verify Korean vehicle registration plate format.
+     */
+    public static boolean krVehicleRegistrationValid(String value) {
+        String val = value.replace(" ", "");
+        String validHangul = "가나다라마거너더러머버서어저고노도로모보소오조구누두루무부수우주하허호바사아자배";
+        String pattern = "^(\\d{2,3})([" + validHangul + "])(\\d{4})$";
+        return Pattern.matches(pattern, val);
+    }
+
+    /**
+     * Verify decimal latitude is within the -90 to 90 range.
+     */
+    public static boolean latitudeValid(String value) {
+        try {
+            double lat = Double.parseDouble(value.trim());
+            return lat >= -90.0 && lat <= 90.0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Verify decimal longitude is within the -180 to 180 range.
+     */
+    public static boolean longitudeValid(String value) {
+        try {
+            double lon = Double.parseDouble(value.trim());
+            return lon >= -180.0 && lon <= 180.0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

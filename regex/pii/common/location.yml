@@ -6,7 +6,7 @@ patterns:
     location: comm
     category: location
     description: Decimal latitude (4+ decimal places)
-    pattern: '-?([1-8]?\d(\.\d{4,})?|90(\.0{4,})?)'
+    pattern: '-?([1-8]?\d\.\d{4,}|90\.0{4,})'
     mask: "##.####"
     verification: latitude_valid
     examples:
@@ -22,16 +22,16 @@ patterns:
       severity: low
     match_type: exactly_matches
     langs:
-      python: '-?([1-8]?\d(\.\d{4,})?|90(\.0{4,})?)'
-      go: '-?([1-8]?\d(\.\d{4,})?|90(\.0{4,})?)'
-      java: '-?([1-8]?\d(\.\d{4,})?|90(\.0{4,})?)'
-      javascript: '-?([1-8]?\d(\.\d{4,})?|90(\.0{4,})?)'
+      python: '-?([1-8]?\d\.\d{4,}|90\.0{4,})'
+      go: '-?([1-8]?\d\.\d{4,}|90\.0{4,})'
+      java: '-?([1-8]?\d\.\d{4,}|90\.0{4,})'
+      javascript: '-?([1-8]?\d\.\d{4,}|90\.0{4,})'
 
   - id: longitude_01
     location: comm
     category: location
     description: Decimal longitude (4+ decimal places)
-    pattern: '-?((1[0-7]\d|[1-9]?\d)(\.\d{4,})?|180(\.0{4,})?)'
+    pattern: '-?((1[0-7]\d|[1-9]?\d)\.\d{4,}|180\.0{4,})'
     mask: "###.####"
     verification: longitude_valid
     examples:
@@ -47,10 +47,10 @@ patterns:
       severity: low
     match_type: exactly_matches
     langs:
-      python: '-?((1[0-7]\d|[1-9]?\d)(\.\d{4,})?|180(\.0{4,})?)'
-      go: '-?((1[0-7]\d|[1-9]?\d)(\.\d{4,})?|180(\.0{4,})?)'
-      java: '-?((1[0-7]\d|[1-9]?\d)(\.\d{4,})?|180(\.0{4,})?)'
-      javascript: '-?((1[0-7]\d|[1-9]?\d)(\.\d{4,})?|180(\.0{4,})?)'
+      python: '-?((1[0-7]\d|[1-9]?\d)\.\d{4,}|180\.0{4,})'
+      go: '-?((1[0-7]\d|[1-9]?\d)\.\d{4,}|180\.0{4,})'
+      java: '-?((1[0-7]\d|[1-9]?\d)\.\d{4,}|180\.0{4,})'
+      javascript: '-?((1[0-7]\d|[1-9]?\d)\.\d{4,}|180\.0{4,})'
 
   - id: coordinates_dms_01
     location: comm

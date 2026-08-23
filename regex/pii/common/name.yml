@@ -5,7 +5,7 @@ patterns:
   location: comm
   category: other
   description: English Name (First Last or First Middle Last)
-  pattern: '\b[A-Z][a-z]+(?:[\t\n\f\r ]+[A-Z][a-z]+){1,2}\b'
+  pattern: '\b[A-Z][a-z]+(?:[ \t]+[A-Z][a-z]+){1,2}\b'
   verification: english_name_valid
   mask: '*'
   examples:

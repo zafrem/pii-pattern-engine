@@ -9,6 +9,9 @@ patterns:
     pattern: '[A-Z0-9]{6,9}'
     flags: [IGNORECASE]
     mask: "********"
+    # Broad catch-all: run after specific national patterns so it does not
+    # steal overlapping spans (e.g. a sub-token of a bank account number).
+    priority: 200
     examples:
       match:
         - "123456789"

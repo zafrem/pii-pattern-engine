@@ -585,7 +585,9 @@ def high_entropy_token(value: str) -> bool:
         (count / length) * math.log2(count / length) for count in char_counts.values()
     )
 
-    return entropy >= 4.5
+    # Threshold chosen so a 20-char random token (max entropy log2(20)=4.32)
+    # qualifies, while repetitive/sequential strings (<=3.32) do not.
+    return entropy >= 4.0
 
 
 # Common English surnames - covers ~25-30% of US/UK population

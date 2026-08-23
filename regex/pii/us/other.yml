@@ -51,3 +51,42 @@ patterns:
   metadata:
     note: Uses address database verification to ensure valid city and state combinations.
   match_type: exactly_matches
+- id: zipcode_01
+  location: us
+  category: address
+  description: US ZIP code (5 digits or ZIP+4)
+  pattern: \b[0-9]{5}(?:-[0-9]{4})?\b
+  verification: us_zipcode_valid
+  mask: '*****'
+  examples:
+    match:
+    - '90210'
+    - 90210-1234
+    - '48201'
+    - '10001'
+    - 60601-5678
+    - '33101'
+    nomatch:
+    - '1234'
+    - '123456'
+    - '12345'
+    - '11111'
+    - ABC12345
+    - 90210XYZ
+    - MODEL90210A
+    - '00000'
+    - '99999'
+    - '54321'
+  policy:
+    store_raw: false
+    action_on_match: report
+    severity: low
+  metadata:
+    note: Uses word boundaries to prevent matching when embedded in alphanumeric strings.
+      Uses verification to reject sequential/repetitive patterns.
+  match_type: exactly_matches
+  langs:
+    python: \b[0-9]{5}(?:-[0-9]{4})?\b
+    go: \b[0-9]{5}(?:-[0-9]{4})?\b
+    java: \b[0-9]{5}(?:-[0-9]{4})?\b
+    javascript: \b[0-9]{5}(?:-[0-9]{4})?\b

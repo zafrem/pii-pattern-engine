@@ -62,7 +62,7 @@ public class Verification {
     // Chinese non-name keywords
     public static final Set<String> CHINESE_NON_NAME_KEYWORDS = new HashSet<>(Arrays.asList(
         "王国", "王朝", "王牌", "王者", "李子", "张开", "张力", "张贴", "黄金", "黄色", "黄油", "黄土", "黄瓜", "黄油", "黄河", "黄昏", "高度", "高级", "高中", "高速", "高考", "高峰", "高手", "高端", "周围", "周期", "周末", "周年", "周边", "周到", "马上", "马路", "马力", "朱红", "曹操", "白色", "白天", "白云", "白金", "白菜", "金属", "金融", "金额", "金钱", "金牌", "田地", "田野", "田园", "石头", "石油", "石材", "方法", "方案", "方向", "方式", "方面", "方便", "任务", "任何", "任意", "任命", "程度", "程序", "江山", "江南", "江河", "余额", "余下", "于是", "何时", "何处", "何必",
-        "电话", "電話", "邮箱", "郵箱", "地址", "姓名", "信息", "資訊", "联系", "聯繫", "手机", "手機", "号码", "號碼", "传真", "傳真", "邮件", "郵件", "密码", "密碼", "账号", "帳號", "注册", "註冊", "登录", "登錄", "确认", "確認", "验证", "驗證", "性别", "性別", "生日", "职业", "職業", "公司", "部门", "部門"
+        "电话", "電話", "邮箱", "郵箱", "地址", "姓名", "信息", "資訊", "联系", "聯繫", "手机", "手機", "号码", "號碼", "传真", "傳真", "邮件", "郵件", "密码", "密碼", "账号", "帳號", "注册", "註冊", "登录", "登錄", "确认", "確認", "验证", "驗證", "性别", "性別", "生日", "职业", "職業", "公司", "部门", "部門", "任務"
     ));
 
     // Korean non-name keywords
@@ -123,6 +123,15 @@ public class Verification {
         registerVerificationFunction("korean_address_valid", Verification::koreanAddressValid);
         registerVerificationFunction("japanese_address_valid", Verification::japaneseAddressValid);
         registerVerificationFunction("chinese_address_valid", Verification::chineseAddressValid);
+        registerVerificationFunction("us_address_valid", Verification::usAddressValid);
+        registerVerificationFunction("imei_valid", Verification::imeiValid);
+        registerVerificationFunction("mac_address_valid", Verification::macAddressValid);
+        registerVerificationFunction("jp_driver_license_valid", Verification::jpDriverLicenseValid);
+        registerVerificationFunction("kr_driver_license_valid", Verification::krDriverLicenseValid);
+        registerVerificationFunction("kr_pccc_valid", Verification::krPcccValid);
+        registerVerificationFunction("kr_vehicle_registration_valid", Verification::krVehicleRegistrationValid);
+        registerVerificationFunction("latitude_valid", Verification::latitudeValid);
+        registerVerificationFunction("longitude_valid", Verification::longitudeValid);
     }
 
     /**
@@ -1398,5 +1407,151 @@ public class Verification {
             if (value.contains(p)) return true;
         }
         return false;
+    }
+
+    // US state data (used by usAddressValid)
+    private static final Set<String> US_STATES = new HashSet<>(Arrays.asList(
+        "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
+        "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
+        "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan",
+        "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire",
+        "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
+        "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
+        "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia",
+        "Wisconsin", "Wyoming"
+    ));
+
+    private static final Set<String> US_STATE_ABBRS = new HashSet<>(Arrays.asList(
+        "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN",
+        "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV",
+        "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN",
+        "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+    ));
+
+    private static final Pattern US_STATE_ABBR_RE = Pattern.compile("\\b[A-Z]{2}\\b");
+
+    /**
+     * Verify US address contains a valid state name or abbreviation.
+     */
+    public static boolean usAddressValid(String value) {
+        String trimmed = value.trim();
+        String upperTrimmed = trimmed.toUpperCase();
+
+        // Standalone exact match — full state name or abbreviation
+        if (US_STATE_ABBRS.contains(upperTrimmed)) return true;
+        for (String state : US_STATES) {
+            if (trimmed.equalsIgnoreCase(state)) return true;
+        }
+
+        // State name contained anywhere in the address
+        String lower = value.toLowerCase();
+        for (String state : US_STATES) {
+            if (lower.contains(state.toLowerCase())) return true;
+        }
+
+        // Two-letter abbreviation with word boundary (e.g. "Los Angeles, CA 90001")
+        Matcher m = US_STATE_ABBR_RE.matcher(value.toUpperCase());
+        while (m.find()) {
+            if (US_STATE_ABBRS.contains(m.group())) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Verify 15-digit IMEI using the Luhn algorithm.
+     */
+    public static boolean imeiValid(String value) {
+        String digits = value.replaceAll("\\D", "");
+        if (digits.length() != 15) return false;
+        Set<Character> distinct = new HashSet<>();
+        for (char c : digits.toCharArray()) distinct.add(c);
+        if (distinct.size() == 1) return false;
+        return luhn(digits);
+    }
+
+    /**
+     * Verify MAC address format and common exclusion rules.
+     */
+    public static boolean macAddressValid(String value) {
+        String mac = value.replace(":", "").replace("-", "").replace(" ", "").toUpperCase();
+        if (mac.length() != 12) return false;
+        if (mac.equals("FFFFFFFFFFFF") || mac.equals("000000000000")) return false;
+        return true;
+    }
+
+    /**
+     * Verify Japanese Driver's License Number (12 digits, modulus-11 check digit).
+     */
+    public static boolean jpDriverLicenseValid(String value) {
+        String digits = value.replaceAll("\\D", "");
+        if (digits.length() != 12) return false;
+        int regionCode = Integer.parseInt(digits.substring(0, 2));
+        if (regionCode < 10) return false;
+        int[] weights = {5, 4, 3, 2, 7, 6, 5, 4, 3, 2};
+        int total = 0;
+        for (int i = 0; i < 10; i++) {
+            total += Character.getNumericValue(digits.charAt(i)) * weights[i];
+        }
+        int remainder = total % 11;
+        int expectedCheck = (remainder <= 1) ? 0 : 11 - remainder;
+        return Character.getNumericValue(digits.charAt(10)) == expectedCheck;
+    }
+
+    /**
+     * Verify Korean Driver's License Number (10 or 12 digits with a valid region code).
+     */
+    public static boolean krDriverLicenseValid(String value) {
+        String digits = value.replaceAll("\\D", "");
+        if (digits.length() != 10 && digits.length() != 12) return false;
+        Set<Character> distinct = new HashSet<>();
+        for (char c : digits.toCharArray()) distinct.add(c);
+        if (distinct.size() == 1) return false;
+        int regionCode = Integer.parseInt(digits.substring(0, 2));
+        Set<Integer> validRegions = new HashSet<>(Arrays.asList(
+            11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28));
+        return validRegions.contains(regionCode);
+    }
+
+    /**
+     * Verify Korean Personal Customs Clearance Code (PCCC): P + 12 digits.
+     */
+    public static boolean krPcccValid(String value) {
+        if (value == null || value.length() != 13) return false;
+        if (Character.toUpperCase(value.charAt(0)) != 'P') return false;
+        return value.substring(1).matches("\\d{12}");
+    }
+
+    /**
+     * Verify Korean vehicle registration plate format.
+     */
+    public static boolean krVehicleRegistrationValid(String value) {
+        String val = value.replace(" ", "");
+        String validHangul = "가나다라마거너더러머버서어저고노도로모보소오조구누두루무부수우주하허호바사아자배";
+        String pattern = "^(\\d{2,3})([" + validHangul + "])(\\d{4})$";
+        return Pattern.matches(pattern, val);
+    }
+
+    /**
+     * Verify decimal latitude is within the -90 to 90 range.
+     */
+    public static boolean latitudeValid(String value) {
+        try {
+            double lat = Double.parseDouble(value.trim());
+            return lat >= -90.0 && lat <= 90.0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Verify decimal longitude is within the -180 to 180 range.
+     */
+    public static boolean longitudeValid(String value) {
+        try {
+            double lon = Double.parseDouble(value.trim());
+            return lon >= -180.0 && lon <= 180.0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

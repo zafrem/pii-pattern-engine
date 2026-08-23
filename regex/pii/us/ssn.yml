@@ -29,16 +29,11 @@ patterns:
     note: 'Validates against basic SSA rules: no 000, 666, 900-999 in first group;
       no 00 in middle; no 0000 in last group'
   match_type: exactly_matches
-  langs:
-    python: '[0-9]{3}-?[0-9]{2}-?[0-9]{4}'
-    go: '[0-9]{3}-?[0-9]{2}-?[0-9]{4}'
-    java: '[0-9]{3}-?[0-9]{2}-?[0-9]{4}'
-    javascript: '[0-9]{3}-?[0-9]{2}-?[0-9]{4}'
 - id: itin_01
   location: us
   category: ssn
   description: Individual Taxpayer Identification Number (9XX-XX-XXXX)
-  pattern: 9[0-9]{2}(?:-[0-9]{2}-[0-9]{4}|[0-9]{6})
+  pattern: '9[0-9]{2}(?:-[0-9]{2}-[0-9]{4}|[0-9]{6})'
   mask: '***-**-****'
   examples:
     match:
@@ -53,8 +48,3 @@ patterns:
     action_on_match: redact
     severity: critical
   match_type: exactly_matches
-  langs:
-    python: 9[0-9]{2}(?:-[0-9]{2}-[0-9]{4}|[0-9]{6})
-    go: 9[0-9]{2}(?:-[0-9]{2}-[0-9]{4}|[0-9]{6})
-    java: 9[0-9]{2}(?:-[0-9]{2}-[0-9]{4}|[0-9]{6})
-    javascript: 9[0-9]{2}(?:-[0-9]{2}-[0-9]{4}|[0-9]{6})

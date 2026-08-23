@@ -5,7 +5,7 @@ patterns:
   location: co
   category: iban
   description: International Bank Account Number (IBAN) with Mod-97 verification
-  pattern: '[A-Z]{2}\d{2}[A-Z0-9]{11,30}'
+  pattern: '[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}'
   mask: '********************'
   verification: iban_mod97
   examples:
@@ -23,16 +23,11 @@ patterns:
     action_on_match: redact
     severity: high
   match_type: exactly_matches
-  langs:
-    python: '[A-Z]{2}\d{2}[A-Z0-9]{11,30}'
-    go: '[A-Z]{2}\d{2}[A-Z0-9]{11,30}'
-    java: '[A-Z]{2}\d{2}[A-Z0-9]{11,30}'
-    javascript: '[A-Z]{2}\d{2}[A-Z0-9]{11,30}'
 - id: iban_de_01
   location: co
   category: iban
   description: IBAN for Germany (DE)
-  pattern: DE\d{2}[A-Z0-9]{18}
+  pattern: 'DE[0-9]{2}[A-Z0-9]{18}'
   mask: DE********************
   verification: iban_mod97
   examples:
@@ -47,16 +42,11 @@ patterns:
     action_on_match: redact
     severity: high
   match_type: exactly_matches
-  langs:
-    python: DE\d{2}[A-Z0-9]{18}
-    go: DE\d{2}[A-Z0-9]{18}
-    java: DE\d{2}[A-Z0-9]{18}
-    javascript: DE\d{2}[A-Z0-9]{18}
 - id: iban_fr_01
   location: co
   category: iban
   description: IBAN for France (FR)
-  pattern: FR\d{2}[A-Z0-9]{23}
+  pattern: 'FR[0-9]{2}[A-Z0-9]{23}'
   mask: FR***********************
   verification: iban_mod97
   examples:
@@ -71,16 +61,11 @@ patterns:
     action_on_match: redact
     severity: high
   match_type: exactly_matches
-  langs:
-    python: FR\d{2}[A-Z0-9]{23}
-    go: FR\d{2}[A-Z0-9]{23}
-    java: FR\d{2}[A-Z0-9]{23}
-    javascript: FR\d{2}[A-Z0-9]{23}
 - id: iban_gb_01
   location: co
   category: iban
   description: IBAN for United Kingdom (GB)
-  pattern: GB\d{2}[A-Z0-9]{18}
+  pattern: 'GB[0-9]{2}[A-Z0-9]{18}'
   mask: GB********************
   verification: iban_mod97
   examples:
@@ -95,16 +80,11 @@ patterns:
     action_on_match: redact
     severity: high
   match_type: exactly_matches
-  langs:
-    python: GB\d{2}[A-Z0-9]{18}
-    go: GB\d{2}[A-Z0-9]{18}
-    java: GB\d{2}[A-Z0-9]{18}
-    javascript: GB\d{2}[A-Z0-9]{18}
 - id: iban_it_01
   location: co
   category: iban
   description: IBAN for Italy (IT)
-  pattern: IT\d{2}[A-Z0-9]{23}
+  pattern: 'IT[0-9]{2}[A-Z0-9]{23}'
   mask: IT***********************
   verification: iban_mod97
   examples:
@@ -119,8 +99,3 @@ patterns:
     action_on_match: redact
     severity: high
   match_type: exactly_matches
-  langs:
-    python: IT\d{2}[A-Z0-9]{23}
-    go: IT\d{2}[A-Z0-9]{23}
-    java: IT\d{2}[A-Z0-9]{23}
-    javascript: IT\d{2}[A-Z0-9]{23}

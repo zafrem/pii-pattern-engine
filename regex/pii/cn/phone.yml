@@ -5,7 +5,7 @@ patterns:
   location: cn
   category: phone
   description: Chinese mobile phone number (1XX-XXXX-XXXX)
-  pattern: 1[3-9][0-9]-?[0-9]{4}-?[0-9]{4}
+  pattern: '1[3-9][0-9]-?[0-9]{4}-?[0-9]{4}'
   mask: 1**-****-****
   examples:
     match:
@@ -22,16 +22,11 @@ patterns:
     action_on_match: redact
     severity: high
   match_type: exactly_matches
-  langs:
-    python: 1[3-9][0-9]-?[0-9]{4}-?[0-9]{4}
-    go: 1[3-9][0-9]-?[0-9]{4}-?[0-9]{4}
-    java: 1[3-9][0-9]-?[0-9]{4}-?[0-9]{4}
-    javascript: 1[3-9][0-9]-?[0-9]{4}-?[0-9]{4}
 - id: landline_01
   location: cn
   category: phone
   description: Chinese landline number (area code + number)
-  pattern: 0[1-9][0-9]{1,2}-?[0-9]{7,8}
+  pattern: '0[1-9][0-9]{1,2}-?[0-9]{7,8}'
   mask: 0***-********
   examples:
     match:
@@ -48,8 +43,3 @@ patterns:
     action_on_match: report
     severity: low
   match_type: exactly_matches
-  langs:
-    python: 0[1-9][0-9]{1,2}-?[0-9]{7,8}
-    go: 0[1-9][0-9]{1,2}-?[0-9]{7,8}
-    java: 0[1-9][0-9]{1,2}-?[0-9]{7,8}
-    javascript: 0[1-9][0-9]{1,2}-?[0-9]{7,8}

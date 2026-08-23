@@ -26,16 +26,11 @@ patterns:
       G (official), H (diplomatic), J (service), K (child).
   priority: 180
   match_type: exactly_matches
-  langs:
-    python: '[CFGHJK][0-9A-Z]{8}'
-    go: '[CFGHJK][0-9A-Z]{8}'
-    java: '[CFGHJK][0-9A-Z]{8}'
-    javascript: '[CFGHJK][0-9A-Z]{8}'
 - id: passport_france_01
   location: eu
   category: passport
   description: French passport number (2 digits + 2 letters + 5 digits)
-  pattern: \d{2}[A-Z]{2}\d{5}
+  pattern: '[0-9]{2}[A-Z]{2}[0-9]{5}'
   mask: '*********'
   examples:
     match:
@@ -54,16 +49,11 @@ patterns:
     note: French Passeport number.
   priority: 180
   match_type: exactly_matches
-  langs:
-    python: \d{2}[A-Z]{2}\d{5}
-    go: \d{2}[A-Z]{2}\d{5}
-    java: \d{2}[A-Z]{2}\d{5}
-    javascript: \d{2}[A-Z]{2}\d{5}
 - id: passport_italy_01
   location: eu
   category: passport
   description: Italian passport number (2 letters + 7 digits)
-  pattern: '[A-Z]{2}\d{7}'
+  pattern: '[A-Z]{2}[0-9]{7}'
   mask: '*********'
   examples:
     match:
@@ -82,16 +72,11 @@ patterns:
     note: Italian Passaporto number.
   priority: 180
   match_type: exactly_matches
-  langs:
-    python: '[A-Z]{2}\d{7}'
-    go: '[A-Z]{2}\d{7}'
-    java: '[A-Z]{2}\d{7}'
-    javascript: '[A-Z]{2}\d{7}'
 - id: passport_spain_01
   location: eu
   category: passport
   description: Spanish passport number (3 letters + 6 digits)
-  pattern: '[A-Z]{3}\d{6}'
+  pattern: '[A-Z]{3}[0-9]{6}'
   mask: '*********'
   examples:
     match:
@@ -110,16 +95,11 @@ patterns:
     note: Spanish Pasaporte number.
   priority: 180
   match_type: exactly_matches
-  langs:
-    python: '[A-Z]{3}\d{6}'
-    go: '[A-Z]{3}\d{6}'
-    java: '[A-Z]{3}\d{6}'
-    javascript: '[A-Z]{3}\d{6}'
 - id: passport_uk_01
   location: eu
   category: passport
   description: UK passport number (9 digits or 12 alphanumeric)
-  pattern: (?:\d{9}|[A-Z0-9]{12})
+  pattern: '(?:[0-9]{9}|[A-Z0-9]{12})'
   mask: '*********'
   examples:
     match:
@@ -139,16 +119,11 @@ patterns:
       Note: UK left EU but included for transition.'
   priority: 180
   match_type: exactly_matches
-  langs:
-    python: (?:\d{9}|[A-Z0-9]{12})
-    go: (?:\d{9}|[A-Z0-9]{12})
-    java: (?:\d{9}|[A-Z0-9]{12})
-    javascript: (?:\d{9}|[A-Z0-9]{12})
 - id: passport_netherlands_01
   location: eu
   category: passport
   description: Dutch passport number (2 letters + 6 digits)
-  pattern: '[A-Z]{2}\d{6}'
+  pattern: '[A-Z]{2}[0-9]{6}'
   mask: '********'
   examples:
     match:
@@ -167,16 +142,11 @@ patterns:
     note: Dutch Paspoort number.
   priority: 180
   match_type: exactly_matches
-  langs:
-    python: '[A-Z]{2}\d{6}'
-    go: '[A-Z]{2}\d{6}'
-    java: '[A-Z]{2}\d{6}'
-    javascript: '[A-Z]{2}\d{6}'
 - id: passport_belgium_01
   location: eu
   category: passport
   description: Belgian passport number (2 letters + 6 digits)
-  pattern: '[A-Z]{2}\d{6}'
+  pattern: '[A-Z]{2}[0-9]{6}'
   mask: '********'
   examples:
     match:
@@ -195,16 +165,11 @@ patterns:
     note: Belgian Paspoort/Passeport number.
   priority: 180
   match_type: exactly_matches
-  langs:
-    python: '[A-Z]{2}\d{6}'
-    go: '[A-Z]{2}\d{6}'
-    java: '[A-Z]{2}\d{6}'
-    javascript: '[A-Z]{2}\d{6}'
 - id: passport_sweden_01
   location: eu
   category: passport
   description: Swedish passport number (8 digits)
-  pattern: \d{8}
+  pattern: '[0-9]{8}'
   mask: '********'
   examples:
     match:
@@ -223,16 +188,11 @@ patterns:
     note: Swedish Pass number.
   priority: 180
   match_type: exactly_matches
-  langs:
-    python: \d{8}
-    go: \d{8}
-    java: \d{8}
-    javascript: \d{8}
 - id: passport_poland_01
   location: eu
   category: passport
   description: Polish passport number (2 letters + 7 digits)
-  pattern: '[A-Z]{2}\d{7}'
+  pattern: '[A-Z]{2}[0-9]{7}'
   mask: '*********'
   examples:
     match:
@@ -251,16 +211,11 @@ patterns:
     note: Polish Paszport number.
   priority: 180
   match_type: exactly_matches
-  langs:
-    python: '[A-Z]{2}\d{7}'
-    go: '[A-Z]{2}\d{7}'
-    java: '[A-Z]{2}\d{7}'
-    javascript: '[A-Z]{2}\d{7}'
 - id: passport_austria_01
   location: eu
   category: passport
   description: Austrian passport number (letter + 7 digits)
-  pattern: '[A-Z]\d{7}'
+  pattern: '[A-Z][0-9]{7}'
   mask: '********'
   examples:
     match:
@@ -279,16 +234,11 @@ patterns:
     note: Austrian Reisepass number.
   priority: 180
   match_type: exactly_matches
-  langs:
-    python: '[A-Z]\d{7}'
-    go: '[A-Z]\d{7}'
-    java: '[A-Z]\d{7}'
-    javascript: '[A-Z]\d{7}'
 - id: passport_portugal_01
   location: eu
   category: passport
   description: Portuguese passport number (letter + 6 digits)
-  pattern: '[A-Z]\d{6}'
+  pattern: '[A-Z][0-9]{6}'
   mask: '*******'
   examples:
     match:
@@ -307,16 +257,11 @@ patterns:
     note: Portuguese Passaporte number.
   priority: 180
   match_type: exactly_matches
-  langs:
-    python: '[A-Z]\d{6}'
-    go: '[A-Z]\d{6}'
-    java: '[A-Z]\d{6}'
-    javascript: '[A-Z]\d{6}'
 - id: passport_ireland_01
   location: eu
   category: passport
   description: Irish passport number (2 letters + 7 digits)
-  pattern: '[A-Z]{2}\d{7}'
+  pattern: '[A-Z]{2}[0-9]{7}'
   mask: '*********'
   examples:
     match:
@@ -335,8 +280,3 @@ patterns:
     note: Irish Pas number.
   priority: 180
   match_type: exactly_matches
-  langs:
-    python: '[A-Z]{2}\d{7}'
-    go: '[A-Z]{2}\d{7}'
-    java: '[A-Z]{2}\d{7}'
-    javascript: '[A-Z]{2}\d{7}'

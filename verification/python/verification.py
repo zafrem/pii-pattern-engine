@@ -34,6 +34,10 @@ logger = logging.getLogger(__name__)
 USE_VECTOR_MODEL = (
     os.getenv("ENABLE_KOREAN_VECTOR_VERIFICATION", "false").lower() == "true"
 )
+# NOTE: the bundled datas/ko_w2v.vec is a tiny MOCK model (a handful of vectors)
+# used only by the tests/verify_vector.py demo. It is NOT a real word embedding.
+# For production vector verification, point KOREAN_VECTOR_MODEL_PATH at a real
+# Word2Vec .vec model.
 VECTOR_MODEL_PATH = os.getenv("KOREAN_VECTOR_MODEL_PATH", "datas/ko_w2v.vec")
 _VECTOR_MODEL_CACHE: Dict[str, Any] = {}
 _KEYWORDS_CENTROID: Optional[Any] = None
@@ -113,10 +117,24 @@ _DATA_CACHE: Dict[str, Set[str]] = {}
 _ADDRESS_DATA_CACHE: Dict[str, List[Dict[str, str]]] = {}
 
 
+def _get_repo_root() -> Path:
+    """Determine the project root that holds datas/, keyword/, regex/, etc.
+
+    Defaults to three levels up from this file (the repo layout, which also
+    works for editable installs). Set the ``PII_PATTERN_ENGINE_ROOT``
+    environment variable to point at the data directory for a non-editable
+    installation where the data ships outside the Python package.
+    """
+    env_root = os.getenv("PII_PATTERN_ENGINE_ROOT")
+    if env_root:
+        return Path(env_root)
+    return Path(__file__).parent.parent.parent
+
+
 def _get_data_path() -> Path:
     """Determine data directory path."""
     # Data is in pii-pattern-engine/datas/
-    return Path(__file__).parent.parent.parent / "datas"
+    return _get_repo_root() / "datas"
 
 
 def _load_data_file(filename: str) -> Set[str]:
@@ -368,7 +386,7 @@ def _get_no_words(lang: str) -> Set[str]:
 
     no_words = set()
     # Configuration is in pii-pattern-engine/keyword/no_words.yml
-    config_path = Path(__file__).parent.parent.parent / "keyword" / "no_words.yml"
+    config_path = _get_repo_root() / "keyword" / "no_words.yml"
 
     if config_path.exists():
         try:

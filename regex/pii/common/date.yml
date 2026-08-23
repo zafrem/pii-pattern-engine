@@ -5,7 +5,7 @@ patterns:
   location: comm
   category: date_of_birth
   description: ISO 8601 Date (YYYY-MM-DD)
-  pattern: (19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])
+  pattern: '(19|20)[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])'
   verification: not_timestamp
   mask: '****-**-**'
   examples:
@@ -25,16 +25,11 @@ patterns:
     note: Matches dates from 1900-2099. Requires context (birthday, dob) for high
       confidence.
   match_type: exactly_matches
-  langs:
-    python: (19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])
-    go: (19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])
-    java: (19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])
-    javascript: (19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])
 - id: date_slash_01
   location: comm
   category: date_of_birth
   description: Date with slashes (YYYY/MM/DD or MM/DD/YYYY)
-  pattern: ((19|20)\d{2}/(0[1-9]|1[0-2])/(0[1-9]|[12]\d|3[01])|(0[1-9]|1[0-2])/(0[1-9]|[12]\d|3[01])/(19|20)\d{2})
+  pattern: '((19|20)[0-9]{2}/(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])|(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/(19|20)[0-9]{2})'
   mask: '**/**/****'
   examples:
     match:
@@ -48,8 +43,3 @@ patterns:
     severity: low
   priority: 150
   match_type: exactly_matches
-  langs:
-    python: ((19|20)\d{2}/(0[1-9]|1[0-2])/(0[1-9]|[12]\d|3[01])|(0[1-9]|1[0-2])/(0[1-9]|[12]\d|3[01])/(19|20)\d{2})
-    go: ((19|20)\d{2}/(0[1-9]|1[0-2])/(0[1-9]|[12]\d|3[01])|(0[1-9]|1[0-2])/(0[1-9]|[12]\d|3[01])/(19|20)\d{2})
-    java: ((19|20)\d{2}/(0[1-9]|1[0-2])/(0[1-9]|[12]\d|3[01])|(0[1-9]|1[0-2])/(0[1-9]|[12]\d|3[01])/(19|20)\d{2})
-    javascript: ((19|20)\d{2}/(0[1-9]|1[0-2])/(0[1-9]|[12]\d|3[01])|(0[1-9]|1[0-2])/(0[1-9]|[12]\d|3[01])/(19|20)\d{2})

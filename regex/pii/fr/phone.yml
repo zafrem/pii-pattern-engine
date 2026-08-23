@@ -5,7 +5,7 @@ patterns:
   location: fr
   category: phone
   description: French phone number (10 digits starting with 0)
-  pattern: 0[1-9]\d{8}
+  pattern: '0[1-9][0-9]{8}'
   mask: 0* ** ** ** **
   examples:
     match:
@@ -21,16 +21,11 @@ patterns:
     action_on_match: redact
     severity: high
   match_type: exactly_matches
-  langs:
-    python: 0[1-9]\d{8}
-    go: 0[1-9]\d{8}
-    java: 0[1-9]\d{8}
-    javascript: 0[1-9]\d{8}
 - id: phone_international_01
   location: fr
   category: phone
   description: French phone number with international prefix (+33)
-  pattern: (?:\+33|0033)\s?[1-9]\d{8}
+  pattern: '(?:\+33|0033)[\t\n\f\r ]?[1-9][0-9]{8}'
   mask: +33 * ** ** ** **
   examples:
     match:
@@ -45,16 +40,11 @@ patterns:
     action_on_match: redact
     severity: high
   match_type: exactly_matches
-  langs:
-    python: (?:\+33|0033)\s?[1-9]\d{8}
-    go: (?:\+33|0033)\s?[1-9]\d{8}
-    java: (?:\+33|0033)\s?[1-9]\d{8}
-    javascript: (?:\+33|0033)\s?[1-9]\d{8}
 - id: phone_formatted_01
   location: fr
   category: phone
   description: French phone number with spaces or dots
-  pattern: 0[1-9](?:[\s\.]\d{2}){4}
+  pattern: '0[1-9](?:[\t\n\f\r \.][0-9]{2}){4}'
   mask: 0* ** ** ** **
   examples:
     match:
@@ -68,8 +58,3 @@ patterns:
     action_on_match: redact
     severity: high
   match_type: exactly_matches
-  langs:
-    python: 0[1-9](?:[\s\.]\d{2}){4}
-    go: 0[1-9](?:[\s\.]\d{2}){4}
-    java: 0[1-9](?:[\s\.]\d{2}){4}
-    javascript: 0[1-9](?:[\s\.]\d{2}){4}

@@ -5,7 +5,7 @@ patterns:
   location: comm
   category: other
   description: English Name (First Last or First Middle Last)
-  pattern: \b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2}\b
+  pattern: '\b[A-Z][a-z]+(?:[\t\n\f\r ]+[A-Z][a-z]+){1,2}\b'
   verification: english_name_valid
   mask: '*'
   examples:
@@ -28,8 +28,3 @@ patterns:
     note: Detects capitalized English names (First Last or First Middle Last).
       Uses verification against common surnames and given names.
   match_type: exactly_matches
-  langs:
-    python: \b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2}\b
-    go: \b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2}\b
-    java: \b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2}\b
-    javascript: \b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2}\b

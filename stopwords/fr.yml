@@ -1,0 +1,147 @@
+language: fr
+description: French stopwords — articles, prepositions, conjunctions, and pronouns to strip before keyword matching
+
+words:
+  # Articles (definite)
+  - le
+  - la
+  - les
+  - l'
+
+  # Articles (indefinite)
+  - un
+  - une
+  - des
+
+  # Articles (partitive)
+  - du
+  - de
+  - d'
+
+  # Prepositions
+  - à
+  - au
+  - aux
+  - de
+  - du
+  - des
+  - en
+  - par
+  - pour
+  - sans
+  - sur
+  - sous
+  - dans
+  - entre
+  - vers
+  - chez
+  - avec
+  - contre
+  - depuis
+  - jusqu
+  - pendant
+  - selon
+  - parmi
+
+  # Conjunctions
+  - et
+  - ou
+  - mais
+  - donc
+  - or
+  - ni
+  - car
+  - que
+  - qui
+  - quoi
+  - dont
+  - où
+  - si
+  - comme
+  - quand
+  - lorsque
+  - puisque
+  - bien que
+  - afin que
+
+  # Pronouns
+  - je
+  - me
+  - mon
+  - ma
+  - mes
+  - nous
+  - notre
+  - nos
+  - tu
+  - te
+  - ton
+  - ta
+  - tes
+  - vous
+  - votre
+  - vos
+  - il
+  - lui
+  - son
+  - sa
+  - ses
+  - elle
+  - ils
+  - eux
+  - leurs
+  - elles
+  - se
+  - on
+  - ce
+  - cet
+  - cette
+  - ces
+  - cela
+  - ça
+
+  # Auxiliaries / common verbs
+  - est
+  - sont
+  - été
+  - être
+  - avoir
+  - a
+  - ont
+  - avait
+  - avaient
+  - fait
+  - faire
+  - peut
+  - peuvent
+  - doit
+  - doivent
+  - va
+  - vont
+
+  # Adverbs / other function words
+  - ne
+  - pas
+  - plus
+  - très
+  - aussi
+  - tout
+  - tous
+  - toute
+  - toutes
+  - bien
+  - mal
+  - non
+  - oui
+  - même
+  - encore
+  - déjà
+  - puis
+  - ainsi
+  - donc
+  - alors
+  - mais
+  - cependant
+  - pourtant
+  - néanmoins
+  - etc

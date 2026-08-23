@@ -21,11 +21,6 @@ patterns:
       action_on_match: redact
       severity: high
     match_type: exactly_matches
-    langs:
-      python: '1[a-km-zA-HJ-NP-Z1-9]{25,34}'
-      go: '1[a-km-zA-HJ-NP-Z1-9]{25,34}'
-      java: '1[a-km-zA-HJ-NP-Z1-9]{25,34}'
-      javascript: '1[a-km-zA-HJ-NP-Z1-9]{25,34}'
 
   - id: crypto_eth_01
     verification: crypto_eth_valid
@@ -46,8 +41,3 @@ patterns:
       action_on_match: redact
       severity: high
     match_type: exactly_matches
-    langs:
-      python: '0x[a-fA-F0-9]{40}'
-      go: '0x[a-fA-F0-9]{40}'
-      java: '0x[a-fA-F0-9]{40}'
-      javascript: '0x[a-fA-F0-9]{40}'

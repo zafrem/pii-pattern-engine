@@ -1,0 +1,61 @@
+language: ja
+description: Japanese stopwords — particles and auxiliary words to strip before keyword matching
+
+words:
+  # Topic / subject / object particles
+  - は    # topic marker
+  - が    # subject marker
+  - を    # object marker
+  - に    # at, to, in (location/direction/time)
+  - で    # at, in, by (location of action / means)
+  - の    # possessive (of, 's); nominalizer
+  - へ    # toward, to (direction)
+  - と    # and; with; quotation marker
+  - も    # also, too
+  - か    # question marker; or
+  - や    # and (non-exhaustive list)
+  - より  # than; from (more formal)
+  - から  # from; because
+  - まで  # until; up to
+  - だけ  # only, just
+  - しか  # only (with negative)
+  - でも  # even; but; or something
+  - ほど  # about, approximately; to the extent
+  - ばかり # just, only, about
+  - ながら # while (simultaneous action)
+  - けど   # but (colloquial)
+  - けれど # but
+  - ので   # because, so
+  - のに   # even though; for (purpose)
+  - ば    # if (conditional)
+  - たら   # if/when (conditional past)
+
+  # Auxiliary verbs / copulas
+  - です  # polite copula (is/are)
+  - ます  # polite verb ending
+  - ない  # negative
+  - ある  # to exist (inanimate)
+  - いる  # to exist (animate)
+  - する  # to do
+  - なる  # to become
+  - れる  # passive / potential auxiliary
+  - られる # passive / potential auxiliary
+  - せる  # causative auxiliary
+  - させる # causative auxiliary
+  - た    # past tense ending
+  - て    # te-form connector
+  - で    # te-form of です
+  - ず    # negative te-form
+
+  # Common conjunctions / adverbs
+  - そして  # and then
+  - また    # also; again
+  - しかし  # however
+  - でも    # but
+  - だから  # therefore
+  - つまり  # in other words
+  - または  # or
+  - および  # and (formal)
+  - ただし  # however (proviso)
+  - なお    # additionally; furthermore
+  - 等      # etc. (kanji shorthand)

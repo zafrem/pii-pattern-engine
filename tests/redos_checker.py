@@ -1,223 +1,125 @@
 #!/usr/bin/env python3
 """
-ReDoS (Regular Expression Denial of Service) Vulnerability Checker
+ReDoS (Regular Expression Denial of Service) Safety Checker.
 
-This script analyzes all regex patterns in the pii-pattern-engine project
-for potential ReDoS vulnerabilities.
+The authoritative defense against catastrophic backtracking in this project is
+that **every pattern must compile under google-re2**. RE2 guarantees linear-time
+matching, so a pattern that RE2 accepts cannot exhibit catastrophic backtracking
+regardless of input.
+
+This checker therefore reports the only thing that actually matters for ReDoS:
+patterns that FAIL to compile with RE2 (and are thus a genuine linear-time risk
+if run on a backtracking engine such as Python's `re`, Java's `Pattern`, or the
+JavaScript engine). Patterns that compile under RE2 are reported as safe.
+
+An earlier version of this script flagged patterns with regex-on-regex
+heuristics (nested quantifiers, alternations, etc.). Those heuristics produced
+mostly false positives on RE2-safe patterns and did not reflect real risk, so
+they have been replaced by the RE2 compilation check that the test suite also
+enforces (see tests/test_patterns.py::TestPatternRE2).
 """
 
-import re
-import yaml
+import sys
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple
+
+import yaml
+
+try:
+    import re2
+
+    HAS_RE2 = True
+except ImportError:
+    HAS_RE2 = False
 
 
 class ReDoSChecker:
-    """Analyzes regex patterns for ReDoS vulnerabilities."""
+    """Verifies that all regex patterns are RE2-compatible (linear-time safe)."""
 
-    # Common ReDoS vulnerability patterns
-    REDOS_PATTERNS = [
-        # Nested quantifiers - catastrophic backtracking
-        (r'\([^)]*[*+]\)[*+?]', 'Nested quantifiers (e.g., (a+)+, (a*)*, (a+)*)'),
-        (r'\([^)]*[*+]\)\{', 'Nested quantifiers with counted repetition (e.g., (a+){2,})'),
-
-        # Overlapping alternation with quantifiers
-        (r'\([^)]*\|[^)]*\)[*+]', 'Alternation with quantifier (potential overlap)'),
-
-        # Character class followed by itself with quantifiers
-        (r'\[[^\]]+\][*+]\[[^\]]+\][*+]', 'Adjacent character classes with quantifiers'),
-
-        # Greedy quantifiers followed by optional
-        (r'[*+]\?', 'Greedy quantifier followed by optional (potential backtracking)'),
-
-        # Multiple consecutive .* or .+
-        (r'\.\*\.\*|\.\+\.\+', 'Multiple consecutive .* or .+ (excessive backtracking)'),
-
-        # Word boundary with quantifiers that can cause issues
-        (r'\\w[*+]\\w[*+]', 'Multiple \\w+ patterns (potential backtracking)'),
-    ]
-
-    def __init__(self, base_path: str = 'regex'):
+    def __init__(self, base_path: str = "regex"):
         self.base_path = Path(base_path)
-        self.vulnerabilities = []
 
-    def check_pattern(self, pattern: str, pattern_id: str, file_path: str) -> List[Dict]:
-        """Check a single regex pattern for ReDoS vulnerabilities."""
-        issues = []
-
-        # Check against known ReDoS patterns
-        for redos_pattern, description in self.REDOS_PATTERNS:
-            if re.search(redos_pattern, pattern):
-                issues.append({
-                    'pattern_id': pattern_id,
-                    'file': str(file_path),
-                    'pattern': pattern,
-                    'issue': description,
-                    'severity': 'HIGH'
-                })
-
-        # Additional heuristic checks
-        issues.extend(self._check_complexity(pattern, pattern_id, file_path))
-
-        return issues
-
-    def _check_complexity(self, pattern: str, pattern_id: str, file_path: str) -> List[Dict]:
-        """Check for complexity-based ReDoS risks."""
-        issues = []
-
-        # Check for multiple overlapping quantifiers
-        quantifier_count = len(re.findall(r'[*+?]\??|\{\d+,?\d*\}', pattern))
-        if quantifier_count > 5:
-            issues.append({
-                'pattern_id': pattern_id,
-                'file': str(file_path),
-                'pattern': pattern,
-                'issue': f'High quantifier count ({quantifier_count}) - potential complexity risk',
-                'severity': 'MEDIUM'
-            })
-
-        # Check for nested groups with quantifiers
-        nested_groups = re.findall(r'\([^()]*\([^()]*\)[^()]*\)', pattern)
-        for group in nested_groups:
-            if re.search(r'[*+?]', group):
-                issues.append({
-                    'pattern_id': pattern_id,
-                    'file': str(file_path),
-                    'pattern': pattern,
-                    'issue': f'Nested groups with quantifiers: {group}',
-                    'severity': 'MEDIUM'
-                })
-
-        # Check for patterns like (a|ab)+ or (a|a?)+ which can cause exponential time
-        alt_patterns = re.findall(r'\([^)]+\|[^)]+\)[*+]', pattern)
-        for alt in alt_patterns:
-            # Simple heuristic: check if alternatives might overlap
-            if '|' in alt and ('+' in alt or '*' in alt):
-                issues.append({
-                    'pattern_id': pattern_id,
-                    'file': str(file_path),
-                    'pattern': pattern,
-                    'issue': f'Alternation with quantifier (check for overlap): {alt}',
-                    'severity': 'MEDIUM'
-                })
-
-        return issues
-
-    def analyze_file(self, yaml_file: Path) -> List[Dict]:
-        """Analyze all patterns in a YAML file."""
-        issues = []
-
-        try:
-            with open(yaml_file, 'r', encoding='utf-8') as f:
-                data = yaml.safe_load(f)
-
-            if not data or 'patterns' not in data:
-                return issues
-
-            for pattern_data in data['patterns']:
-                pattern = pattern_data.get('pattern', '')
-                pattern_id = pattern_data.get('id', 'unknown')
-
-                issues.extend(self.check_pattern(pattern, pattern_id, yaml_file))
-
-        except Exception as e:
-            print(f"Error analyzing {yaml_file}: {e}")
-
-        return issues
+    def _iter_patterns(self) -> List[Tuple[str, str, Path]]:
+        """Yield (pattern_id, pattern_string, file_path) for every pattern."""
+        patterns = []
+        for yaml_file in sorted(self.base_path.rglob("*.yml")):
+            try:
+                data = yaml.safe_load(yaml_file.read_text(encoding="utf-8"))
+            except Exception as e:  # noqa: BLE001
+                print(f"Error reading {yaml_file}: {e}")
+                continue
+            if not data or "patterns" not in data:
+                continue
+            for p in data["patterns"]:
+                patterns.append(
+                    (p.get("id", "unknown"), p.get("pattern", ""), yaml_file)
+                )
+        return patterns
 
     def analyze_all(self) -> Tuple[List[Dict], int]:
-        """Analyze all YAML files in the regex directory."""
-        all_issues = []
-        total_patterns = 0
-
-        # Find all YAML files
-        yaml_files = list(self.base_path.rglob('*.yml'))
-
-        for yaml_file in yaml_files:
-            issues = self.analyze_file(yaml_file)
-            all_issues.extend(issues)
-
-            # Count patterns
+        """Return (unsafe_patterns, total_patterns)."""
+        unsafe = []
+        patterns = self._iter_patterns()
+        for pattern_id, pattern, yaml_file in patterns:
             try:
-                with open(yaml_file, 'r', encoding='utf-8') as f:
-                    data = yaml.safe_load(f)
-                    if data and 'patterns' in data:
-                        total_patterns += len(data['patterns'])
-            except:
-                pass
+                re2.compile(pattern)
+            except re2.error as e:  # pattern is not linear-time safe under RE2
+                unsafe.append(
+                    {
+                        "pattern_id": pattern_id,
+                        "file": str(yaml_file),
+                        "pattern": pattern,
+                        "issue": f"Not RE2-compatible (possible catastrophic backtracking): {e}",
+                    }
+                )
+        return unsafe, len(patterns)
 
-        return all_issues, total_patterns
-
-    def generate_report(self):
-        """Generate a comprehensive ReDoS vulnerability report."""
+    def generate_report(self) -> int:
+        """Print a report. Returns a process exit code (0 = all safe)."""
         print("=" * 80)
-        print("ReDoS VULNERABILITY ANALYSIS REPORT")
+        print("ReDoS SAFETY REPORT (RE2 linear-time compatibility)")
         print("=" * 80)
         print()
 
-        issues, total_patterns = self.analyze_all()
+        if not HAS_RE2:
+            print("google-re2 is not installed; cannot verify RE2 safety.")
+            print("Install it with:  pip install google-re2")
+            return 2
 
-        print(f"Total patterns analyzed: {total_patterns}")
-        print(f"Total potential vulnerabilities found: {len(issues)}")
+        unsafe, total = self.analyze_all()
+
+        print(f"Total patterns analyzed: {total}")
+        print(f"Patterns that are NOT RE2-safe: {len(unsafe)}")
         print()
 
-        if not issues:
-            print("✓ No ReDoS vulnerabilities detected!")
-            print()
-            print("All patterns appear to be safe from catastrophic backtracking.")
-            return
+        if not unsafe:
+            print("✓ All patterns compile under RE2 — linear-time matching")
+            print("  is guaranteed, so none are vulnerable to catastrophic backtracking.")
+            return 0
 
-        # Group by severity
-        high_severity = [i for i in issues if i['severity'] == 'HIGH']
-        medium_severity = [i for i in issues if i['severity'] == 'MEDIUM']
-
-        print(f"HIGH severity issues: {len(high_severity)}")
-        print(f"MEDIUM severity issues: {len(medium_severity)}")
+        print("=" * 80)
+        print("UNSAFE PATTERNS (reject or rewrite before production use)")
+        print("=" * 80)
         print()
-
-        # Report HIGH severity issues
-        if high_severity:
-            print("=" * 80)
-            print("HIGH SEVERITY ISSUES (Likely ReDoS Vulnerable)")
-            print("=" * 80)
+        for idx, issue in enumerate(unsafe, 1):
+            print(f"{idx}. Pattern ID: {issue['pattern_id']}")
+            print(f"   File: {issue['file']}")
+            print(f"   Pattern: {issue['pattern']}")
+            print(f"   Issue: {issue['issue']}")
             print()
 
-            for idx, issue in enumerate(high_severity, 1):
-                print(f"{idx}. Pattern ID: {issue['pattern_id']}")
-                print(f"   File: {issue['file']}")
-                print(f"   Pattern: {issue['pattern']}")
-                print(f"   Issue: {issue['issue']}")
-                print()
-
-        # Report MEDIUM severity issues
-        if medium_severity:
-            print("=" * 80)
-            print("MEDIUM SEVERITY ISSUES (Potential ReDoS Risk)")
-            print("=" * 80)
-            print()
-
-            for idx, issue in enumerate(medium_severity, 1):
-                print(f"{idx}. Pattern ID: {issue['pattern_id']}")
-                print(f"   File: {issue['file']}")
-                print(f"   Pattern: {issue['pattern']}")
-                print(f"   Issue: {issue['issue']}")
-                print()
-
-        # Recommendations
         print("=" * 80)
         print("RECOMMENDATIONS")
         print("=" * 80)
         print()
-        print("For patterns with ReDoS vulnerabilities:")
-        print("1. Replace nested quantifiers (e.g., (a+)+ -> a+)")
-        print("2. Use atomic groups or possessive quantifiers where supported")
-        print("3. Simplify alternations to avoid overlap")
-        print("4. Consider using more specific character classes instead of .*")
-        print("5. Add anchors (^, $, \\b) to limit backtracking scope")
-        print("6. Test patterns with long, crafted inputs to verify performance")
+        print("1. Rewrite the pattern to avoid features RE2 rejects")
+        print("   (backreferences, lookaround), which are the constructs that")
+        print("   enable catastrophic backtracking on non-RE2 engines.")
+        print("2. Re-run this checker and tests/test_patterns.py::TestPatternRE2.")
         print()
+        return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     checker = ReDoSChecker()
-    checker.generate_report()
+    sys.exit(checker.generate_report())

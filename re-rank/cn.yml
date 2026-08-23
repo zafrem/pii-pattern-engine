@@ -1,0 +1,260 @@
+version: "2.0"
+region: China
+region_code: CN
+code_series: 3001-3012
+engine: re-rank/scoring.yml
+reference: reference/cn.yml
+
+entities:
+
+  3001:
+    entity: cn_name
+    keyword_scores:
+      姓名: 60
+      名字: 55
+      全名: 60
+      名称: 50
+      name: 40
+      full name: 55
+    context_bonus:
+      "姓名:": 20
+      "名字:": 20
+    regex_scores:
+      chinese_name_01: 30      # broad CJK char-class
+    sum_example:
+      keyword_hits: [60, 55]
+      keyword_avg: 57
+      context_bonus: 20
+      regex_score: 30
+      final_score: 100         # 57+20+30 = 107 → capped
+      label: definite_pii
+
+  3002:
+    entity: cn_national_id
+    keyword_scores:
+      身份证: 85
+      居民身份证: 90
+      身份证号: 90
+      身份证号码: 90
+      id card: 70
+      national id: 70
+    context_bonus:
+      "身份证号:": 40
+      "身份证号码:": 40
+    regex_scores:
+      national_id_01: 50       # 18-digit with checksum
+    sum_example:
+      keyword_hits: [90, 90]
+      keyword_avg: 90
+      context_bonus: 40
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  3003:
+    entity: cn_passport
+    keyword_scores:
+      护照: 80
+      护照号码: 90
+      护照号: 85
+      passport: 75
+      passport number: 85
+    context_bonus:
+      "护照号码:": 35
+      "Passport:": 30
+    regex_scores:
+      passport_01: 45
+    sum_example:
+      keyword_hits: [80, 90]
+      keyword_avg: 85
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  3004:
+    entity: cn_phone_mobile
+    keyword_scores:
+      手机: 65
+      手机号: 75
+      联系电话: 70
+      电话: 55
+      电话号码: 70
+      mobile: 55
+      phone: 50
+    context_bonus:
+      "手机:": 25
+      "联系电话:": 25
+    regex_scores:
+      mobile_01: 40
+    sum_example:
+      keyword_hits: [75, 70, 65]
+      keyword_avg: 70
+      context_bonus: 25
+      regex_score: 40
+      final_score: 100         # 70+25+40 = 135 → capped
+      label: definite_pii
+
+  3005:
+    entity: cn_phone_landline
+    keyword_scores:
+      电话: 55
+      固定电话: 65
+      座机: 65
+      电话号码: 70
+      telephone: 55
+    context_bonus:
+      "电话:": 20
+      "Tel:": 20
+    regex_scores:
+      landline_01: 40
+    sum_example:
+      keyword_hits: [55, 65]
+      keyword_avg: 60
+      context_bonus: 20
+      regex_score: 40
+      final_score: 100         # 60+20+40 = 120 → capped
+      label: definite_pii
+
+  3006:
+    entity: cn_address
+    keyword_scores:
+      地址: 55
+      住址: 60
+      通讯地址: 65
+      居住地址: 65
+      address: 45
+    context_bonus:
+      "地址:": 25
+      "住址:": 25
+    regex_scores:
+      address_01: 40
+    sum_example:
+      keyword_hits: [55, 60]
+      keyword_avg: 57
+      context_bonus: 25
+      regex_score: 40
+      final_score: 100         # 57+25+40 = 122 → capped
+      label: definite_pii
+
+  3007:
+    entity: cn_social_credit
+    keyword_scores:
+      统一社会信用代码: 90
+      社会信用代码: 85
+      信用代码: 80
+      营业执照: 75
+      social credit: 80
+    context_bonus:
+      "统一社会信用代码:": 40
+    regex_scores:
+      social_credit_01: 40     # broad 18-char alphanumeric
+    sum_example:
+      keyword_hits: [90, 85]
+      keyword_avg: 87
+      context_bonus: 40
+      regex_score: 40
+      final_score: 100         # 87+40+40 = 167 → capped
+      label: definite_pii
+
+  3008:
+    entity: cn_bank_icbc
+    keyword_scores:
+      工商银行: 80
+      工行: 65
+      ICBC: 70
+      账号: 75
+      卡号: 75
+      银行账号: 80
+    context_bonus:
+      "账号:": 30
+      "卡号:": 30
+    regex_scores:
+      icbc_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75, 80]
+      keyword_avg: 78
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  3009:
+    entity: cn_bank_ccb
+    keyword_scores:
+      建设银行: 80
+      建行: 65
+      CCB: 70
+      账号: 75
+      银行账号: 80
+    context_bonus:
+      "账号:": 30
+    regex_scores:
+      ccb_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  3010:
+    entity: cn_bank_abc
+    keyword_scores:
+      农业银行: 80
+      农行: 65
+      ABC: 70
+      账号: 75
+      银行账号: 80
+    context_bonus:
+      "账号:": 30
+    regex_scores:
+      abc_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  3011:
+    entity: cn_bank_boc
+    keyword_scores:
+      中国银行: 80
+      中行: 65
+      BOC: 70
+      账号: 75
+      银行账号: 80
+    context_bonus:
+      "账号:": 30
+    regex_scores:
+      boc_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  3012:
+    entity: cn_bank_cmb
+    keyword_scores:
+      招商银行: 80
+      招行: 65
+      CMB: 70
+      账号: 75
+      银行账号: 80
+    context_bonus:
+      "账号:": 30
+    regex_scores:
+      cmb_account_01: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii

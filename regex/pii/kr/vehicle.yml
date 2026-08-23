@@ -6,7 +6,7 @@ patterns:
     location: kr
     category: vehicle
     description: Korean license plate format (e.g., 123가 4567)
-    pattern: '\b\d{2,3}[가-힣]\s?\d{4}\b'
+    pattern: '\b[0-9]{2,3}[가-힣][\t\n\f\r ]?[0-9]{4}\b'
     mask: "###* ####"
     verification: kr_vehicle_registration_valid
     examples:
@@ -22,8 +22,3 @@ patterns:
       action_on_match: report
       severity: low
     match_type: exactly_matches
-    langs:
-      python: '\b\d{2,3}[가-힣]\s?\d{4}\b'
-      go: '\b\d{2,3}[가-힣]\s?\d{4}\b'
-      java: '\b\d{2,3}[가-힣]\s?\d{4}\b'
-      javascript: '\b\d{2,3}[가-힣]\s?\d{4}\b'

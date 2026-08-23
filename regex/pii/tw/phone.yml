@@ -5,7 +5,7 @@ patterns:
   location: tw
   category: phone
   description: Taiwan mobile phone number (09XX-XXX-XXX)
-  pattern: 09[0-9]{2}-?[0-9]{3}-?[0-9]{3}
+  pattern: '09[0-9]{2}-?[0-9]{3}-?[0-9]{3}'
   mask: 09**-***-***
   examples:
     match:
@@ -21,16 +21,11 @@ patterns:
     action_on_match: redact
     severity: high
   match_type: exactly_matches
-  langs:
-    python: 09[0-9]{2}-?[0-9]{3}-?[0-9]{3}
-    go: 09[0-9]{2}-?[0-9]{3}-?[0-9]{3}
-    java: 09[0-9]{2}-?[0-9]{3}-?[0-9]{3}
-    javascript: 09[0-9]{2}-?[0-9]{3}-?[0-9]{3}
 - id: mobile_02
   location: tw
   category: phone
   description: Taiwan mobile phone number with closing parenthesis (09XX)XXX-XXX)
-  pattern: 09[0-9]{2}\)[0-9]{3}-?[0-9]{3}
+  pattern: '09[0-9]{2}\)[0-9]{3}-?[0-9]{3}'
   mask: 09**)***-***
   examples:
     match:
@@ -46,16 +41,11 @@ patterns:
     action_on_match: redact
     severity: high
   match_type: exactly_matches
-  langs:
-    python: 09[0-9]{2}\)[0-9]{3}-?[0-9]{3}
-    go: 09[0-9]{2}\)[0-9]{3}-?[0-9]{3}
-    java: 09[0-9]{2}\)[0-9]{3}-?[0-9]{3}
-    javascript: 09[0-9]{2}\)[0-9]{3}-?[0-9]{3}
 - id: landline_01
   location: tw
   category: phone
   description: Taiwan landline number (area code + number)
-  pattern: 0[2-8]-?[0-9]{7,8}
+  pattern: '0[2-8]-?[0-9]{7,8}'
   mask: 0*-********
   examples:
     match:
@@ -72,16 +62,11 @@ patterns:
     action_on_match: report
     severity: low
   match_type: exactly_matches
-  langs:
-    python: 0[2-8]-?[0-9]{7,8}
-    go: 0[2-8]-?[0-9]{7,8}
-    java: 0[2-8]-?[0-9]{7,8}
-    javascript: 0[2-8]-?[0-9]{7,8}
 - id: landline_02
   location: tw
   category: phone
   description: Taiwan landline number with closing parenthesis
-  pattern: 0[2-8]\)[0-9]{7,8}
+  pattern: '0[2-8]\)[0-9]{7,8}'
   verification: not_repeating_pattern
   mask: 0*-)********
   examples:
@@ -98,8 +83,3 @@ patterns:
     action_on_match: report
     severity: low
   match_type: exactly_matches
-  langs:
-    python: 0[2-8]\)[0-9]{7,8}
-    go: 0[2-8]\)[0-9]{7,8}
-    java: 0[2-8]\)[0-9]{7,8}
-    javascript: 0[2-8]\)[0-9]{7,8}

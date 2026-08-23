@@ -20,11 +20,6 @@ patterns:
       action_on_match: report
       severity: medium
     match_type: exactly_matches
-    langs:
-      python: '[1-9][0-9]{3,5}'
-      go: '[1-9][0-9]{3,5}'
-      java: '[1-9][0-9]{3,5}'
-      javascript: '[1-9][0-9]{3,5}'
 
   - id: sox_revenue_transaction
     location: sox
@@ -44,11 +39,6 @@ patterns:
       action_on_match: report
       severity: high
     match_type: exactly_matches
-    langs:
-      python: 'REV-[0-9]{6,12}'
-      go: 'REV-[0-9]{6,12}'
-      java: 'REV-[0-9]{6,12}'
-      javascript: 'REV-[0-9]{6,12}'
 
   - id: sox_internal_control_id
     location: sox
@@ -68,11 +58,6 @@ patterns:
       action_on_match: report
       severity: medium
     match_type: exactly_matches
-    langs:
-      python: '\bIC-[A-Z]{2,4}-[0-9]{3,4}\b'
-      go: '\bIC-[A-Z]{2,4}-[0-9]{3,4}\b'
-      java: '\bIC-[A-Z]{2,4}-[0-9]{3,4}\b'
-      javascript: '\bIC-[A-Z]{2,4}-[0-9]{3,4}\b'
 
   - id: sox_financial_period
     location: sox
@@ -93,11 +78,6 @@ patterns:
       action_on_match: report
       severity: low
     match_type: exactly_matches
-    langs:
-      python: '\b(FY|Q[1-4])[- ]?([0-9]{2,4})\b'
-      go: '\b(FY|Q[1-4])[- ]?([0-9]{2,4})\b'
-      java: '\b(FY|Q[1-4])[- ]?([0-9]{2,4})\b'
-      javascript: '\b(FY|Q[1-4])[- ]?([0-9]{2,4})\b'
 
   - id: sox_audit_log_id
     location: sox
@@ -117,11 +97,6 @@ patterns:
       action_on_match: report
       severity: medium
     match_type: exactly_matches
-    langs:
-      python: '\bAUD-[0-9]{8}-[0-9]{4,6}\b'
-      go: '\bAUD-[0-9]{8}-[0-9]{4,6}\b'
-      java: '\bAUD-[0-9]{8}-[0-9]{4,6}\b'
-      javascript: '\bAUD-[0-9]{8}-[0-9]{4,6}\b'
 
   - id: sox_sec_cik
     location: sox
@@ -141,11 +116,6 @@ patterns:
       action_on_match: report
       severity: medium
     match_type: exactly_matches
-    langs:
-      python: '\b[0-9]{10}\b'
-      go: '\b[0-9]{10}\b'
-      java: '\b[0-9]{10}\b'
-      javascript: '\b[0-9]{10}\b'
 
   - id: sox_sec_file_number
     location: sox
@@ -165,8 +135,3 @@ patterns:
       action_on_match: report
       severity: low
     match_type: exactly_matches
-    langs:
-      python: '\b[0-9]{3}-[0-9]{5}\b'
-      go: '\b[0-9]{3}-[0-9]{5}\b'
-      java: '\b[0-9]{3}-[0-9]{5}\b'
-      javascript: '\b[0-9]{3}-[0-9]{5}\b'

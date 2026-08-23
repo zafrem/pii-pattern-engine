@@ -52,6 +52,22 @@ const JAPANESE_NON_NAME_KEYWORDS = new Set([
   "電話", "住所", "名前", "情報", "連絡", "番号", "携帯", "確認", "登録", "氏名", "性別", "生年", "職業", "会社", "部署", "郵便", "暗号", "認証", "口座"
 ]);
 
+const ENGLISH_SURNAMES = new Set([
+  "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
+  "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
+  "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson",
+  "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", "Walker",
+  "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill",
+  "Flores", "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell",
+  "Mitchell", "Carter", "Roberts", "Gomez", "Phillips", "Evans", "Turner",
+  "Diaz", "Parker", "Cruz", "Edwards", "Collins", "Reyes", "Stewart", "Morris",
+  "Morales", "Murphy", "Cook", "Rogers", "Gutierrez", "Ortiz", "Morgan", "Cooper",
+  "Peterson", "Bailey", "Reed", "Kelly", "Howard", "Ramos", "Kim", "Cox", "Ward",
+  "Richardson", "Watson", "Brooks", "Chavez", "Wood", "James", "Bennett", "Gray",
+  "Mendoza", "Ruiz", "Hughes", "Price", "Alvarez", "Castillo", "Sanders", "Patel",
+  "Myers", "Long", "Ross", "Foster", "Jimenez"
+]);
+
 // --- Core Verification Functions ---
 
 function iban_mod97(value) {
@@ -123,8 +139,8 @@ function high_entropy_token(value) {
   const allowedChars = /^[A-Za-z0-9_\-+/./=]+$/;
   if (!allowedChars.test(value)) return false;
 
-  // Normalize for entropy calculation: lowercase and treat separators as spaces
-  const normalized = value.toLowerCase().replace(/[-_]/g, " ");
+  // Normalize separators to spaces before entropy calculation
+  const normalized = value.replace(/[-_|]/g, " ");
 
   const charCounts = {};
   for (const char of normalized) {
@@ -176,68 +192,6 @@ function not_timestamp(value) {
   return true;
 }
 
-function korean_zipcode_valid(value) {
-  const digitsOnly = value.replace(/\D/g, "");
-  if (digitsOnly.length !== 5) return false;
-  return digitsOnly[0] >= '0' && digitsOnly[0] <= '6';
-}
-
-function us_zipcode_valid(value) {
-  const digitsOnly = value.replace(/\D/g, "");
-  const validZips = _loadData("us_zipcodes.csv");
-  if (validZips.size > 0) {
-    if (digitsOnly.length === 5) return validZips.has(digitsOnly);
-    if (digitsOnly.length === 9) return validZips.has(digitsOnly.slice(0, 5));
-  }
-  if (digitsOnly.length !== 5 && digitsOnly.length !== 9) return false;
-  const baseZip = digitsOnly.slice(0, 5);
-  if (new Set(baseZip).size === 1) return false;
-  return true;
-}
-
-function jp_zipcode_valid(value) {
-  const digitsOnly = value.replace(/[-−‐]/g, "").replace(/\D/g, "");
-  if (digitsOnly.length !== 7) return false;
-  const validZips = _loadData("jp_zipcodes.csv");
-  if (validZips.size > 0) {
-    return validZips.has(`${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`) || validZips.has(digitsOnly);
-  }
-  if (new Set(digitsOnly).size === 1) return false;
-  return true;
-}
-
-function cn_zipcode_valid(value) {
-  const digitsOnly = value.replace(/\D/g, "");
-  if (digitsOnly.length !== 6) return false;
-  const validZips = _loadData("cn_zipcodes.csv");
-  if (validZips.size > 0) return validZips.has(digitsOnly);
-  if (new Set(digitsOnly).size === 1) return false;
-  const firstTwo = parseInt(digitsOnly.slice(0, 2), 10);
-  return firstTwo >= 1 && firstTwo <= 86;
-}
-
-function tw_zipcode_valid(value) {
-  const digitsOnly = value.replace(/\D/g, "");
-  if (digitsOnly.length !== 3 && digitsOnly.length !== 5) return false;
-  const validZips = _loadData("tw_zipcodes.csv");
-  if (validZips.size > 0) {
-    if (validZips.has(digitsOnly)) return true;
-    if (digitsOnly.length === 5 && validZips.has(digitsOnly.slice(0, 3))) return true;
-    return false;
-  }
-  if (new Set(digitsOnly).size === 1) return false;
-  return digitsOnly[0] !== '0';
-}
-
-function in_pincode_valid(value) {
-  const digitsOnly = value.replace(/\D/g, "");
-  if (digitsOnly.length !== 6 || digitsOnly[0] === '0') return false;
-  const validPins = _loadData("in_pincodes.csv");
-  if (validPins.size > 0) return validPins.has(digitsOnly);
-  if (new Set(digitsOnly).size === 1) return false;
-  return true;
-}
-
 function korean_bank_account_valid(value) {
   const digitsOnly = value.replace(/\D/g, "");
   if (!digitsOnly) return false;
@@ -251,11 +205,40 @@ function korean_bank_account_valid(value) {
 }
 
 function generic_number_not_timestamp(value) {
+  const hasSeparators = ["-", " ", "/"].some(c => value.includes(c));
   const digitsOnly = value.replace(/\D/g, "");
   if (!digitsOnly) return true;
-  if (digitsOnly.length === 10) {
+  const length = digitsOnly.length;
+
+  // Values with separators are rarely timestamps; only reject clear datetimes
+  if (hasSeparators) {
+    if (length >= 14) {
+      const year = parseInt(digitsOnly.slice(0, 4), 10);
+      const month = parseInt(digitsOnly.slice(4, 6), 10);
+      const day = parseInt(digitsOnly.slice(6, 8), 10);
+      if (year >= 1900 && year <= 2099 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // No separators - be strict about timestamps
+  if (length === 10) {
     const num = parseInt(digitsOnly, 10);
     if (num >= 1000000000 && num <= 9999999999) return false;
+  }
+  if (length === 13) {
+    const num = parseInt(digitsOnly, 10);
+    if (num >= 1000000000000 && num <= 9999999999999) return false;
+  }
+  if (length >= 14) {
+    const year = parseInt(digitsOnly.slice(0, 4), 10);
+    const month = parseInt(digitsOnly.slice(4, 6), 10);
+    const day = parseInt(digitsOnly.slice(6, 8), 10);
+    if (year >= 1900 && year <= 2099 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+      return false;
+    }
   }
   return true;
 }
@@ -314,6 +297,24 @@ function cjk_name_standalone(value) {
 function cn_national_id_valid(value) {
   const idStr = value.replace(/\s/g, "").toUpperCase();
   if (idStr.length !== 18) return false;
+
+  const validProvinces = new Set([
+    "11", "12", "13", "14", "15", "21", "22", "23", "31", "32", "33", "34", "35",
+    "36", "37", "41", "42", "43", "44", "45", "46", "50", "51", "52", "53", "54",
+    "61", "62", "63", "64", "65", "71", "81", "82", "91"
+  ]);
+  if (!validProvinces.has(idStr.slice(0, 2))) return false;
+
+  // Validate birth date (YYYYMMDD at positions 6-14)
+  const year = parseInt(idStr.slice(6, 10), 10);
+  const month = parseInt(idStr.slice(10, 12), 10);
+  const day = parseInt(idStr.slice(12, 14), 10);
+  if (!(year >= 1900 && year <= 2100)) return false;
+  if (!(month >= 1 && month <= 12)) return false;
+  if (!(day >= 1 && day <= 31)) return false;
+  const daysInMonth = [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (day > daysInMonth[month]) return false;
+
   const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
   const checkDigits = ["1", "0", "X", "9", "8", "7", "6", "5", "4", "3", "2"];
   let total = 0;
@@ -330,6 +331,11 @@ function tw_national_id_valid(value) {
     "Q": 24, "R": 25, "S": 26, "T": 27, "U": 28, "V": 29, "W": 32, "X": 30,
     "Y": 31, "Z": 33
   };
+  // Invalid letters: I, O, W are not used
+  if (["I", "O", "W"].includes(idStr[0])) return false;
+  // Gender digit (position 1) should be 1 or 2
+  const gender = parseInt(idStr[1], 10);
+  if (gender !== 1 && gender !== 2) return false;
   const letterCode = mapping[idStr[0]];
   if (!letterCode) return false;
   let total = Math.floor(letterCode / 10) * 1 + (letterCode % 10) * 9;
@@ -424,15 +430,455 @@ function credit_card_bin_valid(value) {
   return luhn(digits);
 }
 
+function english_name_valid(value) {
+  const parts = value.trim().split(/\s+/);
+  if (parts.length < 2 || parts.length > 4) return false;
+  if (!parts.every(p => p.length > 0 && p[0] === p[0].toUpperCase())) return false;
+
+  const firstName = parts[0];
+  const lastName = parts[parts.length - 1];
+
+  const validSurnames = _loadData("en_surnames.csv").size > 0 ? _loadData("en_surnames.csv") : ENGLISH_SURNAMES;
+  const validGivenNames = _loadData("en_given_names.csv");
+  const isCommonGiven = validGivenNames.size > 0 && validGivenNames.has(firstName);
+  const isCommonSurname = validSurnames.has(lastName);
+
+  if (isCommonGiven && isCommonSurname) return true;
+  if ((isCommonGiven || isCommonSurname) && lastName.length >= 2 && lastName.length <= 15) return true;
+
+  if (parts.length === 2 && /^[A-Za-z]+$/.test(firstName) && /^[A-Za-z]+$/.test(lastName)) {
+    if (firstName.length >= 2 && lastName.length >= 2) return true;
+  }
+  return false;
+}
+
+function korean_address_valid(value) {
+  const provinces = [
+    "서울특별시", "경기도", "부산광역시", "인천광역시", "대구광역시", "대전광역시",
+    "광주광역시", "울산광역시", "세종특별자치시", "강원도", "충청북도", "충청남도",
+    "전라북도", "전라남도", "경상북도", "경상남도", "제주특별자치도"
+  ];
+  return provinces.some(p => value.includes(p));
+}
+
+function japanese_address_valid(value) {
+  const prefectures = [
+    "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
+    "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
+    "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
+    "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
+    "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
+    "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
+    "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"
+  ];
+  return prefectures.some(p => value.includes(p));
+}
+
+function chinese_address_valid(value) {
+  const provinces = [
+    "北京市", "天津市", "河北省", "山西省", "内蒙古自治区", "辽宁省", "吉林省",
+    "黑龙江省", "上海市", "江苏省", "浙江省", "安徽省", "福建省", "江西省",
+    "山东省", "河南省", "湖北省", "湖南省", "广东省", "广西壮族自治区", "海南省",
+    "重庆市", "四川省", "贵州省", "云南省", "西藏自治区", "陕西省", "甘肃省",
+    "青海省", "宁夏回族自治区", "新疆维吾尔自治区", "香港特别行政区", "澳门特别行政区", "台湾省"
+  ];
+  return provinces.some(p => value.includes(p));
+}
+
+// --- US state data (used by us_address_valid) ---
+
+const US_STATES = new Set([
+  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
+  "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
+  "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan",
+  "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire",
+  "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
+  "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
+  "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia",
+  "Wisconsin", "Wyoming"
+]);
+
+const US_STATE_ABBRS = new Set([
+  "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN",
+  "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV",
+  "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN",
+  "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+]);
+
+// --- Date helper ---
+
+function _isValidDate(year, month, day) {
+  if (month < 1 || month > 12) return false;
+  if (day < 1 || day > 31) return false;
+  const daysInMonth = [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (day > daysInMonth[month]) return false;
+  if (month === 2 && day === 29) {
+    const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    if (!isLeap) return false;
+  }
+  return true;
+}
+
+// --- National ID / checksum functions ---
+
+function india_aadhaar_valid(value) {
+  const digitsOnly = value.replace(/\D/g, "");
+  if (digitsOnly.length !== 12) return false;
+  if (digitsOnly[0] === "0" || digitsOnly[0] === "1") return false;
+  if (new Set(digitsOnly).size === 1) return false;
+
+  const d = [
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
+    [2, 3, 4, 0, 1, 7, 8, 9, 5, 6],
+    [3, 4, 0, 1, 2, 8, 9, 5, 6, 7],
+    [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],
+    [5, 9, 8, 7, 6, 0, 4, 3, 2, 1],
+    [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],
+    [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],
+    [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
+    [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+  ];
+  const p = [
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],
+    [5, 8, 0, 3, 7, 9, 6, 1, 4, 2],
+    [8, 9, 1, 6, 0, 4, 3, 5, 2, 7],
+    [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],
+    [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],
+    [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
+    [7, 0, 4, 6, 9, 1, 3, 2, 5, 8]
+  ];
+
+  let c = 0;
+  const reversed = digitsOnly.split("").reverse();
+  for (let i = 0; i < reversed.length; i++) {
+    c = d[c][p[i % 8][parseInt(reversed[i], 10)]];
+  }
+  return c === 0;
+}
+
+function india_pan_valid(value) {
+  const pan = value.replace(/\s/g, "").toUpperCase();
+  if (pan.length !== 10) return false;
+  if (!/^[A-Z]{5}$/.test(pan.slice(0, 5))) return false;
+  if (!/^\d{4}$/.test(pan.slice(5, 9))) return false;
+  if (!/^[A-Z]$/.test(pan[9])) return false;
+  const validEntityTypes = new Set(["A", "B", "C", "F", "G", "H", "J", "K", "L", "P", "T"]);
+  if (!validEntityTypes.has(pan[3])) return false;
+  if (["AAAAA", "ABCDE", "XXXXX", "ZZZZZ"].includes(pan.slice(0, 5))) return false;
+  return true;
+}
+
+function jp_my_number_valid(value) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length !== 12) return false;
+  if (new Set(digits).size === 1) return false;
+  if (digits === "123456789012" || digits === "012345678901") return false;
+  const weights = [6, 5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+  let total = 0;
+  for (let i = 0; i < 11; i++) total += parseInt(digits[i], 10) * weights[i];
+  const remainder = total % 11;
+  const expected = remainder <= 1 ? 0 : 11 - remainder;
+  return parseInt(digits[11], 10) === expected;
+}
+
+function jp_corporate_number_valid(value) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length !== 13) return false;
+  const checkDigit = parseInt(digits[0], 10);
+  const base = digits.slice(1).split("").map(Number);
+  let total = 0;
+  for (let i = 0; i < 12; i++) {
+    const weight = (12 - i) % 2 === 0 ? 2 : 1;
+    total += base[i] * weight;
+  }
+  return checkDigit === 9 - (total % 9);
+}
+
+function kr_business_registration_valid(value) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length !== 10) return false;
+  if (new Set(digits).size === 1) return false;
+  const weights = [1, 3, 7, 1, 3, 7, 1, 3, 5];
+  let total = 0;
+  for (let i = 0; i < 9; i++) {
+    const digit = parseInt(digits[i], 10);
+    total += digit * weights[i];
+    if (i === 8) total += Math.floor((digit * 5) / 10);
+  }
+  const checkDigit = (10 - (total % 10)) % 10;
+  return parseInt(digits[9], 10) === checkDigit;
+}
+
+function kr_driver_license_valid(value) {
+  const digitsOnly = value.replace(/\D/g, "");
+  if (digitsOnly.length !== 10 && digitsOnly.length !== 12) return false;
+  if (new Set(digitsOnly).size === 1) return false;
+  const regionCode = parseInt(digitsOnly.slice(0, 2), 10);
+  const validRegions = new Set([11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28]);
+  return validRegions.has(regionCode);
+}
+
+function kr_pccc_valid(value) {
+  if (!value || value.length !== 13) return false;
+  if (value[0].toUpperCase() !== "P") return false;
+  return /^\d{12}$/.test(value.slice(1));
+}
+
+function kr_vehicle_registration_valid(value) {
+  const val = value.replace(/\s/g, "");
+  let validHangul = "가나다라마거너더러머버서어저고노도로모보소오조구누두루무부수우주";
+  validHangul += "하허호바사아자배";
+  const pattern = new RegExp(`^(\\d{2,3})([${validHangul}])(\\d{4})$`);
+  return pattern.test(val);
+}
+
+function spain_dni_valid(value) {
+  const dni = value.replace(/\s/g, "").toUpperCase();
+  if (dni.length !== 9) return false;
+  if (!/^\d{8}$/.test(dni.slice(0, 8)) || !/^[A-Z]$/.test(dni[8])) return false;
+  const letters = "TRWAGMYFPDXBNJZSQVHLCKE";
+  const number = parseInt(dni.slice(0, 8), 10);
+  return dni[8] === letters[number % 23];
+}
+
+function spain_nie_valid(value) {
+  const nie = value.replace(/\s/g, "").toUpperCase();
+  if (nie.length !== 9) return false;
+  if (!["X", "Y", "Z"].includes(nie[0])) return false;
+  if (!/^\d{7}$/.test(nie.slice(1, 8))) return false;
+  if (!/^[A-Z]$/.test(nie[8])) return false;
+  const replacements = { X: "0", Y: "1", Z: "2" };
+  const numberStr = replacements[nie[0]] + nie.slice(1, 8);
+  const letters = "TRWAGMYFPDXBNJZSQVHLCKE";
+  const number = parseInt(numberStr, 10);
+  return nie[8] === letters[number % 23];
+}
+
+function netherlands_bsn_valid(value) {
+  let digits = value.replace(/\D/g, "");
+  if (digits.length === 8) digits = "0" + digits;
+  else if (digits.length !== 9) return false;
+  if (new Set(digits).size === 1) return false;
+  const weights = [9, 8, 7, 6, 5, 4, 3, 2, -1];
+  let total = 0;
+  for (let i = 0; i < 9; i++) total += parseInt(digits[i], 10) * weights[i];
+  return total % 11 === 0;
+}
+
+function poland_pesel_valid(value) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length !== 11) return false;
+  if (new Set(digits).size === 1) return false;
+  const yy = parseInt(digits.slice(0, 2), 10);
+  const mm = parseInt(digits.slice(2, 4), 10);
+  const dd = parseInt(digits.slice(4, 6), 10);
+  let year, month;
+  if (mm >= 1 && mm <= 12) { year = 1900 + yy; month = mm; }
+  else if (mm >= 21 && mm <= 32) { year = 2000 + yy; month = mm - 20; }
+  else if (mm >= 41 && mm <= 52) { year = 2100 + yy; month = mm - 40; }
+  else if (mm >= 61 && mm <= 72) { year = 2200 + yy; month = mm - 60; }
+  else if (mm >= 81 && mm <= 92) { year = 1800 + yy; month = mm - 80; }
+  else return false;
+  if (!_isValidDate(year, month, dd)) return false;
+  const weights = [1, 3, 7, 9, 1, 3, 7, 9, 1, 3];
+  let total = 0;
+  for (let i = 0; i < 10; i++) total += parseInt(digits[i], 10) * weights[i];
+  const checkDigit = (10 - (total % 10)) % 10;
+  return parseInt(digits[10], 10) === checkDigit;
+}
+
+function sweden_personnummer_valid(value) {
+  let digits = value.replace(/\D/g, "");
+  if (digits.length === 12) digits = digits.slice(2);
+  else if (digits.length !== 10) return false;
+  const mm = parseInt(digits.slice(2, 4), 10);
+  const dd = parseInt(digits.slice(4, 6), 10);
+  if (mm < 1 || mm > 12) return false;
+  if (dd < 1 || dd > 31) return false;
+  return luhn(digits);
+}
+
+function france_insee_valid(value) {
+  const cleaned = value.replace(/\s/g, "");
+  if (cleaned.length !== 15) return false;
+  let calcStr;
+  const dept = cleaned.slice(5, 7).toUpperCase();
+  if (dept === "2A") calcStr = cleaned.slice(0, 5) + "19" + cleaned.slice(7);
+  else if (dept === "2B") calcStr = cleaned.slice(0, 5) + "18" + cleaned.slice(7);
+  else calcStr = cleaned;
+  if (!/^\d{15}$/.test(calcStr)) return false;
+  const sex = parseInt(calcStr[0], 10);
+  if (sex !== 1 && sex !== 2) return false;
+  const month = parseInt(calcStr.slice(3, 5), 10);
+  if (month < 1 || month > 12) return false;
+  const baseNumber = parseInt(calcStr.slice(0, 13), 10);
+  const expectedCheck = 97 - (baseNumber % 97);
+  return parseInt(calcStr.slice(13, 15), 10) === expectedCheck;
+}
+
+function belgium_rrn_valid(value) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length !== 11) return false;
+  const mm = parseInt(digits.slice(2, 4), 10);
+  const dd = parseInt(digits.slice(4, 6), 10);
+  if (mm < 1 || mm > 12) return false;
+  if (dd < 1 || dd > 31) return false;
+  const base9 = parseInt(digits.slice(0, 9), 10);
+  const checkDigits = parseInt(digits.slice(9, 11), 10);
+  if (checkDigits === 97 - (base9 % 97)) return true;
+  const base92000 = parseInt("2" + digits.slice(0, 9), 10);
+  return checkDigits === 97 - (base92000 % 97);
+}
+
+function finland_hetu_valid(value) {
+  const hetu = value.replace(/\s/g, "").toUpperCase();
+  if (hetu.length !== 11) return false;
+  const dd = parseInt(hetu.slice(0, 2), 10);
+  const mm = parseInt(hetu.slice(2, 4), 10);
+  const yy = parseInt(hetu.slice(4, 6), 10);
+  const centurySign = hetu[6];
+  const individual = hetu.slice(7, 10);
+  const checkChar = hetu[10];
+  if (!["+", "-", "A"].includes(centurySign)) return false;
+  if (!/^\d{3}$/.test(individual)) return false;
+  let year;
+  if (centurySign === "+") year = 1800 + yy;
+  else if (centurySign === "-") year = 1900 + yy;
+  else year = 2000 + yy;
+  if (!_isValidDate(year, mm, dd)) return false;
+  const checkSequence = "0123456789ABCDEFHJKLMNPRSTUVWXY";
+  const number = parseInt(hetu.slice(0, 6) + individual, 10);
+  return checkChar === checkSequence[number % 31];
+}
+
+function tw_ubn_valid(value) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length !== 8) return false;
+  const weights = [1, 2, 1, 2, 1, 2, 4, 1];
+  let total = 0;
+  for (let i = 0; i < 8; i++) {
+    const prod = parseInt(digits[i], 10) * weights[i];
+    total += Math.floor(prod / 10) + (prod % 10);
+  }
+  if (total % 10 === 0) return true;
+  if (digits[6] === "7" && (total + 1) % 10 === 0) return true;
+  return false;
+}
+
+function us_npi_valid(value) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length !== 10) return false;
+  const fullStr = "80840" + digits.slice(0, 9);
+  let luhnTotal = 0;
+  const rev = fullStr.split("").reverse().map(Number);
+  for (let i = 0; i < rev.length; i++) {
+    let dd = rev[i];
+    if (i % 2 === 0) {
+      dd *= 2;
+      if (dd > 9) dd -= 9;
+    }
+    luhnTotal += dd;
+  }
+  const expectedCheck = (10 - (luhnTotal % 10)) % 10;
+  return parseInt(digits[9], 10) === expectedCheck;
+}
+
+function uk_nino_valid(value) {
+  const upper = value.toUpperCase();
+  if (!/^[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z]\d{6}[A-D]$/.test(upper)) return false;
+  const prefix = upper.slice(0, 2);
+  if (["BG", "GB", "KN", "NK", "NT", "TN", "ZZ"].includes(prefix)) return false;
+  return true;
+}
+
+function swift_bic_valid(value) {
+  const val = value.replace(/\s/g, "").toUpperCase();
+  if (val.length !== 8 && val.length !== 11) return false;
+  return /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/.test(val);
+}
+
+function aws_access_key_valid(value) {
+  if (value.length !== 20) return false;
+  if (!(value.startsWith("AKIA") || value.startsWith("ASIA"))) return false;
+  return /^[A-Za-z0-9]+$/.test(value);
+}
+
+function google_api_key_valid(value) {
+  if (value.length !== 39) return false;
+  if (!value.startsWith("AIza")) return false;
+  return /^[A-Za-z0-9_-]{39}$/.test(value);
+}
+
+function crypto_btc_valid(value) {
+  if (value.length < 26 || value.length > 35) return false;
+  const base58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+  for (const c of value) {
+    if (!base58.includes(c)) return false;
+  }
+  return true;
+}
+
+function crypto_eth_valid(value) {
+  if (value.length !== 42) return false;
+  if (!value.startsWith("0x")) return false;
+  return /^0x[0-9a-fA-F]{40}$/.test(value);
+}
+
+function latitude_valid(value) {
+  const lat = Number(value);
+  if (value.trim() === "" || Number.isNaN(lat)) return false;
+  return lat >= -90.0 && lat <= 90.0;
+}
+
+function longitude_valid(value) {
+  const lon = Number(value);
+  if (value.trim() === "" || Number.isNaN(lon)) return false;
+  return lon >= -180.0 && lon <= 180.0;
+}
+
+function us_address_valid(value) {
+  const trimmed = value.trim();
+  const upperTrimmed = trimmed.toUpperCase();
+
+  // Standalone exact match — full state name or abbreviation
+  if (US_STATE_ABBRS.has(upperTrimmed)) return true;
+  for (const state of US_STATES) {
+    if (trimmed.toLowerCase() === state.toLowerCase()) return true;
+  }
+
+  // State name contained anywhere in the address
+  const lower = value.toLowerCase();
+  for (const state of US_STATES) {
+    if (lower.includes(state.toLowerCase())) return true;
+  }
+
+  // Two-letter abbreviation with word boundary (e.g. "Los Angeles, CA 90001")
+  const matches = value.toUpperCase().match(/\b[A-Z]{2}\b/g) || [];
+  for (const m of matches) {
+    if (US_STATE_ABBRS.has(m)) return true;
+  }
+  return false;
+}
+
 const VERIFICATION_FUNCTIONS = {
   iban_mod97, luhn, dms_coordinate, high_entropy_token, not_timestamp,
-  korean_zipcode_valid, us_zipcode_valid, jp_zipcode_valid, cn_zipcode_valid, tw_zipcode_valid, in_pincode_valid,
   korean_bank_account_valid, generic_number_not_timestamp, contains_letter, us_ssn_valid,
   chinese_name_valid, korean_name_valid, japanese_name_kanji_valid, cjk_name_standalone,
   cn_national_id_valid, tw_national_id_valid, india_aadhaar_valid, india_pan_valid,
   kr_business_registration_valid, kr_rrn_valid, kr_alien_registration_valid, jp_my_number_valid,
-  kr_corporate_registration_valid, jp_driver_license_valid, imei_valid, mac_address_valid, ipv4_public,
-  not_repeating_pattern, credit_card_bin_valid
+  kr_corporate_registration_valid, jp_driver_license_valid, jp_corporate_number_valid,
+  imei_valid, mac_address_valid, ipv4_public,
+  not_repeating_pattern, credit_card_bin_valid,
+  english_name_valid, korean_address_valid, japanese_address_valid, chinese_address_valid,
+  us_address_valid,
+  kr_driver_license_valid, kr_pccc_valid, kr_vehicle_registration_valid,
+  spain_dni_valid, spain_nie_valid, netherlands_bsn_valid, poland_pesel_valid,
+  sweden_personnummer_valid, france_insee_valid, belgium_rrn_valid, finland_hetu_valid,
+  tw_ubn_valid, us_npi_valid, uk_nino_valid, swift_bic_valid,
+  aws_access_key_valid, google_api_key_valid, crypto_btc_valid, crypto_eth_valid,
+  latitude_valid, longitude_valid
 };
 
 module.exports = { ...VERIFICATION_FUNCTIONS, VERIFICATION_FUNCTIONS, setCustomData,

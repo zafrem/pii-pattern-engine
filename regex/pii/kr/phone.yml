@@ -5,7 +5,7 @@ patterns:
   location: kr
   category: phone
   description: Korean mobile phone number (010/011/016/017/018/019)
-  pattern: 01[01679][ -]?[0-9]{3,4}[ -]?[0-9]{4}
+  pattern: '01[01679][ -]?[0-9]{3,4}[ -]?[0-9]{4}'
   verification: not_repeating_pattern
   mask: '***-****-****'
   examples:
@@ -24,17 +24,12 @@ patterns:
     action_on_match: redact
     severity: high
   match_type: exactly_matches
-  langs:
-    python: 01[01679][ -]?[0-9]{3,4}[ -]?[0-9]{4}
-    go: 01[01679][ -]?[0-9]{3,4}[ -]?[0-9]{4}
-    java: 01[01679][ -]?[0-9]{3,4}[ -]?[0-9]{4}
-    javascript: 01[01679][ -]?[0-9]{3,4}[ -]?[0-9]{4}
 - id: mobile_02
   location: kr
   category: phone
   description: Korean mobile phone number with closing parenthesis after prefix (e.g.,
     010)XXXX-XXXX)
-  pattern: 01[01679]\)[0-9]{3,4}-[0-9]{4}
+  pattern: '01[01679]\)[0-9]{3,4}-[0-9]{4}'
   mask: 010)****-****
   examples:
     match:
@@ -48,16 +43,11 @@ patterns:
     action_on_match: redact
     severity: high
   match_type: exactly_matches
-  langs:
-    python: 01[01679]\)[0-9]{3,4}-[0-9]{4}
-    go: 01[01679]\)[0-9]{3,4}-[0-9]{4}
-    java: 01[01679]\)[0-9]{3,4}-[0-9]{4}
-    javascript: 01[01679]\)[0-9]{3,4}-[0-9]{4}
 - id: landline_01
   location: kr
   category: phone
   description: Korean landline numbers (02, 031-033, 041-044, 051-055, 061-064)
-  pattern: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])[ -]?[0-9]{3,4}[ -]?[0-9]{4}
+  pattern: '(02|03[1-3]|04[1-4]|05[1-5]|06[1-4])[ -]?[0-9]{3,4}[ -]?[0-9]{4}'
   verification: not_repeating_pattern
   mask: 0**-***-****
   examples:
@@ -77,16 +67,11 @@ patterns:
     action_on_match: report
     severity: low
   match_type: exactly_matches
-  langs:
-    python: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])[ -]?[0-9]{3,4}[ -]?[0-9]{4}
-    go: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])[ -]?[0-9]{3,4}[ -]?[0-9]{4}
-    java: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])[ -]?[0-9]{3,4}[ -]?[0-9]{4}
-    javascript: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])[ -]?[0-9]{3,4}[ -]?[0-9]{4}
 - id: landline_02
   location: kr
   category: phone
   description: Korean landline numbers (02, 031-033, 041-044, 051-055, 061-064)
-  pattern: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])\)[0-9]{3,4}-[0-9]{4}
+  pattern: '(02|03[1-3]|04[1-4]|05[1-5]|06[1-4])\)[0-9]{3,4}-[0-9]{4}'
   mask: 0**)***-****
   examples:
     match:
@@ -104,17 +89,12 @@ patterns:
     action_on_match: report
     severity: low
   match_type: exactly_matches
-  langs:
-    python: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])\)[0-9]{3,4}-[0-9]{4}
-    go: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])\)[0-9]{3,4}-[0-9]{4}
-    java: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])\)[0-9]{3,4}-[0-9]{4}
-    javascript: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])\)[0-9]{3,4}-[0-9]{4}
 - id: landline_03
   location: kr
   category: phone
   description: Korean landline numbers without separators (02, 031-033, 041-044, 051-055,
     061-064)
-  pattern: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])[0-9]{3,4}[0-9]{4}
+  pattern: '(02|03[1-3]|04[1-4]|05[1-5]|06[1-4])[0-9]{3,4}[0-9]{4}'
   mask: 0**)***-****
   examples:
     match:
@@ -133,8 +113,34 @@ patterns:
     action_on_match: report
     severity: low
   match_type: exactly_matches
+- id: mobile_hangul_spoken_01
+  location: kr
+  category: phone
+  description: Korean phone number dictated as Hangul digit-words (e.g. 공일공 일이삼사
+    오육칠팔 = 010-1234-5678). A run of 9-11 spoken digits, separated by an optional single
+    space or hyphen; the length bound keeps common digit-word homographs (이/사/오/구) from firing.
+  pattern: '(?<![공영일이삼사오육륙칠팔구])[공영일이삼사오육륙칠팔구](?:[ \-]?[공영일이삼사오육륙칠팔구]){8,10}(?![공영일이삼사오육륙칠팔구])'
+  mask: '***-****-****'
+  examples:
+    match:
+    - 공일공일이삼사오육칠팔
+    - 공일공 일이삼사 오육칠팔
+    - 공일공-일이삼사-오육칠팔
+    - 공이 일이삼사 오육칠팔
+    nomatch:
+    - 일이삼
+    - 오육칠팔
+    - 이 사람은 오늘 구경을 갔다
+  policy:
+    store_raw: false
+    action_on_match: redact
+    severity: high
+  match_type: exactly_matches
+  # RE2 (Go) supports neither lookbehind nor lookahead, so the `go` variant drops the
+  # digit-word boundary guards; the {8,10} length bound still keeps it from firing on
+  # short homograph runs. python/java/javascript keep the guarded form.
   langs:
-    python: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])[0-9]{3,4}[0-9]{4}
-    go: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])[0-9]{3,4}[0-9]{4}
-    java: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])[0-9]{3,4}[0-9]{4}
-    javascript: (02|03[1-3]|04[1-4]|05[1-5]|06[1-4])[0-9]{3,4}[0-9]{4}
+    python: '(?<![공영일이삼사오육륙칠팔구])[공영일이삼사오육륙칠팔구](?:[ \-]?[공영일이삼사오육륙칠팔구]){8,10}(?![공영일이삼사오육륙칠팔구])'
+    go: '[공영일이삼사오육륙칠팔구](?:[ \-]?[공영일이삼사오육륙칠팔구]){8,10}'
+    java: '(?<![공영일이삼사오육륙칠팔구])[공영일이삼사오육륙칠팔구](?:[ \-]?[공영일이삼사오육륙칠팔구]){8,10}(?![공영일이삼사오육륙칠팔구])'
+    javascript: '(?<![공영일이삼사오육륙칠팔구])[공영일이삼사오육륙칠팔구](?:[ \-]?[공영일이삼사오육륙칠팔구]){8,10}(?![공영일이삼사오육륙칠팔구])'

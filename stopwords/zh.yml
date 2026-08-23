@@ -1,0 +1,90 @@
+language: zh
+description: Chinese (Mandarin) stopwords — particles, prepositions, and common function words to strip before keyword matching
+
+words:
+  # Structural particles
+  - 的    # possessive / adjectival (de)
+  - 地    # adverbial marker (de)
+  - 得    # complement marker (de)
+  - 了    # completion aspect / change of state
+  - 着    # ongoing aspect
+  - 过    # experiential aspect
+  - 吗    # yes/no question marker
+  - 呢    # question / continuation marker
+  - 吧    # suggestion / supposition marker
+  - 啊    # exclamation / softening particle
+  - 嘛    # obviousness marker
+
+  # Prepositions / coverbs
+  - 在    # at, in (location / ongoing)
+  - 从    # from
+  - 到    # to, until, arrive
+  - 向    # toward
+  - 对    # toward, for, regarding
+  - 对于  # regarding, with respect to
+  - 给    # give; for; to
+  - 跟    # with; follow
+  - 和    # and; with
+  - 与    # and; with (formal)
+  - 及    # and; up to (formal)
+  - 以    # by means of; with (formal)
+  - 被    # passive marker
+  - 把    # disposal marker (bǎ construction)
+  - 比    # compared to; than
+  - 按    # according to; by
+  - 按照  # according to; in accordance with
+
+  # Conjunctions
+  - 但    # but
+  - 但是  # but, however
+  - 虽然  # although
+  - 因为  # because
+  - 所以  # therefore
+  - 如果  # if
+  - 那么  # then
+  - 而    # while; whereas (formal connector)
+  - 而且  # moreover; furthermore
+  - 或者  # or (statements)
+  - 还是  # or (questions); still
+  - 不仅  # not only
+  - 而且  # but also; moreover
+  - 即使  # even if
+  - 只有  # only if; only when
+
+  # Pronouns
+  - 我    # I, me
+  - 你    # you (singular)
+  - 您    # you (polite)
+  - 他    # he, him
+  - 她    # she, her
+  - 它    # it
+  - 我们  # we, us
+  - 你们  # you (plural)
+  - 他们  # they, them
+  - 她们  # they (female)
+  - 这    # this
+  - 那    # that
+  - 这些  # these
+  - 那些  # those
+  - 谁    # who
+  - 什么  # what
+  - 哪    # which
+
+  # Common adverbs / function words
+  - 不    # not
+  - 没    # not have; did not
+  - 没有  # do not have; have not
+  - 很    # very
+  - 也    # also, too
+  - 都    # all, both
+  - 就    # then, right away
+  - 才    # only then; just
+  - 还    # still, also
+  - 又    # again
+  - 再    # again (future)
+  - 已经  # already
+  - 可以  # can, may
+  - 应该  # should
+  - 需要  # need to
+  - 等    # etc.; wait
+  - 等等  # and so on

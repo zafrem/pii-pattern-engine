@@ -15,8 +15,8 @@ import pytest
 
 from verification import (
     belgium_rrn_valid,
+    chinese_address_valid,
     cn_national_id_valid,
-    cn_zipcode_valid,
     contains_letter,
     credit_card_bin_valid,
     dms_coordinate,
@@ -26,14 +26,13 @@ from verification import (
     get_verification_function,
     high_entropy_token,
     iban_mod97,
-    in_pincode_valid,
     india_aadhaar_valid,
     india_pan_valid,
     ipv4_public,
+    japanese_address_valid,
     jp_my_number_valid,
-    jp_zipcode_valid,
+    korean_address_valid,
     korean_bank_account_valid,
-    korean_zipcode_valid,
     kr_alien_registration_valid,
     kr_business_registration_valid,
     kr_corporate_registration_valid,
@@ -48,11 +47,120 @@ from verification import (
     spain_nie_valid,
     sweden_personnummer_valid,
     tw_national_id_valid,
-    tw_zipcode_valid,
     unregister_verification_function,
+    us_address_valid,
     us_ssn_valid,
-    us_zipcode_valid,
 )
+
+
+class TestKoreanAddressValid:
+    """Tests for Korean address verification."""
+
+    def test_valid_addresses(self):
+        """Test valid Korean administrative division combinations."""
+        valid_addresses = [
+            "서울특별시 강남구 역삼동",
+            "경기도 수원시 팔달구",
+            "서울특별시 종로구 청운동",
+            "부산광역시 중구",
+        ]
+        for addr in valid_addresses:
+            assert korean_address_valid(addr), f"Expected '{addr}' to be valid"
+
+    def test_partial_valid(self):
+        """Test that Level 2 (City/District) match is enough."""
+        assert korean_address_valid("서울특별시 강남구")
+        assert korean_address_valid("경기도 수원시")
+
+    def test_invalid_combinations(self):
+        """Test invalid province/city combinations."""
+        # Mismatched province and city (Suwon is in Gyeonggi, not Seoul)
+        assert not korean_address_valid("서울특별시 수원시")
+
+    def test_fallback_provinces(self):
+        """Test that major provinces are recognized even without Level 2/3."""
+        assert korean_address_valid("서울특별시")
+        assert korean_address_valid("제주특별자치도")
+
+
+class TestUsAddressValid:
+    """Tests for US address verification."""
+
+    def test_valid_addresses(self):
+        """Test valid US state and city combinations."""
+        valid_addresses = [
+            "New York, New York",
+            "Los Angeles, California",
+            "Chicago, Illinois",
+            "Houston, Texas",
+            "albany, new york", # Test case insensitivity
+        ]
+        for addr in valid_addresses:
+            assert us_address_valid(addr), f"Expected '{addr}' to be valid"
+
+    def test_invalid_combinations(self):
+        """Test mismatched state and city."""
+        assert not us_address_valid("New York, California")
+        assert not us_address_valid("Los Angeles, New York")
+
+    def test_fallback_states(self):
+        """Test that states are recognized even without valid city."""
+        assert us_address_valid("California")
+        assert us_address_valid("Texas")
+
+
+class TestJapaneseAddressValid:
+    """Tests for Japanese address verification."""
+
+    def test_valid_addresses(self):
+        """Test valid Japanese prefecture and city/ward combinations."""
+        valid_addresses = [
+            "東京都千代田区",
+            "大阪府大阪市",
+            "北海道札幌市",
+            "神奈川県横浜市",
+        ]
+        for addr in valid_addresses:
+            assert japanese_address_valid(addr), f"Expected '{addr}' to be valid"
+
+    def test_invalid_combinations(self):
+        """Test mismatched prefecture and city."""
+        assert not japanese_address_valid("東京都大阪市")
+        assert not japanese_address_valid("大阪府千代田区")
+
+    def test_fallback_prefectures(self):
+        """Test that prefectures are recognized."""
+        assert japanese_address_valid("東京都")
+        assert japanese_address_valid("沖縄県")
+
+
+class TestChineseAddressValid:
+    """Tests for Chinese address verification."""
+
+    def test_valid_addresses(self):
+        """Test valid Chinese province, city, and street combinations."""
+        valid_addresses = [
+            "北京市市辖区东城区东华门街道",
+            "广东省深圳市南山区",
+            "广东省广州市天河区",
+        ]
+        for addr in valid_addresses:
+            assert chinese_address_valid(addr), f"Expected '{addr}' to be valid"
+
+    def test_partial_valid(self):
+        """Test that Level 2 (City) match is enough."""
+        assert chinese_address_valid("北京市市辖区")
+        assert chinese_address_valid("广东省深圳市")
+
+    def test_invalid_combinations(self):
+        """Test mismatched province and city."""
+        assert not chinese_address_valid("北京市深圳市")
+
+    def test_fallback_provinces(self):
+        """Test that provinces are recognized."""
+        assert chinese_address_valid("北京市")
+        assert chinese_address_valid("四川省")
+
 
 
 class TestIbanMod97:
@@ -189,7 +297,7 @@ class TestHighEntropyToken:
         """Test valid high entropy tokens."""
         valid_tokens = [
             "ghp_1234567890abcdefghijklmnopqrstuvwxyz",  # GitHub token-like
-            "sk_test_4eC39HqLyjWDarjtT1zdp7dc",  # Stripe test key-like
+            "sk_demo_4eC39HqLyjWDarjtT1zdp7dc",  # Stripe-format demo key
             "xoxb-1234567890123-1234567890123-abcdefghijklmnopqrstuvwx",  # Slack-like
             "AIzaSyD-1234567890abcdefghijklmnopqrstuv",  # Google API key-like
             (
@@ -270,99 +378,6 @@ class TestNotTimestamp:
         """Test non-numeric strings."""
         assert not_timestamp("abc123")
         assert not_timestamp("not-a-number")
-
-
-class TestKoreanZipcodeValid:
-    """Tests for Korean zipcode verification."""
-
-    def test_valid_zipcodes(self):
-        """Test valid Korean postal codes (present in kr_zipcodes.csv)."""
-        valid_codes = [
-            "06234",
-            "48058",
-            "63309",
-        ]
-        for code in valid_codes:
-            assert korean_zipcode_valid(code), f"Expected {code} to be valid"
-
-    def test_sequential_patterns(self):
-        """Test sequential patterns (should be rejected - not in data)."""
-        invalid_codes = [
-            "12345",  # Sequential up
-            "54321",  # Sequential down
-        ]
-        for code in invalid_codes:
-            assert not korean_zipcode_valid(code), f"Expected {code} to be invalid"
-
-    def test_all_same_digit(self):
-        """Test all same digit (should be rejected - not in data)."""
-        invalid_codes = [
-            "00000",
-            "99999",
-        ]
-        for code in invalid_codes:
-            assert not korean_zipcode_valid(code), f"Expected {code} to be invalid"
-
-    def test_not_in_data(self):
-        """Test codes not in the data file (should be rejected)."""
-        invalid_codes = [
-            "50000",
-        ]
-        for code in invalid_codes:
-            assert not korean_zipcode_valid(code), f"Expected {code} to be invalid"
-
-    def test_wrong_length(self):
-        """Test wrong length postal codes."""
-        assert not korean_zipcode_valid("1234")
-        assert not korean_zipcode_valid("123456")
-
-
-class TestUsZipcodeValid:
-    """Tests for US zipcode verification."""
-
-    def test_valid_5_digit_zip(self):
-        """Test valid 5-digit ZIP codes (present in us_zipcodes.csv)."""
-        valid_codes = [
-            "10001",
-            "90210",
-            "60601",
-        ]
-        for code in valid_codes:
-            assert us_zipcode_valid(code), f"Expected {code} to be valid"
-
-    def test_valid_9_digit_zip(self):
-        """Test valid 9-digit ZIP+4 codes (base ZIP in data)."""
-        valid_codes = [
-            "10001-1234",
-            "902101234",
-            "60601-5678",
-        ]
-        for code in valid_codes:
-            assert us_zipcode_valid(code), f"Expected {code} to be valid"
-
-    def test_sequential_patterns(self):
-        """Test sequential patterns (should be rejected - not in data)."""
-        invalid_codes = [
-            "12345",
-            "54321",
-        ]
-        for code in invalid_codes:
-            assert not us_zipcode_valid(code), f"Expected {code} to be invalid"
-
-    def test_not_in_data(self):
-        """Test codes not in the data file (should be rejected)."""
-        invalid_codes = [
-            "00000",
-            "11111",
-            "99999",
-        ]
-        for code in invalid_codes:
-            assert not us_zipcode_valid(code), f"Expected {code} to be invalid"
-
-    def test_wrong_length(self):
-        """Test wrong length ZIP codes."""
-        assert not us_zipcode_valid("1234")
-        assert not us_zipcode_valid("123456")
 
 
 class TestKoreanBankAccountValid:
@@ -525,25 +540,26 @@ class TestKoreanAlienRegistrationValid:
     def test_valid_alien_registration(self):
         """Test valid alien registration numbers."""
         valid_numbers = [
-            "900101-5234567",
-            "850315-6789012",
-            "920228-7123456",
+            "900101-5234561",
+            "850315-6789019",
+            "920228-7123452",
         ]
         for num in valid_numbers:
             assert kr_alien_registration_valid(num), f"Expected {num} to be valid"
 
     def test_invalid_gender_digit(self):
         """Test with citizen gender digits (should fail)."""
-        assert not kr_alien_registration_valid("900101-1234567")  # 1 is for citizens
-        assert not kr_alien_registration_valid("900101-4234567")  # 4 is for citizens
+        assert not kr_alien_registration_valid("900101-1234561")  # 1 is for citizens
+        assert not kr_alien_registration_valid("900101-4234561")  # 4 is for citizens
 
     def test_invalid_month(self):
         """Test with invalid month."""
-        assert not kr_alien_registration_valid("901301-5234567")  # Month 13
+        assert not kr_alien_registration_valid("901301-5234561")  # Month 13
 
     def test_invalid_day(self):
         """Test with invalid day."""
-        assert not kr_alien_registration_valid("900132-5234567")  # Day 32
+        assert not kr_alien_registration_valid("900132-5234561")  # Day 32
+
 
 
 class TestKoreanCorporateRegistrationValid:
@@ -552,12 +568,13 @@ class TestKoreanCorporateRegistrationValid:
     def test_valid_corporate_registration(self):
         """Test valid corporate registration numbers."""
         valid_numbers = [
-            "110111-1234568",
-            "134511-2345671",
-            "1801115678906",
+            "110111-1234569",
+            "134511-2345674",
+            "1801115678909",
         ]
         for num in valid_numbers:
             assert kr_corporate_registration_valid(num), f"Expected {num} to be valid"
+
 
     def test_invalid_checksum(self):
         """Test with invalid checksum."""
@@ -964,193 +981,6 @@ class TestNotRepeatingPattern:
         """Test two-character repeating pattern."""
         assert not not_repeating_pattern("12121212")
         assert not not_repeating_pattern("ABABABAB")
-
-
-class TestJpZipcodeValid:
-    """Tests for Japanese zipcode verification."""
-
-    def test_valid_zipcodes(self):
-        """Test valid Japanese postal codes."""
-        valid_codes = [
-            "100-0001",
-            "150-0002",
-            "530-0001",
-            "810-0001",
-            "9000001",
-        ]
-        for code in valid_codes:
-            assert jp_zipcode_valid(code), f"Expected {code} to be valid"
-
-    def test_sequential_patterns(self):
-        """Test sequential patterns (should be rejected when not in data)."""
-        invalid_codes = [
-            "7654321",
-        ]
-        for code in invalid_codes:
-            assert not jp_zipcode_valid(code), f"Expected {code} to be invalid"
-
-    def test_all_same_digit(self):
-        """Test all same digit (should be rejected)."""
-        invalid_codes = [
-            "0000000",
-            "1111111",
-            "9999999",
-            "000-0000",
-            "111-1111",
-        ]
-        for code in invalid_codes:
-            assert not jp_zipcode_valid(code), f"Expected {code} to be invalid"
-
-    def test_too_round_numbers(self):
-        """Test numbers that are multiples of 100000."""
-        invalid_codes = [
-            "100-0000",
-            "200-0000",
-            "5000000",
-        ]
-        for code in invalid_codes:
-            assert not jp_zipcode_valid(code), f"Expected {code} to be invalid"
-
-    def test_wrong_length(self):
-        """Test wrong length postal codes."""
-        assert not jp_zipcode_valid("12345")
-        assert not jp_zipcode_valid("12345678")
-
-
-class TestCnZipcodeValid:
-    """Tests for Chinese zipcode verification."""
-
-    def test_valid_zipcodes(self):
-        """Test valid Chinese postal codes."""
-        valid_codes = [
-            "518000",
-            "310000",
-            "430000",
-            "610000",
-        ]
-        for code in valid_codes:
-            assert cn_zipcode_valid(code), f"Expected {code} to be valid"
-
-    def test_sequential_patterns(self):
-        """Test sequential patterns (should be rejected)."""
-        assert not cn_zipcode_valid("123456")
-        assert not cn_zipcode_valid("654321")
-
-    def test_all_same_digit(self):
-        """Test all same digit (should be rejected)."""
-        invalid_codes = [
-            "000000",
-            "111111",
-            "999999",
-        ]
-        for code in invalid_codes:
-            assert not cn_zipcode_valid(code), f"Expected {code} to be invalid"
-
-    def test_invalid_first_two_digits(self):
-        """Test postal codes with invalid first 2 digits (>86)."""
-        assert not cn_zipcode_valid("870000")
-        assert not cn_zipcode_valid("990000")
-
-    def test_wrong_length(self):
-        """Test wrong length postal codes."""
-        assert not cn_zipcode_valid("12345")
-        assert not cn_zipcode_valid("1234567")
-
-
-class TestTwZipcodeValid:
-    """Tests for Taiwan zipcode verification."""
-
-    def test_valid_3_digit_zipcodes(self):
-        """Test valid 3-digit Taiwan postal codes."""
-        valid_codes = [
-            "100",
-            "200",
-            "300",
-            "800",
-        ]
-        for code in valid_codes:
-            assert tw_zipcode_valid(code), f"Expected {code} to be valid"
-
-    def test_valid_5_digit_zipcodes(self):
-        """Test valid 5-digit Taiwan postal codes."""
-        valid_codes = [
-            "10041",
-            "80661",
-        ]
-        for code in valid_codes:
-            assert tw_zipcode_valid(code), f"Expected {code} to be valid"
-
-    def test_sequential_patterns(self):
-        """Test sequential patterns (should be rejected)."""
-        assert not tw_zipcode_valid("12345")
-
-    def test_all_same_digit(self):
-        """Test all same digit (should be rejected)."""
-        invalid_codes = [
-            "000",
-            "999",
-            "00000",
-        ]
-        for code in invalid_codes:
-            assert not tw_zipcode_valid(code), f"Expected {code} to be invalid"
-
-    def test_first_digit_zero(self):
-        """Test postal codes starting with 0 (should be rejected)."""
-        assert not tw_zipcode_valid("012")
-
-    def test_wrong_length(self):
-        """Test wrong length postal codes."""
-        assert not tw_zipcode_valid("12")
-        assert not tw_zipcode_valid("1234")
-        assert not tw_zipcode_valid("123456")
-
-
-class TestInPincodeValid:
-    """Tests for Indian PIN code verification."""
-
-    def test_valid_pincodes(self):
-        """Test valid Indian PIN codes."""
-        valid_codes = [
-            "110001",
-            "400001",
-            "560001",
-            "700001",
-        ]
-        for code in valid_codes:
-            assert in_pincode_valid(code), f"Expected {code} to be valid"
-
-    def test_sequential_patterns(self):
-        """Test sequential patterns (should be rejected)."""
-        assert not in_pincode_valid("123456")
-        assert not in_pincode_valid("654321")
-
-    def test_all_same_digit(self):
-        """Test all same digit (should be rejected)."""
-        invalid_codes = [
-            "111111",
-            "222222",
-            "999999",
-        ]
-        for code in invalid_codes:
-            assert not in_pincode_valid(code), f"Expected {code} to be invalid"
-
-    def test_first_digit_zero(self):
-        """Test PIN codes starting with 0 (should be rejected)."""
-        assert not in_pincode_valid("012345")
-
-    def test_too_round_numbers(self):
-        """Test numbers that are multiples of 100000."""
-        invalid_codes = [
-            "100000",
-            "500000",
-        ]
-        for code in invalid_codes:
-            assert not in_pincode_valid(code), f"Expected {code} to be invalid"
-
-    def test_wrong_length(self):
-        """Test wrong length PIN codes."""
-        assert not in_pincode_valid("12345")
-        assert not in_pincode_valid("1234567")
 
 
 class TestVerificationRegistry:

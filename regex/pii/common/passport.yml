@@ -22,8 +22,3 @@ patterns:
       action_on_match: redact
       severity: high
     match_type: exactly_matches
-    langs:
-      python: '[A-Z0-9]{6,9}'
-      go: '[A-Z0-9]{6,9}'
-      java: '[A-Z0-9]{6,9}'
-      javascript: '[A-Z0-9]{6,9}'

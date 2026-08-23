@@ -56,7 +56,7 @@ patterns:
     location: comm
     category: location
     description: DMS format coordinate (e.g., 40°26'46"N)
-    pattern: '\d{1,3}°\s*\d{1,2}′\s*\d{1,2}(?:\.\d+)?″\s*[NSEW]'
+    pattern: '[0-9]{1,3}°[\t\n\f\r ]*[0-9]{1,2}′[\t\n\f\r ]*[0-9]{1,2}(?:\.[0-9]+)?″[\t\n\f\r ]*[NSEW]'
     mask: "###°##′##″*"
     verification: dms_coordinate
     examples:
@@ -71,8 +71,3 @@ patterns:
       action_on_match: report
       severity: low
     match_type: exactly_matches
-    langs:
-      python: '\d{1,3}°\s*\d{1,2}′\s*\d{1,2}(?:\.\d+)?″\s*[NSEW]'
-      go: '\d{1,3}°\s*\d{1,2}′\s*\d{1,2}(?:\.\d+)?″\s*[NSEW]'
-      java: '\d{1,3}°\s*\d{1,2}′\s*\d{1,2}(?:\.\d+)?″\s*[NSEW]'
-      javascript: '\d{1,3}°\s*\d{1,2}′\s*\d{1,2}(?:\.\d+)?″\s*[NSEW]'

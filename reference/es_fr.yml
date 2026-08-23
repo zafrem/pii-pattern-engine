@@ -1,0 +1,233 @@
+version: "1.0"
+regions:
+  - name: Spain
+    region_code: ES
+    code_series: 8001-8049
+  - name: France
+    region_code: FR
+    code_series: 8051-8099
+description: Internal reference codes for Spanish and French PII entities, mapping regex patterns and keyword categories.
+
+entities:
+
+  # ── Spain (ES) ─────────────────────────────────────────────────────────
+
+  es_dni:
+    code: 8001
+    description: Spanish DNI (Documento Nacional de Identidad, 8 digits + check letter)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/es/identification.yml
+        pattern_id: dni_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [dni, documento nacional de identidad, nif, carnet de identidad]
+        relevant_contexts: ["DNI:", "NIF:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  es_nie:
+    code: 8002
+    description: Spanish NIE (Número de Identificación de Extranjero, X/Y/Z + 7 digits + letter)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/es/identification.yml
+        pattern_id: nie_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [nie, número de identificación de extranjero, foreigners id]
+        relevant_contexts: ["NIE:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  es_passport:
+    code: 8003
+    description: Spanish passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/es/identification.yml
+        pattern_id: passport_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [pasaporte, passport, número de pasaporte]
+        relevant_contexts: ["Pasaporte:", "Passport:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  es_cif:
+    code: 8004
+    description: Spanish CIF (Código de Identificación Fiscal, organizational tax ID)
+    category: identification
+    pii_type: organizational
+    severity: high
+    regex:
+      - source: regex/pii/es/identification.yml
+        pattern_id: cif_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [cif, código de identificación fiscal, nif empresa]
+        relevant_contexts: ["CIF:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  es_phone_mobile:
+    code: 8005
+    description: Spanish mobile phone number (6xx/7xx, 9 digits)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/es/phone.yml
+        pattern_id: mobile_01
+      - source: regex/pii/es/phone.yml
+        pattern_id: mobile_02
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [teléfono, móvil, celular, número de teléfono, contacto]
+        relevant_contexts: ["Teléfono:", "Móvil:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  es_phone_landline:
+    code: 8006
+    description: Spanish landline phone number (8xx/9xx, 9 digits)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/es/phone.yml
+        pattern_id: landline_01
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [teléfono, fijo, número fijo, tel]
+        relevant_contexts: ["Teléfono:", "Tel:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  # ── France (FR) ──────────────────────────────────────────────────────────
+
+  fr_nir:
+    code: 8051
+    description: French NIR (Numéro d'Inscription au Répertoire, 15-digit INSEE/SSN)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/fr/identification.yml
+        pattern_id: nir_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [nir, insee, numéro de sécurité sociale, numéro ss]
+        relevant_contexts: ["NIR:", "INSEE:", "Numéro SS:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ssn
+
+  fr_cni:
+    code: 8052
+    description: French CNI (Carte Nationale d'Identité, national identity card number)
+    category: identification
+    pii_type: government_id
+    severity: critical
+    regex:
+      - source: regex/pii/fr/identification.yml
+        pattern_id: cni_01
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [cni, carte nationale d'identité, carte d'identité, pièce d'identité]
+        relevant_contexts: ["CNI:", "Carte d'identité:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: kr_rrn
+
+  fr_passport:
+    code: 8053
+    description: French passport number
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/fr/identification.yml
+        pattern_id: passport_01
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [passeport, passport, numéro de passeport]
+        relevant_contexts: ["Passeport:", "Passport:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: passport
+
+  fr_phone:
+    code: 8054
+    description: French phone number (0X XX XX XX XX format)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/fr/phone.yml
+        pattern_id: phone_01
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [téléphone, portable, mobile, tél, numéro de téléphone]
+        relevant_contexts: ["Téléphone:", "Tél:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  fr_phone_international:
+    code: 8055
+    description: French phone number in international format (+33 X XX XX XX XX)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/fr/phone.yml
+        pattern_id: phone_international_01
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [téléphone, portable, +33, international]
+        relevant_contexts: ["Téléphone:", "Tel:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone
+
+  fr_phone_formatted:
+    code: 8056
+    description: French phone number in formatted local notation (XX.XX.XX.XX.XX)
+    category: phone
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/fr/phone.yml
+        pattern_id: phone_formatted_01
+    keyword:
+      - source: keyword/contact.yml
+        category: phone
+        relevant_terms: [téléphone, tél, numéro]
+        relevant_contexts: ["Téléphone:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: phone

@@ -1,0 +1,243 @@
+version: "1.0"
+region: Common / International
+region_code: COMM
+code_series: 9001-9099
+description: Internal reference codes for common/cross-regional PII entities, mapping regex patterns and keyword categories.
+
+entities:
+
+  common_email:
+    code: 9001
+    description: Email address (RFC 5322 simplified, user@domain.tld)
+    category: contact
+    pii_type: contact
+    severity: medium
+    regex:
+      - source: regex/pii/common/email.yml
+        pattern_id: email_01
+        pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}'
+        mask: '***@***.***'
+    keyword:
+      - source: keyword/contact.yml
+        category: email
+        relevant_terms: [email, e-mail, email address, mail, 이메일, メール, 电子邮件, correo, courriel]
+        relevant_contexts: ["Email:", "E-mail:", "Contact:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: email
+
+  common_name_en:
+    code: 9002
+    description: English person name pattern (Title? First Last)
+    category: name
+    pii_type: personal
+    severity: low
+    regex:
+      - source: regex/pii/common/name.yml
+        pattern_id: name_en_01
+    keyword:
+      - source: keyword/personal.yml
+        category: name
+        relevant_terms: [name, full name, first name, last name, given name, surname]
+        relevant_contexts: ["Name:", "Full Name:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: name
+
+  common_date_iso:
+    code: 9003
+    description: ISO 8601 date (YYYY-MM-DD)
+    category: temporal
+    pii_type: personal
+    severity: low
+    regex:
+      - source: regex/pii/common/date.yml
+        pattern_id: date_iso_01
+    keyword:
+      - source: keyword/personal.yml
+        category: date_of_birth
+        relevant_terms: [date of birth, dob, birthday, birth date, born]
+        relevant_contexts: ["DOB:", "Date of Birth:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: date_of_birth
+
+  common_date_slash:
+    code: 9004
+    description: Slash-separated date (MM/DD/YYYY or DD/MM/YYYY)
+    category: temporal
+    pii_type: personal
+    severity: low
+    regex:
+      - source: regex/pii/common/date.yml
+        pattern_id: date_slash_01
+    keyword:
+      - source: keyword/personal.yml
+        category: date_of_birth
+        relevant_terms: [date of birth, dob, birthday, born, 생년월일, 生年月日]
+        relevant_contexts: ["DOB:", "Birthday:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: date_of_birth
+
+  common_ipv4:
+    code: 9005
+    description: IPv4 address (N.N.N.N where N is 0–255)
+    category: network
+    pii_type: network
+    severity: low
+    regex:
+      - source: regex/pii/common/ip.yml
+        pattern_id: ipv4_01
+    keyword:
+      - source: keyword/network.yml
+        category: ip_address
+        relevant_terms: [ip, ip address, ipv4, host, server, client ip]
+        relevant_contexts: ["IP:", "IP Address:", "Server:", "Host:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ip_address
+
+  common_ipv6:
+    code: 9006
+    description: IPv6 address (full and compressed forms)
+    category: network
+    pii_type: network
+    severity: low
+    regex:
+      - source: regex/pii/common/ip.yml
+        pattern_id: ipv6_01
+    keyword:
+      - source: keyword/network.yml
+        category: ip_address
+        relevant_terms: [ip, ip address, ipv6, host, server]
+        relevant_contexts: ["IP:", "IP Address:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ip_address
+
+  common_url:
+    code: 9007
+    description: Web URL (http/https/ftp scheme + domain + path)
+    category: network
+    pii_type: network
+    severity: low
+    regex:
+      - source: regex/pii/common/urls.yml
+        pattern_id: url_01
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [url, link, website, web address, http, https, domain]
+        relevant_contexts: ["URL:", "Link:", "Website:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: ip_address
+
+  common_credit_card_visa:
+    code: 9008
+    description: Visa credit card number (4xxx, 13–16 digits, Luhn-valid)
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/common/credit-cards.yml
+        pattern_id: credit_card_visa_01
+    keyword:
+      - source: keyword/financial.yml
+        category: credit_card
+        relevant_terms: [visa, credit card, card number, cc, cvv, expiry]
+        relevant_contexts: ["Card Number:", "Credit Card:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: credit_card
+
+  common_credit_card_mastercard:
+    code: 9009
+    description: Mastercard credit card number (51–55 or 2221–2720 prefix, 16 digits)
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/common/credit-cards.yml
+        pattern_id: credit_card_mastercard_01
+    keyword:
+      - source: keyword/financial.yml
+        category: credit_card
+        relevant_terms: [mastercard, credit card, card number, cc, cvv]
+        relevant_contexts: ["Card Number:", "Credit Card:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: credit_card
+
+  common_credit_card_amex:
+    code: 9010
+    description: American Express card number (34/37 prefix, 15 digits)
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/common/credit-cards.yml
+        pattern_id: credit_card_amex_01
+    keyword:
+      - source: keyword/financial.yml
+        category: credit_card
+        relevant_terms: [amex, american express, credit card, card number, csc]
+        relevant_contexts: ["Card Number:", "Amex:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: credit_card
+
+  common_credit_card_discover:
+    code: 9011
+    description: Discover card number (6011/622126–622925/644–649/65 prefix, 16 digits)
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/common/credit-cards.yml
+        pattern_id: credit_card_discover_01
+    keyword:
+      - source: keyword/financial.yml
+        category: credit_card
+        relevant_terms: [discover, credit card, card number, cc]
+        relevant_contexts: ["Card Number:", "Discover:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: credit_card
+
+  common_credit_card_jcb:
+    code: 9012
+    description: JCB card number (3528–3589 prefix, 16 digits)
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/common/credit-cards.yml
+        pattern_id: credit_card_jcb_01
+    keyword:
+      - source: keyword/financial.yml
+        category: credit_card
+        relevant_terms: [jcb, credit card, card number, クレジットカード, カード番号]
+        relevant_contexts: ["Card Number:", "JCB:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: credit_card
+
+  common_credit_card_diners:
+    code: 9013
+    description: Diners Club card number (300–305/36/38 prefix, 14 digits)
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/common/credit-cards.yml
+        pattern_id: credit_card_diners_01
+    keyword:
+      - source: keyword/financial.yml
+        category: credit_card
+        relevant_terms: [diners, diners club, credit card, card number]
+        relevant_contexts: ["Card Number:", "Diners:"]
+    rerank:
+      source: re-rank/scoring.yml
+      category: credit_card

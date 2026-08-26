@@ -26,7 +26,7 @@ patterns:
   category: phone
   description: Japanese landline phone number (03-xxxx-xxxx, etc.) - excludes 070/080/090
     mobile prefixes
-  pattern: '0(?:[1-6][0-9]?|[789][1-9])(?:-?[0-9]{3,4}-?[0-9]{4})'
+  pattern: '0(?:[1-6][1-9]?|[789][1-9])(?:-?[0-9]{3,4}-?[0-9]{4})'
   verification: not_repeating_pattern
   mask: '**-****-****'
   examples:
@@ -39,6 +39,8 @@ patterns:
     - 00-1234-5678
     - 090-1234-5678
     - 03-12345-678
+    - 010-7392-4816
+    - 010-1234-5678
   policy:
     store_raw: false
     action_on_match: report

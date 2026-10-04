@@ -6,6 +6,7 @@ patterns:
   category: other
   description: Chinese National ID (18 digits)
   pattern: '[0-9]{17}[0-9X]'
+  min_digit_run: 17
   flags:
   - IGNORECASE
   verification: cn_national_id_valid
@@ -38,6 +39,7 @@ patterns:
   category: passport
   description: Chinese passport number (1 letter + 8 digits)
   pattern: '[EG][0-9]{8}'
+  min_digit_run: 8
   flags:
   - IGNORECASE
   mask: E********

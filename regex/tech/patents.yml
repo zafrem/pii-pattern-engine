@@ -7,6 +7,7 @@ patterns:
     category: patent
     description: United States Patent Number (7-9 digits)
     pattern: '\bUS[\t\n\f\r ]?([0-9]{7,9})\b'
+    min_digit_run: 7
     mask: "US*******"
     examples:
       match:
@@ -26,6 +27,7 @@ patterns:
     category: patent
     description: PCT (WO) Patent Number (e.g., WO 2023/123456)
     pattern: '\bWO[\t\n\f\r ]?([0-9]{4})/([0-9]{6})\b'
+    min_digit_run: 6
     mask: "WO****/******"
     examples:
       match:
@@ -45,6 +47,7 @@ patterns:
     category: patent
     description: European Patent (EP) Number (7 digits)
     pattern: '\bEP[\t\n\f\r ]?([0-9]{7})\b'
+    min_digit_run: 7
     mask: "EP*******"
     examples:
       match:
@@ -64,6 +67,7 @@ patterns:
     category: patent
     description: International Patent Classification (IPC) code (e.g., A61K 31/00)
     pattern: '\b[A-H][0-9]{2}[A-Z][\t\n\f\r ]?[0-9]{1,4}/[0-9]{2,6}\b'
+    min_digit_run: 2
     mask: "**** ***/**"
     examples:
       match:

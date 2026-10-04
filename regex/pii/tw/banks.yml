@@ -5,7 +5,8 @@ patterns:
   location: tw
   category: bank
   description: Bank of Taiwan account (004-XXXXXXXXXXXX)
-  pattern: '004-?[0-9]{9,13}'
+  pattern: '(?:004-[0-9]{9,13}|004[0-9]{9,13})'
+  min_digit_run: 9
   mask: 004-*********
   examples:
     match:
@@ -29,7 +30,8 @@ patterns:
   location: tw
   category: bank
   description: First Commercial Bank account (007-XXXXXXXXXXXX)
-  pattern: '007-?[0-9]{9,13}'
+  pattern: '(?:007-[0-9]{9,13}|007[0-9]{9,13})'
+  min_digit_run: 9
   verification: generic_number_not_timestamp
   mask: 007-*********
   examples:
@@ -54,7 +56,8 @@ patterns:
   location: tw
   category: bank
   description: Hua Nan Commercial Bank account (008-XXXXXXXXXXXX)
-  pattern: '008-?[0-9]{9,13}'
+  pattern: '(?:008-[0-9]{9,13}|008[0-9]{9,13})'
+  min_digit_run: 9
   mask: 008-*********
   examples:
     match:
@@ -78,7 +81,8 @@ patterns:
   location: tw
   category: bank
   description: Chang Hwa Commercial Bank account (009-XXXXXXXXXXXX)
-  pattern: '009-?[0-9]{9,13}'
+  pattern: '(?:009-[0-9]{9,13}|009[0-9]{9,13})'
+  min_digit_run: 9
   mask: 009-*********
   examples:
     match:
@@ -102,7 +106,8 @@ patterns:
   location: tw
   category: bank
   description: Shanghai Commercial & Savings Bank account (011-XXXXXXXXXXXX)
-  pattern: '011-?[0-9]{9,13}'
+  pattern: '(?:011-[0-9]{9,13}|011[0-9]{9,13})'
+  min_digit_run: 9
   mask: 011-*********
   examples:
     match:
@@ -126,7 +131,8 @@ patterns:
   location: tw
   category: bank
   description: Taipei Fubon Commercial Bank account (012-XXXXXXXXXXXX)
-  pattern: '012-?[0-9]{9,13}'
+  pattern: '(?:012-[0-9]{9,13}|012[0-9]{9,13})'
+  min_digit_run: 9
   mask: 012-*********
   examples:
     match:
@@ -150,7 +156,8 @@ patterns:
   location: tw
   category: bank
   description: CTBC Bank account (822-XXXXXXXXXXXX)
-  pattern: '822-?[0-9]{9,13}'
+  pattern: '(?:822-[0-9]{9,13}|822[0-9]{9,13})'
+  min_digit_run: 9
   mask: 822-*********
   examples:
     match:
@@ -174,7 +181,8 @@ patterns:
   location: tw
   category: bank
   description: E.SUN Commercial Bank account (808-XXXXXXXXXXXX)
-  pattern: '808-?[0-9]{9,13}'
+  pattern: '(?:808-[0-9]{9,13}|808[0-9]{9,13})'
+  min_digit_run: 9
   mask: 808-*********
   examples:
     match:
@@ -198,7 +206,8 @@ patterns:
   location: tw
   category: bank
   description: Taiwan Cooperative Bank account (006-XXXXXXXXXXXX)
-  pattern: '006-?[0-9]{9,13}'
+  pattern: '(?:006-[0-9]{9,13}|006[0-9]{9,13})'
+  min_digit_run: 9
   mask: 006-*********
   examples:
     match:
@@ -222,7 +231,8 @@ patterns:
   location: tw
   category: bank
   description: Generic Taiwan bank account (XXX-XXXXXXXXXXXX)
-  pattern: '[0-9]{3}-?[0-9]{9,13}'
+  pattern: '(?:[0-9]{3}-[0-9]{9,13}|[0-9]{3}[0-9]{9,13})'
+  min_digit_run: 9
   mask: '***-*********'
   verification: generic_number_not_timestamp
   examples:

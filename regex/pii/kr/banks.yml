@@ -6,6 +6,7 @@ patterns:
   category: bank
   description: Korean Kookmin Bank account number (국민은행)
   pattern: '(?:110|120|150|190|830)[- ]?[0-9]{3}[- ]?[0-9]{6,7}'
+  min_digit_run: 6
   verification: korean_bank_account_valid
   mask: '***-***-*******'
   examples:
@@ -32,7 +33,8 @@ patterns:
   location: kr
   category: bank
   description: Korean Shinhan Bank account number (신한은행)
-  pattern: '(?:110)-?[0-9]{3}-?[0-9]{6,7}'
+  pattern: '(?:(?:110)-[0-9]{3}-[0-9]{6,7}|(?:110)[0-9]{3}[0-9]{6,7})'
+  min_digit_run: 6
   mask: '***-***-*******'
   examples:
     match:
@@ -55,7 +57,8 @@ patterns:
   location: kr
   category: bank
   description: Korean Woori Bank account number (우리은행)
-  pattern: '(?:1002)-?[0-9]{3}-?[0-9]{6,7}'
+  pattern: '(?:(?:1002)-[0-9]{3}-[0-9]{6,7}|(?:1002)[0-9]{3}[0-9]{6,7})'
+  min_digit_run: 6
   mask: '****-***-*******'
   examples:
     match:
@@ -78,7 +81,8 @@ patterns:
   location: kr
   category: bank
   description: Korean Hana Bank account number (하나은행)
-  pattern: '[0-9]{3}-?[0-9]{6}-?[0-9]{4,5}'
+  pattern: '(?:[0-9]{3}-[0-9]{6}-[0-9]{4,5}|[0-9]{3}[0-9]{6}[0-9]{4,5})'
+  min_digit_run: 6
   verification: generic_number_not_timestamp
   mask: '***-******-*****'
   examples:
@@ -103,7 +107,8 @@ patterns:
   location: kr
   category: bank
   description: Korean Nonghyup Bank account number (농협은행)
-  pattern: '(?:301)-?[0-9]{4}-?[0-9]{4}-?[0-9]{2}'
+  pattern: '(?:(?:301)-[0-9]{4}-[0-9]{4}-[0-9]{2}|(?:301)[0-9]{4}[0-9]{4}[0-9]{2})'
+  min_digit_run: 4
   mask: '***-****-****-**'
   examples:
     match:
@@ -126,7 +131,8 @@ patterns:
   location: kr
   category: bank
   description: Korean IBK Industrial Bank account number (IBK기업은행)
-  pattern: '[0-9]{3}-?[0-9]{6}-?[0-9]{2}-?[0-9]{3}'
+  pattern: '(?:[0-9]{3}-[0-9]{6}-[0-9]{2}-[0-9]{3}|[0-9]{3}[0-9]{6}[0-9]{2}[0-9]{3})'
+  min_digit_run: 6
   verification: generic_number_not_timestamp
   mask: '***-******-**-***'
   examples:
@@ -151,6 +157,7 @@ patterns:
   category: bank
   description: Korean SC First Bank account number (SC제일은행)
   pattern: '[0-9]{3}-[0-9]{2}-[0-9]{6}'
+  min_digit_run: 6
   verification: generic_number_not_timestamp
   mask: '***-**-******'
   examples:
@@ -174,7 +181,8 @@ patterns:
   location: kr
   category: bank
   description: Korean Citibank account number (한국씨티은행)
-  pattern: '[0-9]{3}-?[0-9]{5}-?[0-9]{2}-?[0-9]{3}'
+  pattern: '(?:[0-9]{3}-[0-9]{5}-[0-9]{2}-[0-9]{3}|[0-9]{3}[0-9]{5}[0-9]{2}[0-9]{3})'
+  min_digit_run: 5
   verification: generic_number_not_timestamp
   mask: '***-*****-**-***'
   examples:
@@ -199,7 +207,8 @@ patterns:
   location: kr
   category: bank
   description: Korean Busan Bank account number (부산은행)
-  pattern: '[0-9]{3}-?[0-9]{4}-?[0-9]{4}-?[0-9]{2}'
+  pattern: '(?:[0-9]{3}-[0-9]{4}-[0-9]{4}-[0-9]{2}|[0-9]{3}[0-9]{4}[0-9]{4}[0-9]{2})'
+  min_digit_run: 4
   mask: '***-****-****-**'
   examples:
     match:
@@ -223,6 +232,7 @@ patterns:
   category: bank
   description: Korean Daegu Bank account number (대구은행)
   pattern: '[0-9]{3}-[0-9]{2}-[0-9]{6}-[0-9]'
+  min_digit_run: 6
   mask: '***-**-******-*'
   examples:
     match:
@@ -246,6 +256,7 @@ patterns:
   category: bank
   description: Korean Gwangju Bank account number (광주은행)
   pattern: '[0-9]{3}-[0-9]{3}-[0-9]{6}'
+  min_digit_run: 6
   mask: '***-***-******'
   examples:
     match:
@@ -291,7 +302,8 @@ patterns:
   location: kr
   category: bank
   description: Korean Jeju Bank account number (제주은행)
-  pattern: '[0-9]{2}-?[0-9]{6}-?[0-9]{2}'
+  pattern: '(?:[0-9]{2}-[0-9]{6}-[0-9]{2}|[0-9]{2}[0-9]{6}[0-9]{2})'
+  min_digit_run: 6
   verification: generic_number_not_timestamp
   mask: '**-******-**'
   examples:
@@ -314,7 +326,8 @@ patterns:
   location: kr
   category: bank
   description: Korean Kakao Bank account number (카카오뱅크)
-  pattern: '3333-?[0-9]{2}-?[0-9]{7}'
+  pattern: '(?:3333-[0-9]{2}-[0-9]{7}|3333[0-9]{2}[0-9]{7})'
+  min_digit_run: 7
   mask: '****-**-*******'
   examples:
     match:
@@ -337,7 +350,8 @@ patterns:
   location: kr
   category: bank
   description: Korean digital bank account (K Bank / Toss Bank)
-  pattern: '100-?[0-9]{3}-?[0-9]{6}'
+  pattern: '(?:100-[0-9]{3}-[0-9]{6}|100[0-9]{3}[0-9]{6})'
+  min_digit_run: 6
   mask: '***-***-******'
   examples:
     match:

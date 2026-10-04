@@ -6,6 +6,7 @@ patterns:
   category: iban
   description: International Bank Account Number (IBAN) with Mod-97 verification
   pattern: '[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}'
+  min_digit_run: 2
   mask: '********************'
   verification: iban_mod97
   examples:
@@ -28,6 +29,7 @@ patterns:
   category: iban
   description: IBAN for Germany (DE)
   pattern: 'DE[0-9]{2}[A-Z0-9]{18}'
+  min_digit_run: 2
   mask: DE********************
   verification: iban_mod97
   examples:
@@ -47,6 +49,7 @@ patterns:
   category: iban
   description: IBAN for France (FR)
   pattern: 'FR[0-9]{2}[A-Z0-9]{23}'
+  min_digit_run: 2
   mask: FR***********************
   verification: iban_mod97
   examples:
@@ -66,6 +69,7 @@ patterns:
   category: iban
   description: IBAN for United Kingdom (GB)
   pattern: 'GB[0-9]{2}[A-Z0-9]{18}'
+  min_digit_run: 2
   mask: GB********************
   verification: iban_mod97
   examples:
@@ -85,6 +89,7 @@ patterns:
   category: iban
   description: IBAN for Italy (IT)
   pattern: 'IT[0-9]{2}[A-Z0-9]{23}'
+  min_digit_run: 2
   mask: IT***********************
   verification: iban_mod97
   examples:

@@ -8,6 +8,7 @@ patterns:
     category: financial
     description: Bitcoin P2PKH address (Starts with 1)
     pattern: '1[a-km-zA-HJ-NP-Z1-9]{25,34}'
+    min_digit_run: 1
     mask: "1***"
     examples:
       match:
@@ -28,6 +29,8 @@ patterns:
     category: financial
     description: Ethereum / ERC-20 address
     pattern: '0x[a-fA-F0-9]{40}'
+    min_digit_run: 1
+    hit_keywords: ['0x']
     mask: "0x***"
     examples:
       match:

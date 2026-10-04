@@ -6,6 +6,7 @@ patterns:
   category: other
   description: Spanish DNI (8 digits + letter)
   pattern: '[0-9]{8}[A-Z]'
+  min_digit_run: 8
   verification: spain_dni_valid
   mask: '********-*'
   examples:
@@ -32,6 +33,7 @@ patterns:
   category: other
   description: Spanish NIE (foreigner ID - letter + 7 digits + letter)
   pattern: '[XYZ][0-9]{7}[A-Z]'
+  min_digit_run: 7
   verification: spain_nie_valid
   mask: '*-*******-*'
   examples:
@@ -58,6 +60,7 @@ patterns:
   category: passport
   description: Spanish passport number (3 letters + 6 digits)
   pattern: '[A-Z]{3}[0-9]{6}'
+  min_digit_run: 6
   mask: '*********'
   examples:
     match:
@@ -81,6 +84,7 @@ patterns:
   category: other
   description: Spanish CIF (Business tax ID - letter + 7 digits + control character)
   pattern: '[A-HJKLMNPQSVW][0-9]{7}[0-9A-J]'
+  min_digit_run: 7
   mask: '*-*******-*'
   examples:
     match:

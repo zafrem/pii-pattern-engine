@@ -4,26 +4,29 @@ patterns:
 - id: passport_germany_01
   location: eu
   category: passport
-  description: German passport number (9 alphanumeric starting with C, F, G, H, J,
-    or K)
-  pattern: '[CFGHJK][0-9A-Z]{8}'
+  description: German passport number (series letter + 8 chars from the official
+    document alphabet)
+  pattern: '[CFGHJK][0-9CFGHJKLMNPRTVWXYZ]{8}'
   mask: '*********'
   examples:
     match:
     - C01X00T47
     - F22000129
-    - G9Y1BTM58
+    - G9Y1CTM58
     nomatch:
     - A01X00T47
     - C01X00T4
     - C01X00T471
+    - C01B00T47
   policy:
     store_raw: false
     action_on_match: redact
     severity: high
   metadata:
-    note: German Reisepass number. Series C (2007-2010), F (since 2007 biometric),
-      G (official), H (diplomatic), J (service), K (child).
+    note: 'German Reisepass number. Series C (2007-2010), F (since 2007 biometric),
+      G (official), H (diplomatic), J (service), K (child). The document number uses
+      only digits and the letters C F G H J K L M N P R T V W X Y Z; look-alike
+      letters (A B D E I O Q S U) are never used.'
   priority: 180
   match_type: exactly_matches
 - id: passport_france_01
@@ -31,6 +34,7 @@ patterns:
   category: passport
   description: French passport number (2 digits + 2 letters + 5 digits)
   pattern: '[0-9]{2}[A-Z]{2}[0-9]{5}'
+  min_digit_run: 5
   mask: '*********'
   examples:
     match:
@@ -54,6 +58,7 @@ patterns:
   category: passport
   description: Italian passport number (2 letters + 7 digits)
   pattern: '[A-Z]{2}[0-9]{7}'
+  min_digit_run: 7
   mask: '*********'
   examples:
     match:
@@ -77,6 +82,7 @@ patterns:
   category: passport
   description: Spanish passport number (3 letters + 6 digits)
   pattern: '[A-Z]{3}[0-9]{6}'
+  min_digit_run: 6
   mask: '*********'
   examples:
     match:
@@ -98,25 +104,27 @@ patterns:
 - id: passport_uk_01
   location: eu
   category: passport
-  description: UK passport number (9 digits or 12 alphanumeric)
-  pattern: '(?:[0-9]{9}|[A-Z0-9]{12})'
+  description: UK passport number (9 digits)
+  pattern: '[0-9]{9}'
+  min_digit_run: 9
   mask: '*********'
   examples:
     match:
     - '123456789'
-    - ABC123DEF456
     - '999999999'
     nomatch:
     - '12345678'
     - '1234567890'
+    - ABC123DEF456
     - ABCD1234
   policy:
     store_raw: false
     action_on_match: redact
     severity: high
   metadata:
-    note: 'UK Passport number. Older passports: 9 digits. Newer biometric: 12 alphanumeric.
-      Note: UK left EU but included for transition.'
+    note: 'UK Passport number: 9 digits. (The previously listed "12 alphanumeric"
+      form was incorrect and matched almost any 12-char string; UK passport book
+      numbers are 9 digits. UK left the EU but is retained here for coverage.)'
   priority: 180
   match_type: exactly_matches
 - id: passport_netherlands_01
@@ -124,6 +132,7 @@ patterns:
   category: passport
   description: Dutch passport number (2 letters + 6 digits)
   pattern: '[A-Z]{2}[0-9]{6}'
+  min_digit_run: 6
   mask: '********'
   examples:
     match:
@@ -170,6 +179,7 @@ patterns:
   category: passport
   description: Swedish passport number (8 digits)
   pattern: '[0-9]{8}'
+  min_digit_run: 8
   mask: '********'
   examples:
     match:
@@ -216,6 +226,7 @@ patterns:
   category: passport
   description: Austrian passport number (letter + 7 digits)
   pattern: '[A-Z][0-9]{7}'
+  min_digit_run: 7
   mask: '********'
   examples:
     match:
@@ -239,6 +250,7 @@ patterns:
   category: passport
   description: Portuguese passport number (letter + 6 digits)
   pattern: '[A-Z][0-9]{6}'
+  min_digit_run: 6
   mask: '*******'
   examples:
     match:

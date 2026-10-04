@@ -27,6 +27,7 @@ patterns:
     category: device
     description: 15-digit IMEI (includes Luhn checksum validation)
     pattern: '\b[0-9]{15}\b'
+    min_digit_run: 15
     mask: "**********#####"
     verification: imei_valid
     examples:

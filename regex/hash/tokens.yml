@@ -32,6 +32,7 @@ patterns:
   category: token
   description: AWS Access Key ID (starts with AKIA, 20 chars)
   pattern: 'AKIA[0-9A-Z]{16}'
+  hit_keywords: ['AKIA']
   priority: 1
   mask: AKIA****************
   examples:
@@ -78,6 +79,7 @@ patterns:
   description: GitHub Personal Access Token (starts with ghp_, gho_, ghu_, ghs_, or
     ghr_)
   pattern: 'gh[pousr]_[A-Za-z0-9_]{36,}'
+  hit_keywords: ['ghp_', 'gho_', 'ghu_', 'ghs_', 'ghr_']
   verification: high_entropy_token
   priority: 1
   mask: ghp_************************************
@@ -102,6 +104,7 @@ patterns:
   category: token
   description: Stripe API Key — secret (sk_), publishable (pk_), and restricted (rk_) prefixes
   pattern: '(?:rk|sk|pk)_(live|test|demo)_[A-Za-z0-9]{24,}'
+  hit_keywords: ['sk_', 'pk_', 'rk_']
   verification: high_entropy_token
   priority: 1
   mask: '****_****_************************'
@@ -127,6 +130,7 @@ patterns:
   category: token
   description: JSON Web Token (JWT) - three base64url parts separated by dots
   pattern: 'eyJ[A-Za-z0-9_\-]+\.eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+'
+  hit_keywords: ['eyJ']
   priority: 2
   mask: '[REDACTED_JWT]'
   examples:
@@ -148,6 +152,7 @@ patterns:
   category: token
   description: Slack Token (starts with xoxb-, xoxp-, xoxa-, or xoxr-)
   pattern: 'xox[bpar]-[A-Za-z0-9\-]{10,}'
+  hit_keywords: ['xoxb-', 'xoxp-', 'xoxa-', 'xoxr-']
   verification: high_entropy_token
   priority: 1
   mask: xox*-***************************
@@ -172,6 +177,7 @@ patterns:
   category: token
   description: Google API Key (starts with AIza)
   pattern: 'AIza[A-Za-z0-9\-_]{35}'
+  hit_keywords: ['AIza']
   priority: 1
   mask: AIza***********************************
   examples:
@@ -217,6 +223,7 @@ patterns:
   category: token
   description: Private key header (RSA, EC, SSH, PGP)
   pattern: '-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----'
+  hit_keywords: ['PRIVATE KEY']
   priority: 1
   mask: '[REDACTED_PRIVATE_KEY]'
   examples:

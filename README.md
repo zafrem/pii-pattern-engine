@@ -84,12 +84,23 @@ pii-pattern-engine/
 │   ├── personal.yml
 │   └── README.md
 │
-├── tests/                        # Test suite
-│   ├── test_rerank.py           # Re-rank scoring tests (400 tests)
-│   ├── test_verification.py     # Verification function tests
-│   ├── test_patterns.py         # Pattern validation tests
+├── prefilter/                    # Scan-optimization layer (pre-filter)
+│   ├── prefilter.py             # Aho-Corasick keywords + min_digit_run gating
 │   └── README.md
 │
+├── examples/                     # Runnable, end-to-end examples
+│   ├── detect.py                # Detection engine using the Aho-Corasick pre-filter
+│   └── README.md
+│
+├── tests/                        # Test suite
+│   ├── test_rerank.py           # Re-rank scoring tests
+│   ├── test_verification.py     # Verification function tests
+│   ├── test_patterns.py         # Pattern validation tests
+│   ├── test_prefilter.py        # Pre-filter + hit_keywords/min_digit_run tests
+│   ├── test_examples.py         # End-to-end example + pre-filter equivalence tests
+│   └── README.md
+│
+├── INTEGRATION.md                # How to build a detector on this library
 ├── pytest.ini
 └── README.md
 ```
@@ -130,6 +141,31 @@ pytest tests/test_patterns.py
 # Run with coverage
 pytest --cov=verification --cov-report=html
 ```
+
+### Detecting PII (end-to-end example)
+
+A runnable reference engine ties the patterns, the Aho-Corasick pre-filter, and
+the verification functions together:
+
+```bash
+python examples/detect.py
+```
+
+```python
+import sys; sys.path.insert(0, "examples")
+from detect import Detector
+
+det = Detector()
+text = "SSN 123-45-6789, email alice@example.com"
+for f in det.detect_clean(text):
+    print(f.category, f.text)        # -> ssn 123-45-6789  /  email alice@example.com
+
+# The pre-filter narrows ~200 patterns to a handful before any regex runs,
+# and returns identical results to scanning with every pattern:
+det.detect(text, use_prefilter=True) == det.detect(text, use_prefilter=False)  # True
+```
+
+See [examples/README.md](examples/README.md) and [INTEGRATION.md](INTEGRATION.md).
 
 ### Using the Re-Rank Scorer
 
@@ -326,6 +362,10 @@ patterns:
     pattern: '<regex_pattern>'      # single source of truth; RE2-compatible
     mask: "<redaction_format>"
     verification: <function_name>   # optional
+    hit_keywords: ['AKIA', '@']     # optional; literal anchors for the
+                                    # Aho-Corasick pre-filter (see prefilter/)
+    min_digit_run: 4                # optional; longest consecutive-digit run every
+                                    # match must contain — numeric pre-filter gate
     flags:                          # optional
       - IGNORECASE
     examples:
@@ -360,6 +400,31 @@ string runs identically on Python `re`, Go (RE2), Java, and JavaScript:
 Because the regex is identical across languages, each pattern carries a single
 `pattern` field rather than per-language copies.
 
+### What each field is for
+
+| Field | Used for | Consumed by |
+|-------|----------|-------------|
+| `id` | Stable identifier within the file | logs, dedup, overlap resolution |
+| `location` / `category` | Grouping & routing (region, data type) | filtering which patterns to run |
+| `pattern` | The detector itself — one RE2-safe regex | the regex engine (Stage 2) |
+| `flags` | Regex flags, e.g. `IGNORECASE` | the regex engine |
+| `verification` | Name of a checksum/validity function to confirm a raw match (Luhn, mod-97, SSA rules…) | `verification/<lang>/` (Stage 3) |
+| **`hit_keywords`** | **Literal anchors for a multi-pattern pre-scan — build an Aho-Corasick automaton and skip the pattern when none are present. Pure scan optimization.** | `prefilter/` (Stage 1) |
+| **`min_digit_run`** | **Scan optimization for numeric patterns with no literal anchor — skip the pattern unless the text has a digit run this long.** | `prefilter/` (Stage 1) |
+| `mask` | Redaction/replacement string once matched | masking step (Stage 4) |
+| `match_type` | How a match relates to the token (whole-token vs substring); drives example validation | test suite / scanning strategy |
+| `policy` | `action_on_match` (redact/report/…), `severity`, `store_raw` — what to *do* with a hit | your enforcement/DLP layer |
+| `priority` | Tie-breaking when spans overlap (lower = higher priority) | match-resolution step |
+| `metadata` | Human notes (provider, type) | documentation only |
+| `examples` | `match`/`nomatch` fixtures | the test suite |
+
+`hit_keywords` and `min_digit_run` are **optional optimization hints only** — they
+never change *what* is detected, only *how fast*. A detector that ignores them is
+still correct (just slower); a detector that uses them must follow the soundness
+rules in [prefilter/README.md](prefilter/README.md). See
+[INTEGRATION.md](INTEGRATION.md) for the full pipeline and the contracts a
+consuming engine must honor.
+
 ## Test Suite
 
 | File | Tests | Coverage |
@@ -367,7 +432,9 @@ Because the regex is identical across languages, each pattern carries a single
 | `test_rerank.py` | 400 | Engine config, sum_example arithmetic (153 entities), 69 sentence cases, edge cases |
 | `test_verification.py` | ~133 | All 55 verification functions |
 | `test_patterns.py` | ~3,000+ | YAML structure, regex compilation, match/nomatch examples |
-| **Total** | **3,500+** | |
+| `test_prefilter.py` | ~560 | Aho-Corasick automaton, `hit_keywords`/`min_digit_run` soundness, gate behavior |
+| `test_examples.py` | ~16 | End-to-end example; pre-filter vs brute-force equivalence |
+| **Total** | **3,800+** | |
 
 ```bash
 # Run all
@@ -411,6 +478,9 @@ Apache License 2.0 — see [LICENSE](LICENSE).
 
 ## Resources
 
+- [Integration Guide](INTEGRATION.md) — how to build a detector on this library (the pipeline, what you must implement, and the contracts)
+- [Examples](examples/README.md) — runnable end-to-end detection using the Aho-Corasick pre-filter
+- [Pre-filter (Aho-Corasick + digit-run)](prefilter/README.md) — scan-optimization layer
 - [Re-Rank Scoring Guide](re-rank/README.md)
 - [Verification Functions](verification/README.md)
 - [Keywords](keyword/README.md)
@@ -419,3 +489,7 @@ Apache License 2.0 — see [LICENSE](LICENSE).
 ---
 
 **Note**: For legitimate use cases — data protection, compliance, and security tooling. Use responsibly and in accordance with applicable laws.
+
+---
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/zafrem)

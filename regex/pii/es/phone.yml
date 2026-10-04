@@ -6,6 +6,7 @@ patterns:
   category: phone
   description: Spanish mobile phone number (starts with 6 or 7)
   pattern: '(?:(?:\+|00)34[\t\n\f\r ]?)?[67][0-9]{8}'
+  min_digit_run: 9
   mask: '*** *** ***'
   examples:
     match:
@@ -27,6 +28,7 @@ patterns:
   category: phone
   description: Spanish mobile phone number with spaces or hyphens
   pattern: '(?:(?:\+|00)34[\t\n\f\r ]?)?[67](?:[ -]?[0-9]{2}){4}'
+  min_digit_run: 2
   mask: '*** ** ** **'
   examples:
     match:
@@ -46,6 +48,7 @@ patterns:
   category: phone
   description: Spanish landline phone number (starts with 8 or 9)
   pattern: '(?:(?:\+|00)34[\t\n\f\r ]?)?[89][0-9]{8}'
+  min_digit_run: 9
   mask: '*** *** ***'
   examples:
     match:

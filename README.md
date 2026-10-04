@@ -12,6 +12,13 @@ PII Pattern Engine provides:
 - **Keyword Mappings**: Context-aware keywords in multiple languages for improved accuracy
 - **Comprehensive Tests**: 3,500+ automated tests ensuring accuracy and reliability
 
+
+---
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/zafrem)
+
+---
+
 ## Project Structure
 
 ```
@@ -490,6 +497,3 @@ Apache License 2.0 — see [LICENSE](LICENSE).
 
 **Note**: For legitimate use cases — data protection, compliance, and security tooling. Use responsibly and in accordance with applicable laws.
 
----
-
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/zafrem)

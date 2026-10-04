@@ -4,8 +4,9 @@ patterns:
 - id: mobile_01
   location: cn
   category: phone
-  description: Chinese mobile phone number (1XX-XXXX-XXXX)
-  pattern: '1[3-9][0-9]-?[0-9]{4}-?[0-9]{4}'
+  description: Chinese mobile phone number (1XX-XXXX-XXXX, optional +86/0086 code)
+  pattern: '(?:(?:(?:\+|00)86[\t\n\f\r -]?)?1[3-9][0-9]-[0-9]{4}-[0-9]{4}|(?:(?:\+|00)86[\t\n\f\r -]?)?1[3-9][0-9][0-9]{4}[0-9]{4})'
+  min_digit_run: 4
   mask: 1**-****-****
   examples:
     match:
@@ -13,10 +14,14 @@ patterns:
     - '13812345678'
     - 186-9876-5432
     - 199-0000-1111
+    - '+8613812345678'
+    - '+86 138-1234-5678'
+    - 0086 13812345678
     nomatch:
     - 128-1234-5678
     - 138-123-45678
     - 1381-234-5678
+    - '+8513812345678'
   policy:
     store_raw: false
     action_on_match: redact
@@ -25,8 +30,10 @@ patterns:
 - id: landline_01
   location: cn
   category: phone
-  description: Chinese landline number (area code + number)
-  pattern: '0[1-9][0-9]{1,2}-?[0-9]{7,8}'
+  description: Chinese landline number (area code + number, optional +86/0086 code;
+    the trunk 0 is dropped when the international code is present)
+  pattern: '(?:(?:(?:\+|00)86[\t\n\f\r -]?|0)[1-9][0-9]{1,2}-[0-9]{7,8}|(?:(?:\+|00)86[\t\n\f\r -]?|0)[1-9][0-9]{1,2}[0-9]{7,8})'
+  min_digit_run: 7
   mask: 0***-********
   examples:
     match:
@@ -34,10 +41,14 @@ patterns:
     - 021-87654321
     - 0755-12345678
     - 02112345678
+    - '+86 10-12345678'
+    - '+86 21-87654321'
+    - 0086 755-12345678
     nomatch:
     - 00-12345678
     - 010-123456
     - 138-12345678
+    - '+86 010-12345678'
   policy:
     store_raw: false
     action_on_match: report

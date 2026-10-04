@@ -45,6 +45,8 @@ patterns:
     category: identifiers
     description: CVE Identifier (Common Vulnerabilities and Exposures)
     pattern: '\bCVE-[0-9]{4}-[0-9]{4,7}\b'
+    min_digit_run: 4
+    hit_keywords: ['CVE-']
     mask: "CVE-****-****"
     examples:
       match:

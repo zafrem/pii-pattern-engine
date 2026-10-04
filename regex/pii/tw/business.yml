@@ -8,6 +8,7 @@ patterns:
     category: identification
     description: Taiwan Unified Business Number (統一編號 - 8 digits)
     pattern: '[0-9]{8}'
+    min_digit_run: 8
     mask: "UBN-********"
     examples:
       match:

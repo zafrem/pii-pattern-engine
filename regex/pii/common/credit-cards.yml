@@ -6,6 +6,7 @@ patterns:
   category: credit_card
   description: Visa credit card number
   pattern: '4[0-9]{12}(?:[0-9]{3})?'
+  min_digit_run: 13
   mask: '****-****-****-****'
   examples:
     match:
@@ -24,6 +25,7 @@ patterns:
   category: credit_card
   description: MasterCard credit card number
   pattern: '5[1-5][0-9]{14}'
+  min_digit_run: 16
   mask: '****-****-****-****'
   examples:
     match:
@@ -42,6 +44,7 @@ patterns:
   category: credit_card
   description: American Express credit card number
   pattern: '3[47][0-9]{13}'
+  min_digit_run: 15
   mask: '****-******-*****'
   examples:
     match:
@@ -60,6 +63,7 @@ patterns:
   category: credit_card
   description: Discover credit card number
   pattern: '6(?:011|5[0-9]{2})[0-9]{12}'
+  min_digit_run: 16
   mask: '****-****-****-****'
   examples:
     match:
@@ -78,6 +82,7 @@ patterns:
   category: credit_card
   description: JCB credit card number
   pattern: '(?:2131|1800|35[0-9]{3})[0-9]{11}'
+  min_digit_run: 15
   mask: '****-****-****-****'
   examples:
     match:
@@ -96,6 +101,7 @@ patterns:
   category: credit_card
   description: Diners Club credit card number
   pattern: '3[0689][0-9]{12}'
+  min_digit_run: 14
   verification: credit_card_bin_valid
   mask: '****-******-****'
   examples:

@@ -6,6 +6,7 @@ patterns:
   category: passport
   description: US passport number (9 digits or letter followed by 8 digits)
   pattern: '(?:[0-9]{9}|[A-Z][0-9]{8})'
+  min_digit_run: 8
   flags:
   - IGNORECASE
   mask: '*********'
@@ -26,6 +27,7 @@ patterns:
   category: other
   description: California driver's license (1 letter + 7 digits)
   pattern: '[A-Z][0-9]{7}'
+  min_digit_run: 7
   flags:
   - IGNORECASE
   mask: A*******
@@ -48,6 +50,7 @@ patterns:
   category: other
   description: Medicare Beneficiary Identifier (MBI format, excludes S/L/O/I/B/Z)
   pattern: '[ACDEFGHJKMNPQRTUVWXY][0-9]{3}[ACDEFGHJKMNPQRTUVWXY]{2}[0-9]{4}[ACDEFGHJKMNPQRTUVWXY]'
+  min_digit_run: 4
   flags:
   - IGNORECASE
   mask: A***AA****A

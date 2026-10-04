@@ -4,18 +4,24 @@ patterns:
 - id: mobile_01
   location: jp
   category: phone
-  description: Japanese mobile phone number (090/080/070-XXXX-XXXX)
-  pattern: '0[789]0-?[0-9]{4}-?[0-9]{4}'
+  description: Japanese mobile phone number (090/080/070-XXXX-XXXX, optional +81/0081
+    code; the trunk 0 is dropped when the international code is present)
+  pattern: '(?:(?:(?:\+|00)81[\t\n\f\r -]?|0)[789]0-[0-9]{4}-[0-9]{4}|(?:(?:\+|00)81[\t\n\f\r -]?|0)[789]0[0-9]{4}[0-9]{4})'
+  min_digit_run: 4
   mask: 0**-****-****
   examples:
     match:
     - 090-1234-5678
     - 08012345678
     - 070-9876-5432
+    - '+81 90-1234-5678'
+    - '+819012345678'
+    - 0081 80-1234-5678
     nomatch:
     - 060-1234-5678
     - 090-123-45678
     - 0901-234-5678
+    - '+81 090-1234-5678'
   policy:
     store_raw: false
     action_on_match: redact
@@ -26,7 +32,8 @@ patterns:
   category: phone
   description: Japanese landline phone number (03-xxxx-xxxx, etc.) - excludes 070/080/090
     mobile prefixes
-  pattern: '0(?:[1-6][0-9]?|[789][1-9])(?:-?[0-9]{3,4}-?[0-9]{4})'
+  pattern: '(?:(?:(?:\+|00)81[\t\n\f\r -]?|0)(?:[1-6][0-9]?|[789][1-9])(?:-[0-9]{3,4}-[0-9]{4})|(?:(?:\+|00)81[\t\n\f\r -]?|0)(?:[1-6][0-9]?|[789][1-9])(?:[0-9]{3,4}[0-9]{4}))'
+  min_digit_run: 4
   verification: not_repeating_pattern
   mask: '**-****-****'
   examples:
@@ -35,10 +42,14 @@ patterns:
     - 06-6789-0123
     - 011-123-4567
     - 0312345678
+    - '+81 3-1234-5678'
+    - '+81 6-6789-0123'
+    - 0081 11-123-4567
     nomatch:
     - 00-1234-5678
     - 090-1234-5678
     - 03-12345-678
+    - '+81 03-1234-5678'
   policy:
     store_raw: false
     action_on_match: report

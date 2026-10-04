@@ -6,6 +6,7 @@ patterns:
   category: bank
   description: ICBC (Industrial and Commercial Bank of China) account number
   pattern: '622[0-9]{13,17}'
+  min_digit_run: 16
   mask: 622****-****-****-****
   examples:
     match:
@@ -28,6 +29,7 @@ patterns:
   category: bank
   description: CCB (China Construction Bank) account number
   pattern: '436[0-9]{13,17}'
+  min_digit_run: 16
   mask: 436****-****-****-****
   examples:
     match:
@@ -50,6 +52,7 @@ patterns:
   category: bank
   description: ABC (Agricultural Bank of China) account number
   pattern: '103[0-9]{15,17}'
+  min_digit_run: 18
   mask: 103****-****-****-****
   examples:
     match:
@@ -72,6 +75,7 @@ patterns:
   category: bank
   description: BOC (Bank of China) account number
   pattern: '456[0-9]{13,17}'
+  min_digit_run: 16
   mask: 456****-****-****-****
   examples:
     match:
@@ -94,6 +98,7 @@ patterns:
   category: bank
   description: CMB (China Merchants Bank) account number
   pattern: '621[0-9]{13,17}'
+  min_digit_run: 16
   mask: 621****-****-****-****
   examples:
     match:

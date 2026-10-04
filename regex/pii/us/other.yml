@@ -6,6 +6,7 @@ patterns:
   category: other
   description: Employer Identification Number (XX-XXXXXXX)
   pattern: '[0-9]{2}-[0-9]{7}'
+  min_digit_run: 7
   verification: not_timestamp
   mask: '**-*******'
   examples:
@@ -56,6 +57,7 @@ patterns:
   category: address
   description: US ZIP code (5 digits or ZIP+4)
   pattern: \b[0-9]{5}(?:-[0-9]{4})?\b
+  min_digit_run: 5
   verification: us_zipcode_valid
   mask: '*****'
   examples:

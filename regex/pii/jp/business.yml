@@ -8,6 +8,7 @@ patterns:
     category: identification
     description: Japanese Corporate Number (法人番号 - 13 digits)
     pattern: '[1-9][0-9]{12}'
+    min_digit_run: 13
     mask: "JP-*************"
     examples:
       match:

@@ -6,6 +6,7 @@ patterns:
   category: other
   description: Taiwan National ID (1 letter + 9 digits)
   pattern: '[A-Z][0-9]{9}'
+  min_digit_run: 9
   flags:
   - IGNORECASE
   verification: tw_national_id_valid
@@ -38,6 +39,7 @@ patterns:
   category: passport
   description: Taiwan passport number (9 digits)
   pattern: '[0-9]{9}'
+  min_digit_run: 9
   mask: '*********'
   examples:
     match:

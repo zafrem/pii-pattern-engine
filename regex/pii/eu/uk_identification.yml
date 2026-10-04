@@ -8,6 +8,7 @@ patterns:
     category: identification
     description: UK National Insurance Number (NINO)
     pattern: '[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[A-D]'
+    min_digit_run: 6
     flags: [IGNORECASE]
     mask: "**-**-**-*"
     examples:

@@ -8,6 +8,7 @@ patterns:
     category: identification
     description: National Provider Identifier (NPI) - 10-digit unique ID
     pattern: '[1-9][0-9]{9}'
+    min_digit_run: 10
     mask: "NPI-**********"
     examples:
       match:
@@ -27,6 +28,7 @@ patterns:
     category: medical
     description: ICD-10-CM Diagnosis Code (3 to 7 characters)
     pattern: '[A-Z][0-9][0-9A-Z](?:\.[0-9A-Z]{1,4})?'
+    min_digit_run: 1
     mask: "ICD-***"
     examples:
       match:

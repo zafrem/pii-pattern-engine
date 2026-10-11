@@ -2212,6 +2212,33 @@ def cn_national_id_valid(value: str) -> bool:
         return False
 
 
+def uscc_valid(value: str) -> bool:
+    """
+    Verify a Chinese Unified Social Credit Code (统一社会信用代码) check digit.
+
+    GB 32100-2015: 18 characters drawn from a 31-symbol alphabet that omits
+    I, O, S, V and Z. Character 18 is a mod-31 check over characters 1-17
+    with weights 3^(i-1) mod 31.
+
+    Without this gate the bare ``[0-9A-Z]{18}`` shape also matches every 18-digit
+    resident ID number (and any other 18-character token).
+
+    Args:
+        value: Candidate USCC string
+
+    Returns:
+        True if the check digit is valid, False otherwise
+    """
+    alphabet = "0123456789ABCDEFGHJKLMNPQRTUWXY"
+    code = value.replace(" ", "").upper()
+
+    if len(code) != 18 or any(c not in alphabet for c in code):
+        return False
+
+    total = sum(alphabet.index(c) * pow(3, i, 31) for i, c in enumerate(code[:17]))
+    return alphabet[(31 - total % 31) % 31] == code[17]
+
+
 def tw_national_id_valid(value: str) -> bool:
     """
     Verify Taiwan National ID using checksum algorithm.
@@ -3676,6 +3703,7 @@ VERIFICATION_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
     "japanese_name_kanji_valid": japanese_name_kanji_valid,
     # National ID verification functions
     "cn_national_id_valid": cn_national_id_valid,
+    "uscc_valid": uscc_valid,
     "tw_national_id_valid": tw_national_id_valid,
     "india_aadhaar_valid": india_aadhaar_valid,
     "india_pan_valid": india_pan_valid,

@@ -4,19 +4,23 @@ patterns:
 - id: social_credit_01
   location: cn
   category: other
-  description: Chinese Unified Social Credit Code (18 characters)
+  description: Chinese Unified Social Credit Code (18 characters, GB 32100-2015 check digit)
   pattern: '[0-9A-Z]{18}'
+  verification: uscc_valid
   flags:
   - IGNORECASE
   mask: '******************'
   examples:
     match:
+    - 91110000MA0012345C
+    - '123456789012345678'
+    - 91320100MA1B2C3D4U
+    - 91440300567891234B
+    - 91110101ABCD123451
+    nomatch:
     - 91110000MA00123456
     - 12345678901234567A
-    - 91320100MA1B2C3D4E
-    - 91440300567891234X
-    - 91110101ABCD123456
-    nomatch:
+    - 11010519491231002X
     - 9111000MA00123456
     - 91110000MA0012345678
     - 91110000MA001234567

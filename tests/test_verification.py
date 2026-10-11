@@ -37,6 +37,7 @@ from verification import (
     kr_business_registration_valid,
     kr_corporate_registration_valid,
     kr_rrn_valid,
+    uscc_valid,
     luhn,
     netherlands_bsn_valid,
     not_repeating_pattern,
@@ -1025,3 +1026,25 @@ class TestVerificationRegistry:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+
+
+class TestUsccValid:
+    """Tests for the Unified Social Credit Code (GB 32100-2015) check digit."""
+
+    def test_valid_codes(self):
+        for code in ["91110000MA0012345C", "91320100MA1B2C3D4U", "91440300567891234B"]:
+            assert uscc_valid(code), code
+
+    def test_wrong_check_digit_rejected(self):
+        assert not uscc_valid("91110000MA00123456")
+
+    def test_resident_id_is_not_a_uscc(self):
+        # An 18-character resident ID fits the bare [0-9A-Z]{18} shape but is not a USCC.
+        assert not uscc_valid("11010519491231002X")
+
+    def test_bad_length_or_alphabet_rejected(self):
+        assert not uscc_valid("91110000MA0012345")
+        assert not uscc_valid("91110000MA0012345I")  # I is not in the alphabet
+
+    def test_registered_by_name(self):
+        assert get_verification_function("uscc_valid") is uscc_valid

@@ -72,9 +72,11 @@ patterns:
     - 桃園市桃園區中正路1000號
     - 高雄市左營區博愛二路999號
     - 台中市西屯區市政北二路100號
+    - 臺南市中西區民權路二段30號
     nomatch:
     - 台北市
     - '100'
+    - 台北市中正區重慶南路
     - 重慶南路
     - invalid address format
     - 123 Main Street
@@ -84,7 +86,7 @@ patterns:
     action_on_match: redact
     severity: high
   metadata:
-    note: 'Simplified Taiwan address pattern. Matches: city/county + district + road + optional section/lane/alley + house number with 號.'
+    note: 'Simplified Taiwan address pattern. Starts from one of the 22 Taiwan cities/counties (an unbounded Han run swallowed leading words in running text). Matches: city/county + district + road + optional section/lane/alley + house number with 號.'
   match_type: exactly_matches
 - id: zipcode_01
   location: tw

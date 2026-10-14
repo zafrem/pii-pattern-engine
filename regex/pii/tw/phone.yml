@@ -51,9 +51,9 @@ patterns:
 - id: landline_01
   location: tw
   category: phone
-  description: Taiwan landline number (area code + number)
-  pattern: '(?:0[2-8]-[0-9]{7,8}|0[2-8][0-9]{7,8})'
-  min_digit_run: 7
+  description: Taiwan landline number (area code + number, also grouped 02-2345-6789)
+  pattern: '(?:0[2-8]-[0-9]{3,4}-[0-9]{4}|0[2-8]-[0-9]{7,8}|0[2-8][0-9]{7,8})'
+  min_digit_run: 4
   mask: 0*-********
   examples:
     match:
@@ -61,10 +61,15 @@ patterns:
     - 07-1234567
     - 04-23456789
     - 0212345678
+    - 02-2345-6789
+    - 04-5628-1260
+    - 07-123-4567
     nomatch:
     - 01-12345678
     - 09-12345678
     - 02-123456
+    - 02-12345-6789
+    - 02-2345-678
   policy:
     store_raw: false
     action_on_match: report

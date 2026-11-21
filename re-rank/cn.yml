@@ -1,7 +1,7 @@
 version: "2.0"
 region: China
 region_code: CN
-code_series: 3001-3012
+code_series: 3001-3013
 engine: re-rank/scoring.yml
 reference: reference/cn.yml
 
@@ -256,5 +256,26 @@ entities:
       keyword_avg: 77
       context_bonus: 30
       regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  3013:
+    entity: cn_zipcode
+    keyword_scores:
+      邮政编码: 80
+      邮编: 75
+      邮政: 55
+      postal code: 70
+      zipcode: 70
+    context_bonus:
+      "邮政编码:": 30
+      "邮编:": 30
+    regex_scores:
+      zipcode_01: 35
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 35
       final_score: 100
       label: definite_pii

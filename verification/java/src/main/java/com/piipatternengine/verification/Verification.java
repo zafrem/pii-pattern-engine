@@ -132,6 +132,13 @@ public class Verification {
         registerVerificationFunction("kr_vehicle_registration_valid", Verification::krVehicleRegistrationValid);
         registerVerificationFunction("latitude_valid", Verification::latitudeValid);
         registerVerificationFunction("longitude_valid", Verification::longitudeValid);
+        registerVerificationFunction("uscc_valid", Verification::usccValid);
+        registerVerificationFunction("korean_zipcode_valid", Verification::koreanZipcodeValid);
+        registerVerificationFunction("us_zipcode_valid", Verification::usZipcodeValid);
+        registerVerificationFunction("jp_zipcode_valid", Verification::jpZipcodeValid);
+        registerVerificationFunction("cn_zipcode_valid", Verification::cnZipcodeValid);
+        registerVerificationFunction("tw_zipcode_valid", Verification::twZipcodeValid);
+        registerVerificationFunction("in_pincode_valid", Verification::inPincodeValid);
     }
 
     /**
@@ -311,7 +318,7 @@ public class Verification {
             entropy -= p * (Math.log(p) / Math.log(2));
         }
 
-        return entropy >= 4.5;
+        return entropy >= 4.0;
     }
 
     /**
@@ -973,7 +980,13 @@ public class Verification {
         for (char c : digits.toCharArray()) distinct.add(c);
         if (distinct.size() == 1) return false;
 
-        return true;
+        int[] weights = {2, 3, 4, 5, 6, 7, 8, 9, 2, 3, 4, 5};
+        int total = 0;
+        for (int i = 0; i < 12; i++) {
+            total += Character.getNumericValue(digits.charAt(i)) * weights[i];
+        }
+        int checkDigit = ((11 - (total % 11)) % 10 + 2) % 10;
+        return Character.getNumericValue(digits.charAt(12)) == checkDigit;
     }
 
     /**
@@ -1013,9 +1026,7 @@ public class Verification {
         int[] weights = {1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2};
         int total = 0;
         for (int i = 0; i < 12; i++) {
-            int product = Character.getNumericValue(digits.charAt(i)) * weights[i];
-            if (product > 9) product -= 9;
-            total += product;
+            total += Character.getNumericValue(digits.charAt(i)) * weights[i];
         }
         int checkDigit = (10 - (total % 10)) % 10;
         return Character.getNumericValue(digits.charAt(12)) == checkDigit;
@@ -1553,5 +1564,91 @@ public class Verification {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    /**
+     * Verify Chinese Unified Social Credit Code (GB 32100-2015) check digit.
+     */
+    public static boolean usccValid(String value) {
+        if (value == null) return false;
+        String alphabet = "0123456789ABCDEFGHJKLMNPQRTUWXY";
+        String code = value.replace(" ", "").toUpperCase();
+        if (code.length() != 18) return false;
+        for (int i = 0; i < 18; i++) {
+            if (alphabet.indexOf(code.charAt(i)) == -1) return false;
+        }
+        int total = 0;
+        int weight = 1;
+        for (int i = 0; i < 17; i++) {
+            total += alphabet.indexOf(code.charAt(i)) * weight;
+            weight = (weight * 3) % 31;
+        }
+        int checkIdx = (31 - (total % 31)) % 31;
+        return alphabet.charAt(checkIdx) == code.charAt(17);
+    }
+
+    private static boolean isSequentialDigits(String s) {
+        if (s.length() < 2) return false;
+        boolean asc = true;
+        boolean desc = true;
+        for (int i = 1; i < s.length(); i++) {
+            int cur = Character.getNumericValue(s.charAt(i));
+            int prev = Character.getNumericValue(s.charAt(i - 1));
+            if (cur != prev + 1) asc = false;
+            if (cur != prev - 1) desc = false;
+        }
+        return asc || desc;
+    }
+
+    private static boolean isAllSameDigits(String s) {
+        if (s.length() <= 1) return true;
+        for (int i = 1; i < s.length(); i++) {
+            if (s.charAt(i) != s.charAt(0)) return false;
+        }
+        return true;
+    }
+
+    public static boolean koreanZipcodeValid(String value) {
+        String s = value.replaceAll("\\D", "");
+        if (s.length() != 5) return false;
+        if (s.charAt(0) < '0' || s.charAt(0) > '6') return false;
+        return !isSequentialDigits(s) && !isAllSameDigits(s);
+    }
+
+    public static boolean usZipcodeValid(String value) {
+        String s = value.replaceAll("\\D", "");
+        if (s.length() != 5 && s.length() != 9) return false;
+        String base = s.substring(0, 5);
+        return !isSequentialDigits(base) && !isAllSameDigits(base);
+    }
+
+    public static boolean jpZipcodeValid(String value) {
+        String s = value.replaceAll("\\D", "");
+        if (s.length() != 7) return false;
+        if (isSequentialDigits(s) || isAllSameDigits(s)) return false;
+        int prefix = Integer.parseInt(s.substring(0, 3));
+        return prefix > 0 && prefix < 999;
+    }
+
+    public static boolean cnZipcodeValid(String value) {
+        String s = value.replaceAll("\\D", "");
+        if (s.length() != 6) return false;
+        if (isSequentialDigits(s) || isAllSameDigits(s)) return false;
+        int firstTwo = Integer.parseInt(s.substring(0, 2));
+        return firstTwo >= 1 && firstTwo <= 86;
+    }
+
+    public static boolean twZipcodeValid(String value) {
+        String s = value.replaceAll("\\D", "");
+        if (s.length() != 3 && s.length() != 5) return false;
+        if (isAllSameDigits(s)) return false;
+        return s.charAt(0) != '0';
+    }
+
+    public static boolean inPincodeValid(String value) {
+        String s = value.replaceAll("\\D", "");
+        if (s.length() != 6) return false;
+        if (s.charAt(0) == '0') return false;
+        return !isSequentialDigits(s) && !isAllSameDigits(s);
     }
 }

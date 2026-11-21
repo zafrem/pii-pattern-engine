@@ -1,7 +1,7 @@
 version: "2.0"
 region: Korea
 region_code: KR
-code_series: 1001-1013
+code_series: 1001-1014
 engine: re-rank/scoring.yml
 reference: reference/kr.yml
 
@@ -137,6 +137,7 @@ entities:
     regex_scores:
       mobile_01: 40
       mobile_02: 40
+      mobile_hangul_spoken_01: 40
     sum_example:
       keyword_hits: [70, 70, 65]
       keyword_avg: 68
@@ -214,15 +215,15 @@ entities:
       bank_account_04: 45      # Hana
       bank_account_05: 45      # NH
       bank_account_06: 45      # IBK
-      bank_account_07: 45      # KDB
-      bank_account_08: 45      # Busan
-      bank_account_09: 45      # Daegu
-      bank_account_10: 45      # Gwangju
-      bank_account_11: 45      # Jeju
+      bank_account_07: 45      # SC First
+      bank_account_08: 45      # Citibank
+      bank_account_09: 45      # Busan
+      bank_account_10: 45      # Daegu
+      bank_account_11: 45      # Gwangju
       bank_account_12: 45      # Jeonbuk
-      bank_account_13: 45      # Kakao
-      bank_account_14: 45      # K Bank
-      bank_account_15: 45      # Toss
+      bank_account_13: 45      # Jeju
+      bank_account_14: 45      # Kakao
+      bank_account_15: 45      # K Bank / Toss
     sum_example:
       keyword_hits: [80, 75]
       keyword_avg: 77
@@ -303,11 +304,32 @@ entities:
     context_bonus:
       "차량번호:": 30
     regex_scores:
-      default: 40              # pattern not yet defined in regex/pii/kr/vehicle.yml
+      vehicle_registration_01: 45
     sum_example:
       keyword_hits: [80, 75]
       keyword_avg: 77
       context_bonus: 30
-      regex_score: 40
-      final_score: 100         # 77+30+40 = 147 → capped
+      regex_score: 45
+      final_score: 100         # 77+30+45 = 152 → capped
+      label: definite_pii
+
+  1014:
+    entity: kr_zipcode
+    keyword_scores:
+      우편번호: 80
+      우편: 55
+      postal code: 70
+      zipcode: 70
+      zip code: 70
+    context_bonus:
+      "우편번호:": 30
+      "Zipcode:": 25
+    regex_scores:
+      zipcode_01: 35
+    sum_example:
+      keyword_hits: [80, 55]
+      keyword_avg: 67
+      context_bonus: 30
+      regex_score: 35
+      final_score: 100         # 67+30+35 = 132 → capped
       label: definite_pii

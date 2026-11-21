@@ -1,7 +1,7 @@
 version: "2.0"
 region: United States
 region_code: US
-code_series: 5001-5009
+code_series: 5001-5012
 engine: re-rank/scoring.yml
 reference: reference/us.yml
 
@@ -202,5 +202,65 @@ entities:
       keyword_avg: 85
       context_bonus: 35
       regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  5010:
+    entity: us_zipcode
+    keyword_scores:
+      zip: 55
+      zip code: 75
+      zipcode: 75
+      postal code: 70
+    context_bonus:
+      "ZIP:": 25
+      "ZIP Code:": 30
+      "Postal Code:": 25
+    regex_scores:
+      zipcode_01: 35
+    sum_example:
+      keyword_hits: [55, 75]
+      keyword_avg: 65
+      context_bonus: 30
+      regex_score: 35
+      final_score: 100
+      label: definite_pii
+
+  5011:
+    entity: us_npi
+    keyword_scores:
+      npi: 85
+      national provider identifier: 90
+      provider id: 75
+    context_bonus:
+      "NPI:": 35
+      "Provider ID:": 30
+    regex_scores:
+      npi_id: 50
+    sum_example:
+      keyword_hits: [85, 90]
+      keyword_avg: 87
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  5012:
+    entity: us_icd10
+    keyword_scores:
+      icd-10: 85
+      icd10: 85
+      diagnosis code: 80
+      diagnosis: 65
+    context_bonus:
+      "ICD-10:": 35
+      "Diagnosis Code:": 30
+    regex_scores:
+      icd10_code: 40
+    sum_example:
+      keyword_hits: [85, 80]
+      keyword_avg: 82
+      context_bonus: 35
+      regex_score: 40
       final_score: 100
       label: definite_pii

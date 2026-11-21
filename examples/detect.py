@@ -27,9 +27,11 @@ import yaml
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "prefilter"))
+sys.path.insert(0, str(REPO / "re-rank"))
 sys.path.insert(0, str(REPO / "verification" / "python"))
 
 from prefilter import AhoCorasick, PatternPrefilter  # noqa: E402
+from rerank import ReRankScorer, ScoredFinding  # noqa: E402
 from verification import get_verification_function  # noqa: E402
 
 REGEX_DIR = REPO / "regex"
@@ -59,7 +61,14 @@ class Detector:
     def __init__(self) -> None:
         self.prefilter = PatternPrefilter(regex_dir=str(REGEX_DIR))
         self.patterns: Dict[str, _Compiled] = {}
+        self._reranker: Optional[ReRankScorer] = None
         self._load()
+
+    @property
+    def reranker(self) -> ReRankScorer:
+        if self._reranker is None:
+            self._reranker = ReRankScorer(root=REPO)
+        return self._reranker
 
     def _key(self, path: Path, p: dict) -> str:
         return f"{path.relative_to(REGEX_DIR).as_posix()}::{p.get('id','?')}"
@@ -115,6 +124,29 @@ class Detector:
             kept.append(f)
         return sorted(kept, key=lambda x: x.start)
 
+    def detect_reranked(
+        self,
+        text: str,
+        *,
+        use_prefilter: bool = True,
+        min_score: float = 40.0,
+        window: Optional[int] = 100,
+        resolve_overlaps: bool = True,
+    ) -> List[ScoredFinding]:
+        """End-to-end PII detection + context-aware Re-Rank confidence scoring.
+
+        Runs Stage 1 (pre-filter), Stage 2 (regex), Stage 3 (verification), and
+        Stages 5 & 6 (re-rank confidence scoring + stable entity code mapping).
+        """
+        raw_findings = self.detect(text, use_prefilter=use_prefilter)
+        return self.reranker.rerank_findings(
+            text,
+            raw_findings,
+            window=window,
+            min_score=min_score,
+            resolve_overlaps=resolve_overlaps,
+        )
+
 
 # --------------------------------------------------------------------------- #
 # Demos
@@ -155,21 +187,17 @@ def _demo() -> None:
             f"  pre-filter: {len(cands)}/{total} candidates "
             f"(skipped {total - len(cands)} without running a regex)"
         )
-        findings = det.detect_clean(text)
+        findings = det.detect_reranked(text, min_score=50.0)
         if findings:
-            for f in findings:
-                pid = f.pattern.split("::")[-1]
-                print(f"    [{f.category:11}] {f.text!r:34} ({pid})")
+            for sf in findings:
+                print(
+                    f"    [{sf.entity_code} {sf.entity:24}] {sf.text!r:28} "
+                    f"score={sf.final_score:5.1f} ({sf.label}, action={sf.action})"
+                )
         else:
             print("    (no high-signal PII detected)")
         print()
 
-    print(
-        "Note: format-only patterns (e.g. SWIFT/BIC = any 8 letters, or a 2-word\n"
-        "      name) still produce matches here. A production pipeline suppresses\n"
-        "      those with the context-scoring layer in re-rank/ — out of scope for\n"
-        "      this pre-filter example.\n"
-    )
     _benchmark(det)
 
 

@@ -35,16 +35,17 @@ Each regional file contains entity definitions keyed by their reference code:
 
 | File | Region | Codes | Entities |
 |------|--------|-------|----------|
-| `kr.yml` | Korea | 1001–1013 | 13 |
-| `jp.yml` | Japan | 2001–2016 | 16 |
-| `cn.yml` | China | 3001–3012 | 12 |
-| `tw.yml` | Taiwan | 4001–4016 | 16 |
-| `us.yml` | United States | 5001–5009 | 9 |
+| `kr.yml` | Korea | 1001–1014 | 14 |
+| `jp.yml` | Japan | 2001–2018 | 18 |
+| `cn.yml` | China | 3001–3013 | 13 |
+| `tw.yml` | Taiwan | 4001–4018 | 18 |
+| `us.yml` | United States | 5001–5012 | 12 |
 | `eu.yml` | European Union | 6001–6054 | 43 |
-| `in.yml` | India | 7001–7009 | 9 |
+| `in.yml` | India | 7001–7010 | 10 |
 | `es_fr.yml` | Spain & France | 8001–8056 | 12 |
-| `common.yml` | Common / International | 9001–9013 | 13 |
-| `tech.yml` | Tech / Tokens | 9501–9510 | 10 |
+| `common.yml` | Common / International | 9001–9023 | 23 |
+| `tech.yml` | Tech / Tokens | 9501–9526 | 26 |
+| **Total** | | | **189** |
 
 ## Entity Definition Structure
 
@@ -182,7 +183,7 @@ label: possible_pii
 
 ## Entity Quick Reference
 
-### Korea (1001–1013)
+### Korea (1001–1014)
 
 | Code | Entity | Key Keywords | Regex Pattern |
 |------|--------|-------------|---------------|
@@ -191,16 +192,17 @@ label: possible_pii
 | 1003 | `kr_alien_registration` | 외국인등록번호 | `alien_registration_01` |
 | 1004 | `kr_passport` | 여권번호, 여권 | `passport_01` |
 | 1005 | `kr_driver_license` | 운전면허번호 | `driver_license_01` |
-| 1006 | `kr_phone_mobile` | 핸드폰, 휴대폰, 전화번호 | `mobile_01` |
+| 1006 | `kr_phone_mobile` | 핸드폰, 휴대폰, 전화번호 | `mobile_01`, `mobile_hangul_spoken_01` |
 | 1007 | `kr_phone_landline` | 전화번호, 유선전화 | `landline_01` |
 | 1008 | `kr_address` | 주소, 도로명주소 | `address_01` |
-| 1009 | `kr_bank_account` | 계좌번호, 은행 | `bank_account_01` |
-| 1010 | `kr_business_number` | 사업자등록번호 | `business_number_01` |
+| 1009 | `kr_bank_account` | 계좌번호, 은행 | `bank_account_01`..`17` |
+| 1010 | `kr_business_registration` | 사업자등록번호 | `business_registration_01` |
 | 1011 | `kr_corporate_registration` | 법인등록번호 | `corporate_registration_01` |
 | 1012 | `kr_personal_customs_code` | 개인통관고유부호 | `personal_customs_code_01` |
-| 1013 | `kr_vehicle_registration` | 차량번호 | `default` |
+| 1013 | `kr_vehicle_registration` | 차량번호 | `vehicle_registration_01` |
+| 1014 | `kr_zipcode` | 우편번호 | `zipcode_01` |
 
-### Japan (2001–2016)
+### Japan (2001–2018)
 
 | Code | Entity | Key Keywords |
 |------|--------|-------------|
@@ -214,20 +216,25 @@ label: possible_pii
 | 2008 | `jp_phone_landline` | 固定電話 |
 | 2009 | `jp_address` | 住所 |
 | 2010–2016 | `jp_bank_*` | 口座番号, major banks |
+| 2017 | `jp_corporate_number` | 法人番号 |
+| 2018 | `jp_zipcode` | 郵便番号 |
 
-### United States (5001–5009)
+### United States (5001–5012)
 
 | Code | Entity | Key Keywords |
 |------|--------|-------------|
 | 5001 | `us_name` | name, full name |
 | 5002 | `us_ssn` | ssn, social security number |
-| 5003 | `us_ein` | ein, employer identification |
+| 5003 | `us_itin` | itin, individual taxpayer identification |
 | 5004 | `us_passport` | passport number |
 | 5005 | `us_driver_license_ca` | driver license |
 | 5006 | `us_medicare` | medicare |
 | 5007 | `us_phone` | phone, telephone |
 | 5008 | `us_address` | address, street |
 | 5009 | `us_ein` | ein |
+| 5010 | `us_npi` | npi, national provider identifier |
+| 5011 | `us_phone_tollfree` | toll-free, 1-800 |
+| 5012 | `us_zipcode` | zip code, postal code |
 
 ### Common / International (9001–9013)
 

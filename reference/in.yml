@@ -167,3 +167,22 @@ entities:
     rerank:
       source: re-rank/scoring.yml
       category: ssn
+
+  in_pincode:
+    code: 7010
+    description: Indian 6-digit Postal Index Number (PIN code)
+    category: address
+    pii_type: location
+    severity: low
+    regex:
+      - source: regex/pii/in/other.yml
+        pattern_id: pincode_01
+        verification: in_pincode_valid
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [pin code, pincode, postal index number, postal code]
+        relevant_contexts: ["PIN:", "PIN Code:", "Pincode:"]
+    rerank:
+      source: re-rank/in.yml
+      category: address

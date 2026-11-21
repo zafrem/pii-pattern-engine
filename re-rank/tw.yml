@@ -1,7 +1,7 @@
 version: "2.0"
 region: Taiwan
 region_code: TW
-code_series: 4001-4016
+code_series: 4001-4018
 engine: re-rank/scoring.yml
 reference: reference/tw.yml
 
@@ -149,6 +149,7 @@ entities:
       "統一編號:": 40
     regex_scores:
       business_id_01: 40       # 8 digits, no checksum in pattern
+      tw_ubn: 50               # 8 digits, checksum-validated UBN
     sum_example:
       keyword_hits: [90, 85]
       keyword_avg: 87
@@ -323,5 +324,46 @@ entities:
       keyword_avg: 77
       context_bonus: 30
       regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  4017:
+    entity: tw_zipcode
+    keyword_scores:
+      郵遞區號: 80
+      郵編: 75
+      postal code: 70
+      zipcode: 70
+    context_bonus:
+      "郵遞區號:": 30
+      "Zipcode:": 25
+    regex_scores:
+      zipcode_01: 35
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 35
+      final_score: 100
+      label: definite_pii
+
+  4018:
+    entity: tw_bank_generic
+    keyword_scores:
+      銀行帳號: 80
+      帳號: 75
+      帳戶號碼: 80
+      匯款: 65
+      bank account: 70
+    context_bonus:
+      "帳號:": 30
+      "銀行帳號:": 30
+    regex_scores:
+      generic_taiwan_bank_account_01: 40
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 40
       final_score: 100
       label: definite_pii

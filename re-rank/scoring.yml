@@ -15,7 +15,7 @@ description: >
 #                   prefix is detected (e.g. "이름:", "SSN:", "Email:")
 #
 #   regex_score  = score for the regex pattern that matched
-#                  (0 – 50; higher means the pattern is more specific)
+#                  (0 – 65; higher means the pattern is more specific)
 #
 #   final_score  = min( keyword_avg + context_bonus + regex_score , 100 )
 #
@@ -86,16 +86,16 @@ thresholds:
 # Full keyword/regex scores are in the regional files listed here.
 # ---------------------------------------------------------------------------
 entity_index:
-  kr: re-rank/kr.yml        # 1001 – 1013
-  jp: re-rank/jp.yml        # 2001 – 2016
-  cn: re-rank/cn.yml        # 3001 – 3012
-  tw: re-rank/tw.yml        # 4001 – 4016
-  us: re-rank/us.yml        # 5001 – 5009
+  kr: re-rank/kr.yml        # 1001 – 1014
+  jp: re-rank/jp.yml        # 2001 – 2018
+  cn: re-rank/cn.yml        # 3001 – 3013
+  tw: re-rank/tw.yml        # 4001 – 4018
+  us: re-rank/us.yml        # 5001 – 5012
   eu: re-rank/eu.yml        # 6001 – 6054
-  in: re-rank/in.yml        # 7001 – 7009
+  in: re-rank/in.yml        # 7001 – 7010
   es_fr: re-rank/es_fr.yml  # 8001 – 8056
-  common: re-rank/common.yml # 9001 – 9013
-  tech: re-rank/tech.yml    # 9501 – 9510
+  common: re-rank/common.yml # 9001 – 9023
+  tech: re-rank/tech.yml    # 9501 – 9526
 
 # ---------------------------------------------------------------------------
 # Regex score calibration guide (for maintainers)

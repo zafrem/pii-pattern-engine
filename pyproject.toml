@@ -39,4 +39,7 @@ Repository = "https://github.com/zafrem/pii-pattern-engine"
 # this works out of the box. For a non-editable install where the data ships
 # outside the package, set the PII_PATTERN_ENGINE_ROOT environment variable.
 [tool.setuptools]
-packages = ["verification", "verification.python"]
+packages = ["verification", "verification.python", "prefilter", "rerank"]
+
+[tool.setuptools.package-dir]
+rerank = "re-rank"

@@ -154,7 +154,7 @@ function high_entropy_token(value) {
     entropy -= p * Math.log2(p);
   }
 
-  return entropy >= 4.5;
+  return entropy >= 4.0;
 }
 
 function not_timestamp(value) {
@@ -348,6 +348,14 @@ function tw_national_id_valid(value) {
 function kr_rrn_valid(value) {
   const digits = value.replace(/\D/g, "");
   if (digits.length !== 13) return false;
+  if (new Set(digits).size === 1) return false;
+  const yy = parseInt(digits.slice(0, 2), 10);
+  const mm = parseInt(digits.slice(2, 4), 10);
+  const dd = parseInt(digits.slice(4, 6), 10);
+  const gc = parseInt(digits[6], 10);
+  if (gc < 1 || gc > 4) return false;
+  const year = gc <= 2 ? 1900 + yy : 2000 + yy;
+  if (!_isValidDate(year, mm, dd)) return false;
   const weights = [2, 3, 4, 5, 6, 7, 8, 9, 2, 3, 4, 5];
   let total = 0;
   for (let i = 0; i < 12; i++) total += parseInt(digits[i], 10) * weights[i];
@@ -357,6 +365,14 @@ function kr_rrn_valid(value) {
 function kr_alien_registration_valid(value) {
   const digits = value.replace(/\D/g, "");
   if (digits.length !== 13) return false;
+  if (new Set(digits).size === 1) return false;
+  const yy = parseInt(digits.slice(0, 2), 10);
+  const mm = parseInt(digits.slice(2, 4), 10);
+  const dd = parseInt(digits.slice(4, 6), 10);
+  const gc = parseInt(digits[6], 10);
+  if (gc < 5 || gc > 8) return false;
+  const year = gc <= 6 ? 1900 + yy : 2000 + yy;
+  if (!_isValidDate(year, mm, dd)) return false;
   const weights = [2, 3, 4, 5, 6, 7, 8, 9, 2, 3, 4, 5];
   let total = 0;
   for (let i = 0; i < 12; i++) total += parseInt(digits[i], 10) * weights[i];
@@ -367,6 +383,7 @@ function kr_alien_registration_valid(value) {
 function kr_corporate_registration_valid(value) {
   const digits = value.replace(/\D/g, "");
   if (digits.length !== 13) return false;
+  if (new Set(digits).size === 1) return false;
   const weights = [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2];
   let total = 0;
   for (let i = 0; i < 12; i++) total += parseInt(digits[i], 10) * weights[i];
@@ -427,6 +444,46 @@ function not_repeating_pattern(value) {
 function credit_card_bin_valid(value) {
   const digits = value.replace(/\D/g, "");
   if (digits.length < 13 || digits.length > 19) return false;
+  let validBin = false;
+  if (digits[0] === "4") {
+    validBin = true;
+  } else if (digits.length >= 2) {
+    const p2 = parseInt(digits.slice(0, 2), 10);
+    if (p2 >= 51 && p2 <= 55) validBin = true;
+    else if (digits.length >= 4) {
+      const p4 = parseInt(digits.slice(0, 4), 10);
+      if (p4 >= 2221 && p4 <= 2720) validBin = true;
+    }
+  }
+  if (!validBin && digits.length >= 2) {
+    const p2 = parseInt(digits.slice(0, 2), 10);
+    if (p2 === 34 || p2 === 37) validBin = true;
+  }
+  if (!validBin) {
+    if (digits.startsWith("6011") || digits.startsWith("65")) validBin = true;
+    else if (digits.length >= 3) {
+      const p3 = parseInt(digits.slice(0, 3), 10);
+      if (p3 >= 644 && p3 <= 649) validBin = true;
+    }
+    if (!validBin && digits.length >= 6) {
+      const p6 = parseInt(digits.slice(0, 6), 10);
+      if (p6 >= 622126 && p6 <= 622925) validBin = true;
+    }
+  }
+  if (!validBin && digits.length >= 4) {
+    const p4 = parseInt(digits.slice(0, 4), 10);
+    if (p4 >= 3528 && p4 <= 3589) validBin = true;
+  }
+  if (!validBin && digits.startsWith("62")) validBin = true;
+  if (!validBin && digits.length >= 2) {
+    const p2 = parseInt(digits.slice(0, 2), 10);
+    if (p2 === 36 || p2 === 38) validBin = true;
+    else if (digits.length >= 3) {
+      const p3 = parseInt(digits.slice(0, 3), 10);
+      if (p3 >= 300 && p3 <= 305) validBin = true;
+    }
+  }
+  if (!validBin) return false;
   return luhn(digits);
 }
 
@@ -786,7 +843,7 @@ function us_npi_valid(value) {
 }
 
 function uk_nino_valid(value) {
-  const upper = value.toUpperCase();
+  const upper = String(value).replace(/\s+/g, "").toUpperCase();
   if (!/^[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z]\d{6}[A-D]$/.test(upper)) return false;
   const prefix = upper.slice(0, 2);
   if (["BG", "GB", "KN", "NK", "NT", "TN", "ZZ"].includes(prefix)) return false;
@@ -862,17 +919,95 @@ function us_address_valid(value) {
   return false;
 }
 
+function uscc_valid(value) {
+  const alphabet = "0123456789ABCDEFGHJKLMNPQRTUWXY";
+  const code = value.replace(/\s/g, "").toUpperCase();
+  if (code.length !== 18) return false;
+  for (let i = 0; i < 18; i++) {
+    if (!alphabet.includes(code[i])) return false;
+  }
+  let total = 0;
+  let weight = 1;
+  for (let i = 0; i < 17; i++) {
+    total += alphabet.indexOf(code[i]) * weight;
+    weight = (weight * 3) % 31;
+  }
+  const checkIdx = (31 - (total % 31)) % 31;
+  return alphabet[checkIdx] === code[17];
+}
+
+function _isSequentialDigits(s) {
+  if (s.length < 2) return false;
+  let asc = true, desc = true;
+  for (let i = 1; i < s.length; i++) {
+    if (parseInt(s[i], 10) !== parseInt(s[i - 1], 10) + 1) asc = false;
+    if (parseInt(s[i], 10) !== parseInt(s[i - 1], 10) - 1) desc = false;
+  }
+  return asc || desc;
+}
+
+function korean_zipcode_valid(value) {
+  const s = value.replace(/\D/g, "");
+  if (s.length !== 5) return false;
+  if (s[0] < "0" || s[0] > "6") return false;
+  if (_isSequentialDigits(s) || new Set(s).size === 1) return false;
+  return true;
+}
+
+function us_zipcode_valid(value) {
+  const s = value.replace(/\D/g, "");
+  if (s.length !== 5 && s.length !== 9) return false;
+  const base = s.slice(0, 5);
+  if (_isSequentialDigits(base) || new Set(base).size === 1) return false;
+  return true;
+}
+
+function jp_zipcode_valid(value) {
+  const s = value.replace(/\D/g, "");
+  if (s.length !== 7) return false;
+  if (_isSequentialDigits(s) || new Set(s).size === 1) return false;
+  const prefix = parseInt(s.slice(0, 3), 10);
+  if (prefix === 0 || prefix >= 999) return false;
+  return true;
+}
+
+function cn_zipcode_valid(value) {
+  const s = value.replace(/\D/g, "");
+  if (s.length !== 6) return false;
+  if (_isSequentialDigits(s) || new Set(s).size === 1) return false;
+  const firstTwo = parseInt(s.slice(0, 2), 10);
+  if (firstTwo < 1 || firstTwo > 86) return false;
+  return true;
+}
+
+function tw_zipcode_valid(value) {
+  const s = value.replace(/\D/g, "");
+  if (s.length !== 3 && s.length !== 5) return false;
+  if (new Set(s).size === 1) return false;
+  if (s[0] === "0") return false;
+  return true;
+}
+
+function in_pincode_valid(value) {
+  const s = value.replace(/\D/g, "");
+  if (s.length !== 6) return false;
+  if (s[0] === "0") return false;
+  if (_isSequentialDigits(s) || new Set(s).size === 1) return false;
+  return true;
+}
+
 const VERIFICATION_FUNCTIONS = {
   iban_mod97, luhn, dms_coordinate, high_entropy_token, not_timestamp,
   korean_bank_account_valid, generic_number_not_timestamp, contains_letter, us_ssn_valid,
   chinese_name_valid, korean_name_valid, japanese_name_kanji_valid, cjk_name_standalone,
-  cn_national_id_valid, tw_national_id_valid, india_aadhaar_valid, india_pan_valid,
+  cn_national_id_valid, uscc_valid, tw_national_id_valid, india_aadhaar_valid, india_pan_valid,
   kr_business_registration_valid, kr_rrn_valid, kr_alien_registration_valid, jp_my_number_valid,
   kr_corporate_registration_valid, jp_driver_license_valid, jp_corporate_number_valid,
   imei_valid, mac_address_valid, ipv4_public,
   not_repeating_pattern, credit_card_bin_valid,
   english_name_valid, korean_address_valid, japanese_address_valid, chinese_address_valid,
   us_address_valid,
+  korean_zipcode_valid, us_zipcode_valid, jp_zipcode_valid, cn_zipcode_valid, tw_zipcode_valid, in_pincode_valid,
   kr_driver_license_valid, kr_pccc_valid, kr_vehicle_registration_valid,
   spain_dni_valid, spain_nie_valid, netherlands_bsn_valid, poland_pesel_valid,
   sweden_personnummer_valid, france_insee_valid, belgium_rrn_valid, finland_hetu_valid,

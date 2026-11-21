@@ -1,7 +1,7 @@
 version: "2.0"
 region: Tech / Tokens
 region_code: TECH
-code_series: 9501-9510
+code_series: 9501-9526
 engine: re-rank/scoring.yml
 reference: reference/tech.yml
 
@@ -220,5 +220,319 @@ entities:
       keyword_avg: 85
       context_bonus: 45
       regex_score: 65
+      final_score: 100
+      label: definite_pii
+
+  9511:
+    entity: tech_fcm_token
+    keyword_scores:
+      fcm: 80
+      firebase: 75
+      push token: 75
+      fcm token: 85
+    context_bonus:
+      "FCM_TOKEN:": 40
+      "FCM Token:": 35
+    regex_scores:
+      fcm_token_01: 60
+    sum_example:
+      keyword_hits: [80, 85]
+      keyword_avg: 82
+      context_bonus: 40
+      regex_score: 60
+      final_score: 100
+      label: definite_pii
+
+  9512:
+    entity: tech_artifactory_token
+    keyword_scores:
+      artifactory: 85
+      jfrog: 80
+      akc: 80
+      artifactory token: 90
+    context_bonus:
+      "ARTIFACTORY_TOKEN:": 40
+      "Artifactory Token:": 35
+    regex_scores:
+      artifactory_token_01: 55
+    sum_example:
+      keyword_hits: [85, 90]
+      keyword_avg: 87
+      context_bonus: 40
+      regex_score: 55
+      final_score: 100
+      label: definite_pii
+
+  9513:
+    entity: tech_mac_address
+    keyword_scores:
+      mac: 60
+      mac address: 80
+      hardware address: 75
+    context_bonus:
+      "MAC:": 30
+      "MAC Address:": 35
+    regex_scores:
+      mac_address: 45
+    sum_example:
+      keyword_hits: [60, 80]
+      keyword_avg: 70
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  9514:
+    entity: tech_uuid_guid
+    keyword_scores:
+      uuid: 75
+      guid: 75
+      identifier: 55
+    context_bonus:
+      "UUID:": 30
+      "GUID:": 30
+    regex_scores:
+      uuid_guid: 45
+    sum_example:
+      keyword_hits: [75, 75]
+      keyword_avg: 75
+      context_bonus: 30
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  9515:
+    entity: tech_cve_identifier
+    keyword_scores:
+      cve: 85
+      vulnerability: 70
+      advisory: 65
+    context_bonus:
+      "CVE:": 35
+      "Advisory:": 25
+    regex_scores:
+      cve_identifier: 50
+    sum_example:
+      keyword_hits: [85, 70]
+      keyword_avg: 77
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  9516:
+    entity: tech_us_patent
+    keyword_scores:
+      patent: 75
+      us patent: 85
+      uspto: 80
+    context_bonus:
+      "Patent:": 30
+      "US Patent:": 35
+    regex_scores:
+      us_patent_number: 45
+    sum_example:
+      keyword_hits: [75, 85]
+      keyword_avg: 80
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  9517:
+    entity: tech_pct_patent
+    keyword_scores:
+      pct: 80
+      wipo: 80
+      patent: 75
+      international patent: 85
+    context_bonus:
+      "PCT:": 35
+      "Patent:": 30
+    regex_scores:
+      pct_patent_number: 45
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  9518:
+    entity: tech_ep_patent
+    keyword_scores:
+      ep patent: 85
+      european patent: 85
+      epo: 80
+      patent: 75
+    context_bonus:
+      "EP Patent:": 35
+      "Patent:": 30
+    regex_scores:
+      ep_patent_number: 45
+    sum_example:
+      keyword_hits: [85, 75]
+      keyword_avg: 80
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  9519:
+    entity: tech_ipc_classification
+    keyword_scores:
+      ipc: 80
+      patent classification: 85
+      classification code: 75
+    context_bonus:
+      "IPC:": 35
+      "Classification:": 30
+    regex_scores:
+      ipc_classification_code: 45
+    sum_example:
+      keyword_hits: [80, 85]
+      keyword_avg: 82
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  9520:
+    entity: sox_gl_account
+    keyword_scores:
+      gl account: 85
+      general ledger: 85
+      ledger account: 80
+      chart of accounts: 75
+    context_bonus:
+      "GL Account:": 35
+      "General Ledger:": 35
+    regex_scores:
+      sox_gl_account: 30
+    sum_example:
+      keyword_hits: [85, 85]
+      keyword_avg: 85
+      context_bonus: 35
+      regex_score: 30
+      final_score: 100
+      label: definite_pii
+
+  9521:
+    entity: sox_revenue_transaction
+    keyword_scores:
+      revenue: 70
+      rev: 65
+      revenue transaction: 85
+      transaction id: 75
+    context_bonus:
+      "Revenue Transaction:": 35
+      "REV:": 30
+    regex_scores:
+      sox_revenue_transaction: 50
+    sum_example:
+      keyword_hits: [70, 85]
+      keyword_avg: 77
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  9522:
+    entity: sox_internal_control_id
+    keyword_scores:
+      internal control: 85
+      sox control: 85
+      control id: 80
+    context_bonus:
+      "Control ID:": 35
+      "Internal Control:": 35
+    regex_scores:
+      sox_internal_control_id: 50
+    sum_example:
+      keyword_hits: [85, 80]
+      keyword_avg: 82
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  9523:
+    entity: sox_financial_period
+    keyword_scores:
+      fiscal year: 75
+      financial period: 80
+      quarter: 65
+      reporting period: 75
+    context_bonus:
+      "Fiscal Period:": 30
+      "Reporting Period:": 30
+    regex_scores:
+      sox_financial_period: 40
+    sum_example:
+      keyword_hits: [75, 80]
+      keyword_avg: 77
+      context_bonus: 30
+      regex_score: 40
+      final_score: 100
+      label: definite_pii
+
+  9524:
+    entity: sox_audit_log_id
+    keyword_scores:
+      audit log: 85
+      audit id: 80
+      audit trail: 75
+      sox audit: 85
+    context_bonus:
+      "Audit ID:": 35
+      "Audit Log:": 35
+    regex_scores:
+      sox_audit_log_id: 50
+    sum_example:
+      keyword_hits: [85, 80]
+      keyword_avg: 82
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  9525:
+    entity: sox_sec_cik
+    keyword_scores:
+      cik: 85
+      central index key: 90
+      sec cik: 90
+      edgar: 75
+    context_bonus:
+      "CIK:": 35
+      "SEC CIK:": 40
+    regex_scores:
+      sox_sec_cik: 35
+    sum_example:
+      keyword_hits: [85, 90]
+      keyword_avg: 87
+      context_bonus: 40
+      regex_score: 35
+      final_score: 100
+      label: definite_pii
+
+  9526:
+    entity: sox_sec_file_number
+    keyword_scores:
+      sec file number: 90
+      file number: 75
+      registration number: 70
+      edgar: 75
+    context_bonus:
+      "File Number:": 30
+      "SEC File Number:": 35
+    regex_scores:
+      sox_sec_file_number: 40
+    sum_example:
+      keyword_hits: [90, 75]
+      keyword_avg: 82
+      context_bonus: 35
+      regex_score: 40
       final_score: 100
       label: definite_pii

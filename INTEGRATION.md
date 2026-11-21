@@ -6,7 +6,7 @@ detector. It ships:
 - regex patterns (`regex/**/*.yml`) with pre-filter metadata,
 - verification functions in 4 languages (`verification/{python,golang,java,javascript}/`),
 - a reference pre-filter (`prefilter/prefilter.py`),
-- an optional confidence-scoring config (`re-rank/`) and stable code registry (`reference/`).
+- a production confidence-scoring engine (`re-rank/rerank.py` + `re-rank/*.yml`) and stable code registry (`reference/`).
 
 To actually scan text for PII you implement a small **engine** that drives these
 pieces. This document describes exactly what you must build, the contracts you
@@ -64,13 +64,14 @@ Each pattern carries `mask` (redaction string) and `policy`
 (`store_raw`, `action_on_match`, `severity`). Apply per your requirements.
 
 ### Stage 5 — (optional) Re-rank confidence score
-If you want a 0–100 confidence instead of a boolean, load `re-rank/scoring.yml`
-plus the regional `re-rank/*.yml` and combine keyword/context/regex signals. See
+If you want a 0–100 confidence instead of a boolean, use `ReRankScorer` from
+`re-rank/rerank.py` (or port the formula from `re-rank/scoring.yml` plus the
+regional `re-rank/*.yml`) to combine keyword/context/regex signals. See
 `re-rank/README.md`.
 
 ### Stage 6 — (optional) Stable entity codes
 Map a detected entity to its stable integer code via `reference/registry.yml`
-for logs/APIs.
+(or `ReRankScorer.entity_codes_for_pattern(source_file, pattern_id)`) for logs/APIs.
 
 ---
 
@@ -82,10 +83,10 @@ for logs/APIs.
 | Pre-filter logic | ✅ Python (`prefilter/prefilter.py`) | port/reuse for your language |
 | `hit_keywords` / `min_digit_run` data | ✅ in the YAML | read the fields |
 | Verification functions | ✅ Python, Go, Java, JS | wire name → function; call on match |
-| Regex execution | — | run with an RE2-compatible engine |
+| Regex execution | ✅ Python (`examples/detect.py`) | run with an RE2-compatible engine |
 | Masking / policy enforcement | policy *data* only | the masking/redaction action |
-| Re-rank scoring | ✅ config (`re-rank/`) | the scoring loop (formula in README) |
-| Entity-code mapping | ✅ `reference/` | the lookup |
+| Re-rank scoring | ✅ Python (`re-rank/rerank.py`) + config (`re-rank/`) | port/reuse for your language |
+| Entity-code mapping | ✅ Python (`re-rank/rerank.py`) + `reference/` | port/reuse the lookup |
 
 **Only Python gets a ready-made pre-filter.** For Go/Java/JS you port the
 pre-filter (it is small — see §5) or precompute candidate sets. The verification

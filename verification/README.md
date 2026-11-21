@@ -70,12 +70,26 @@ All four implementations (Python, JavaScript, Go, Java) expose the same set of f
 | `korean_address_valid` | ✓ | ✓ | ✓ | ✓ | Korean address (province-level check) |
 | `japanese_address_valid` | ✓ | ✓ | ✓ | ✓ | Japanese address (prefecture check) |
 | `chinese_address_valid` | ✓ | ✓ | ✓ | ✓ | Chinese address (province check) |
-| `us_address_valid` | ✓ | — | — | — | US address (city + state, Python only) |
+| `us_address_valid` | ✓ | ✓ | ✓ | ✓ | US address (city + state) |
+| `uscc_valid` | ✓ | ✓ | ✓ | ✓ | Chinese Unified Social Credit Code (MOD-31) |
+| `korean_zipcode_valid` | ✓ | ✓ | ✓ | ✓ | Korean 5-digit postal code |
+| `us_zipcode_valid` | ✓ | ✓ | ✓ | ✓ | US 5-digit / ZIP+4 postal code |
+| `jp_zipcode_valid` | ✓ | ✓ | ✓ | ✓ | Japanese 7-digit postal code |
+| `cn_zipcode_valid` | ✓ | ✓ | ✓ | ✓ | Chinese 6-digit postal code |
+| `tw_zipcode_valid` | ✓ | ✓ | ✓ | ✓ | Taiwan 3/5/6-digit postal code |
+| `in_pincode_valid` | ✓ | ✓ | ✓ | ✓ | Indian 6-digit PIN code |
+| `kr_driver_license_valid` | ✓ | ✓ | ✓ | ✓ | Korean driver's license number |
+| `kr_pccc_valid` | ✓ | ✓ | ✓ | ✓ | Korean Personal Customs Clearance Code |
+| `kr_vehicle_registration_valid` | ✓ | ✓ | ✓ | ✓ | Korean vehicle license plate |
+| `mac_address_valid` | ✓ | ✓ | ✓ | ✓ | IEEE 802 MAC address (non-broadcast/zero) |
+| `imei_valid` | ✓ | ✓ | ✓ | ✓ | 15-digit IMEI with Luhn check |
+| `latitude_valid` | ✓ | ✓ | ✓ | ✓ | Decimal latitude (-90 to 90) |
+| `longitude_valid` | ✓ | ✓ | ✓ | ✓ | Decimal longitude (-180 to 180) |
 
 ### Notes on Key Functions
 
 #### `high_entropy_token`
-Shannon entropy is calculated on the **raw value** (no normalization). Threshold is **4.5 bits/char**. Accepts characters from `A-Za-z0-9_-+/.=`, minimum 20 characters.
+Shannon entropy is calculated on the **raw value** (no normalization). Threshold is **4.0 bits/char** (>= 4.0). Accepts characters from `A-Za-z0-9_-+/.=`, minimum 20 characters.
 
 #### Address Validators
 Python uses database-backed lookups (`*_addresses.csv`) with a province/prefecture fallback. Go, Java, and JavaScript use the hardcoded fallback list directly (province/prefecture/state string containment check).

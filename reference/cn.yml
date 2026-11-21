@@ -224,3 +224,22 @@ entities:
     rerank:
       source: re-rank/scoring.yml
       category: iban
+
+  cn_zipcode:
+    code: 3013
+    description: Chinese 6-digit postal code (邮政编码)
+    category: address
+    pii_type: location
+    severity: low
+    regex:
+      - source: regex/pii/cn/other.yml
+        pattern_id: zipcode_01
+        verification: cn_zipcode_valid
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [邮政编码, 邮编, 邮政, postal code, zipcode]
+        relevant_contexts: ["邮政编码:", "邮编:"]
+    rerank:
+      source: re-rank/cn.yml
+      category: address

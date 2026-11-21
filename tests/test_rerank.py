@@ -17,6 +17,7 @@ Test structure:
 """
 
 import re
+import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List
@@ -25,150 +26,16 @@ import pytest
 import yaml
 
 ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(ROOT / "re-rank"))
+sys.path.insert(0, str(ROOT / "examples"))
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Helpers — load YAML data
-# ─────────────────────────────────────────────────────────────────────────────
-
-def _load_engine() -> dict:
-    return yaml.safe_load((ROOT / "re-rank" / "scoring.yml").read_text(encoding="utf-8"))
-
-
-def _load_rerank_entities() -> Dict[int, dict]:
-    """Load all entity scoring configs keyed by integer reference code."""
-    entities: Dict[int, dict] = {}
-    for f in sorted((ROOT / "re-rank").glob("*.yml")):
-        if f.name == "scoring.yml":
-            continue
-        data = yaml.safe_load(f.read_text(encoding="utf-8"))
-        for code, cfg in data.get("entities", {}).items():
-            entities[int(code)] = cfg
-    return entities
-
-
-def _load_regex_patterns() -> Dict[str, List[re.Pattern]]:
-    """
-    Load every regex pattern from regex/**/*.yml.
-    Returns {pattern_id: [compiled, ...]} — multiple per id when the same
-    pattern_id appears in several region files (e.g. passport_01).
-    """
-    patterns: Dict[str, List[re.Pattern]] = defaultdict(list)
-    for f in (ROOT / "regex").rglob("*.yml"):
-        data = yaml.safe_load(f.read_text(encoding="utf-8"))
-        if not data or "patterns" not in data:
-            continue
-        for p in data["patterns"]:
-            pid = p.get("id")
-            if not pid:
-                continue
-            src = p.get("pattern", "")
-            if "langs" in p and "python" in p["langs"]:
-                src = p["langs"]["python"]
-            flags = 0
-            for flag in p.get("flags", []):
-                if flag in ("IGNORECASE", "I"):
-                    flags |= re.IGNORECASE
-                elif flag in ("MULTILINE", "M"):
-                    flags |= re.MULTILINE
-                elif flag in ("DOTALL", "S"):
-                    flags |= re.DOTALL
-            try:
-                patterns[pid].append(re.compile(src, flags))
-            except re.error:
-                pass
-    return dict(patterns)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Scorer
-# ─────────────────────────────────────────────────────────────────────────────
-
-class ReRankScorer:
-    """
-    Lightweight implementation of the re-rank summed-score formula.
-
-    Does NOT apply verification functions (checksum, entropy checks).
-    Those are tested separately in test_verification.py and test_patterns.py.
-    """
-
-    def __init__(self):
-        engine = _load_engine()
-        self.thresholds: list = engine["thresholds"]
-        self.entities: Dict[int, dict] = _load_rerank_entities()
-        self.regex_patterns: Dict[str, List[re.Pattern]] = _load_regex_patterns()
-
-    # ── public API ──────────────────────────────────────────────────────────
-
-    def score(self, sentence: str, entity_code: int) -> dict:
-        """
-        Score a sentence against one entity and return a full breakdown dict.
-
-        Raises KeyError if entity_code is not in the registry.
-        """
-        entity = self.entities[entity_code]
-        s_lower = sentence.lower()
-
-        keyword_avg, keyword_hits = self._keyword_score(entity, s_lower)
-        context_bonus = self._context_bonus(entity, s_lower)
-        regex_score, regex_hit = self._regex_score(entity, sentence)
-
-        raw = keyword_avg + context_bonus + regex_score
-        final = min(raw, 100.0)
-
-        return {
-            "entity_code": entity_code,
-            "entity": entity.get("entity", ""),
-            "keyword_hits": keyword_hits,
-            "keyword_avg": round(keyword_avg, 2),
-            "context_bonus": context_bonus,
-            "regex_hit": regex_hit,
-            "regex_score": regex_score,
-            "raw_score": round(raw, 2),
-            "final_score": round(final, 2),
-            "label": self._label(final),
-        }
-
-    def label_for(self, sentence: str, entity_code: int) -> str:
-        return self.score(sentence, entity_code)["label"]
-
-    # ── internals ───────────────────────────────────────────────────────────
-
-    def _keyword_score(self, entity: dict, s_lower: str):
-        hits = [
-            (kw, sc)
-            for kw, sc in entity.get("keyword_scores", {}).items()
-            if kw.lower() in s_lower
-        ]
-        avg = sum(sc for _, sc in hits) / len(hits) if hits else 0.0
-        return avg, hits
-
-    def _context_bonus(self, entity: dict, s_lower: str) -> int:
-        return max(
-            (bonus
-             for ctx, bonus in entity.get("context_bonus", {}).items()
-             if ctx.lower() in s_lower),
-            default=0,
-        )
-
-    def _regex_score(self, entity: dict, sentence: str):
-        best_score = 0
-        best_pid = None
-        for pid, pid_score in entity.get("regex_scores", {}).items():
-            if pid == "default":
-                continue  # 'default' requires source-file resolution; skipped here
-            for compiled in self.regex_patterns.get(pid, []):
-                if compiled.search(sentence):
-                    if pid_score > best_score:
-                        best_score = pid_score
-                        best_pid = pid
-                    break
-        return best_score, best_pid
-
-    def _label(self, score: float) -> str:
-        for t in self.thresholds:
-            if score >= t["min_score"]:
-                return t["label"]
-        return "not_pii"
+from rerank import (  # noqa: E402
+    ReRankScorer,
+    ScoredFinding,
+    _load_engine,
+    _load_reference_entities,
+    _load_rerank_entities,
+)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -641,7 +508,7 @@ SENTENCE_CASES = [
         id="3003_cn_passport__full_signal",
     ),
     pytest.param(
-        "固定电话: 010-1234-5678",
+        "固定电话: 010-12345678",
         3005,
         "definite_pii",
         # keyword "电话"=55,"固定电话"=65 → avg=60 | context "固定电话:"=+20 | landline_01=+40
@@ -902,7 +769,7 @@ class TestReRankEngine:
 
     def test_total_entity_count(self):
         entities = _load_rerank_entities()
-        assert len(entities) == 153, f"Expected 153 entities, got {len(entities)}"
+        assert len(entities) == 189, f"Expected 189 entities, got {len(entities)}"
 
     def test_all_entity_codes_are_in_registry(self):
         registry = yaml.safe_load(
@@ -912,6 +779,25 @@ class TestReRankEngine:
         rerank_codes = set(_load_rerank_entities().keys())
         missing = rerank_codes - registry_codes
         assert not missing, f"re-rank codes not in registry: {sorted(missing)}"
+        extra = registry_codes - rerank_codes
+        assert not extra, f"registry codes not in re-rank: {sorted(extra)}"
+
+    def test_all_regex_patterns_are_mapped_in_rerank_and_reference(self, scorer):
+        """Every single pattern in regex/**/*.yml (all 211 patterns) must be mapped
+        to at least one entity in reference/*.yml and re-rank/*.yml."""
+        unmapped = []
+        for f in sorted((ROOT / "regex").rglob("*.yml")):
+            data = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+            rel_key_prefix = f.relative_to(ROOT / "regex").as_posix()
+            for p in data.get("patterns") or []:
+                pid = p.get("id")
+                if not pid:
+                    continue
+                key = f"{rel_key_prefix}::{pid}"
+                codes = scorer.entities_for_pattern(key)
+                if not codes:
+                    unmapped.append(key)
+        assert not unmapped, f"Unmapped regex patterns found ({len(unmapped)}): {unmapped}"
 
     def test_no_duplicate_entity_codes(self):
         seen = []
@@ -953,16 +839,14 @@ class TestReRankSumExamples:
         )
 
     @pytest.mark.parametrize("entity_code,entity_cfg", _load_rerank_entities().items())
-    def test_sum_example_label_matches_thresholds(self, entity_code, entity_cfg):
+    def test_sum_example_label_matches_thresholds(self, scorer, entity_code, entity_cfg):
         ex = entity_cfg.get("sum_example", {})
         if not ex:
             pytest.skip("No sum_example")
         declared_label = ex.get("label")
         if not declared_label:
             pytest.skip("No label in sum_example")
-        engine = _load_engine()
-        scorer_tmp = ReRankScorer()
-        computed_label = scorer_tmp._label(ex["final_score"])
+        computed_label = scorer._label(ex["final_score"])
         assert declared_label == computed_label, (
             f"Code {entity_code}: sum_example label='{declared_label}' "
             f"but final_score={ex['final_score']} → computed='{computed_label}'"
@@ -1063,3 +947,58 @@ class TestReRankEdgeCases:
         """
         result = scorer.score("전화번호: 010-1234-5678", 1006)
         assert result["regex_score"] == 40
+
+    def test_cross_region_pattern_id_isolation(self, scorer):
+        """
+        Bare pattern_ids like passport_01 exist in 8 countries. Scoring a French
+        passport string ("12AB34567") against US passport (5004) or Korean passport
+        (1004) must NOT award a regex_score.
+        """
+        fr_text = "12AB34567"
+        assert scorer.score(fr_text, 8053)["regex_score"] == 45  # fr_passport matches
+        assert scorer.score(fr_text, 5004)["regex_score"] == 0   # us_passport does NOT match
+        assert scorer.score(fr_text, 1004)["regex_score"] == 0   # kr_passport does NOT match
+
+    def test_kr_vehicle_registration_regex_scores(self, scorer):
+        """Entity 1013 (kr_vehicle_registration) uses vehicle_registration_01."""
+        result = scorer.score("차량번호: 123가 4567", 1013)
+        assert result["regex_score"] == 45
+        assert result["regex_hit"] == "vehicle_registration_01"
+        assert result["final_score"] == 100
+
+    def test_verify_flag_gates_invalid_checksum(self, scorer):
+        """When verify=True, a regex match that fails checksum verification scores 0."""
+        # 123-45-0000 matches ssn_01 regex shape if unverified, or 000-12-3456 fails us_ssn_valid
+        bad_ssn = "SSN: 000-12-3456"
+        unverified = scorer.score(bad_ssn, 5002, verify=False)
+        verified = scorer.score(bad_ssn, 5002, verify=True)
+        assert unverified["regex_score"] == 50
+        assert verified["regex_score"] == 0
+
+    def test_window_limits_keyword_context(self, scorer):
+        """When match_span and window are provided, distant keywords are ignored."""
+        padding = "x " * 120
+        text = f"SSN: {padding} 123-45-6789"
+        start = text.index("123-45-6789")
+        end = start + len("123-45-6789")
+        full_ctx = scorer.score(text, 5002)
+        windowed = scorer.score(text, 5002, match_span=(start, end), window=30)
+        assert full_ctx["keyword_avg"] > 0
+        assert windowed["keyword_avg"] == 0
+        assert windowed["context_bonus"] == 0
+        assert windowed["regex_score"] == 50
+
+    def test_detector_reranked_end_to_end(self):
+        """Detector.detect_reranked integrates pre-filter, regex, verification, and re-rank."""
+        from detect import Detector
+
+        det = Detector()
+        text = "Employee SSN: 123-45-6789, email: alice@example.com"
+        findings = det.detect_reranked(text, min_score=50.0)
+        codes = {f.entity_code for f in findings}
+        assert 5002 in codes  # us_ssn
+        assert 9001 in codes  # common_email
+        ssn_finding = next(f for f in findings if f.entity_code == 5002)
+        assert ssn_finding.final_score == 100.0
+        assert ssn_finding.label == "definite_pii"
+        assert ssn_finding.action == "redact"

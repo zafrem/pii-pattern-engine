@@ -251,6 +251,8 @@ entities:
     regex:
       - source: regex/pii/eu/identification.yml
         pattern_id: uk_nino_01
+      - source: regex/pii/eu/uk_identification.yml
+        pattern_id: uk_nino_02
     keyword:
       - source: keyword/identification.yml
         category: ssn

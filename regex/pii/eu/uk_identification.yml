@@ -2,7 +2,7 @@ namespace: eu
 description: UK National Identification Numbers (UK remains common in many PII datasets)
 
 patterns:
-  - id: uk_nino_01
+  - id: uk_nino_02
     verification: uk_nino_valid
     location: eu
     category: identification

@@ -7,6 +7,7 @@ patterns:
   description: Visa credit card number
   pattern: '4[0-9]{12}(?:[0-9]{3})?'
   min_digit_run: 13
+  verification: luhn
   mask: '****-****-****-****'
   examples:
     match:
@@ -26,6 +27,7 @@ patterns:
   description: MasterCard credit card number
   pattern: '5[1-5][0-9]{14}'
   min_digit_run: 16
+  verification: luhn
   mask: '****-****-****-****'
   examples:
     match:
@@ -45,6 +47,7 @@ patterns:
   description: American Express credit card number
   pattern: '3[47][0-9]{13}'
   min_digit_run: 15
+  verification: luhn
   mask: '****-******-*****'
   examples:
     match:
@@ -64,6 +67,7 @@ patterns:
   description: Discover credit card number
   pattern: '6(?:011|5[0-9]{2})[0-9]{12}'
   min_digit_run: 16
+  verification: luhn
   mask: '****-****-****-****'
   examples:
     match:
@@ -83,6 +87,7 @@ patterns:
   description: JCB credit card number
   pattern: '(?:2131|1800|35[0-9]{3})[0-9]{11}'
   min_digit_run: 15
+  verification: luhn
   mask: '****-****-****-****'
   examples:
     match:

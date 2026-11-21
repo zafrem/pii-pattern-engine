@@ -241,3 +241,191 @@ entities:
     rerank:
       source: re-rank/scoring.yml
       category: credit_card
+
+  common_crypto_btc:
+    code: 9014
+    description: Bitcoin P2PKH wallet address (Base58, starts with 1)
+    category: financial
+    pii_type: financial
+    severity: high
+    regex:
+      - source: regex/pii/common/crypto.yml
+        pattern_id: crypto_btc_p2pkh
+        verification: crypto_btc_valid
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [bitcoin, btc, wallet, crypto address, btc address]
+        relevant_contexts: ["BTC:", "Bitcoin Address:", "Wallet:"]
+    rerank:
+      source: re-rank/common.yml
+      category: crypto
+
+  common_crypto_eth:
+    code: 9015
+    description: Ethereum / ERC-20 wallet address (0x + 40 hex chars)
+    category: financial
+    pii_type: financial
+    severity: high
+    regex:
+      - source: regex/pii/common/crypto.yml
+        pattern_id: crypto_eth_01
+        verification: crypto_eth_valid
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [ethereum, eth, wallet, erc20, eth address]
+        relevant_contexts: ["ETH:", "Ethereum Address:", "Wallet:"]
+    rerank:
+      source: re-rank/common.yml
+      category: crypto
+
+  common_mac_address:
+    code: 9016
+    description: Hardware MAC address (XX:XX:XX:XX:XX:XX or XX-XX-XX-XX-XX-XX)
+    category: device
+    pii_type: network
+    severity: low
+    regex:
+      - source: regex/pii/common/device.yml
+        pattern_id: mac_address_01
+        verification: mac_address_valid
+    keyword:
+      - source: keyword/network.yml
+        category: mac_address
+        relevant_terms: [mac, mac address, hardware address, physical address]
+        relevant_contexts: ["MAC:", "MAC Address:"]
+    rerank:
+      source: re-rank/common.yml
+      category: device
+
+  common_imei:
+    code: 9017
+    description: 15-digit mobile equipment identifier (IMEI, Luhn-validated)
+    category: device
+    pii_type: device
+    severity: medium
+    regex:
+      - source: regex/pii/common/device.yml
+        pattern_id: imei_01
+        verification: imei_valid
+    keyword:
+      - source: keyword/network.yml
+        category: mac_address
+        relevant_terms: [imei, device id, serial number]
+        relevant_contexts: ["IMEI:", "IMEI Number:"]
+    rerank:
+      source: re-rank/common.yml
+      category: device
+
+  common_swift_bic:
+    code: 9018
+    description: SWIFT / BIC bank identifier code (8 or 11 characters)
+    category: financial
+    pii_type: financial
+    severity: medium
+    regex:
+      - source: regex/pii/common/financial.yml
+        pattern_id: swift_bic
+        verification: swift_bic_valid
+    keyword:
+      - source: keyword/financial.yml
+        category: iban
+        relevant_terms: [swift, bic, swift code, bic code]
+        relevant_contexts: ["SWIFT:", "BIC:", "BIC/SWIFT:"]
+    rerank:
+      source: re-rank/common.yml
+      category: financial
+
+  common_latitude:
+    code: 9019
+    description: Decimal geographic latitude (-90 to 90, 4+ decimal places)
+    category: location
+    pii_type: location
+    severity: low
+    regex:
+      - source: regex/pii/common/location.yml
+        pattern_id: latitude_01
+        verification: latitude_valid
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [latitude, lat, coordinates, gps]
+        relevant_contexts: ["Latitude:", "Lat:"]
+    rerank:
+      source: re-rank/common.yml
+      category: location
+
+  common_longitude:
+    code: 9020
+    description: Decimal geographic longitude (-180 to 180, 4+ decimal places)
+    category: location
+    pii_type: location
+    severity: low
+    regex:
+      - source: regex/pii/common/location.yml
+        pattern_id: longitude_01
+        verification: longitude_valid
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [longitude, lon, lng, coordinates, gps]
+        relevant_contexts: ["Longitude:", "Lon:", "Lng:"]
+    rerank:
+      source: re-rank/common.yml
+      category: location
+
+  common_coordinates_dms:
+    code: 9021
+    description: Geographic coordinates in Degrees/Minutes/Seconds (DMS) notation
+    category: location
+    pii_type: location
+    severity: low
+    regex:
+      - source: regex/pii/common/location.yml
+        pattern_id: coordinates_dms_01
+        verification: dms_coordinate
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [coordinates, gps, dms, latitude, longitude]
+        relevant_contexts: ["Coordinates:", "GPS:"]
+    rerank:
+      source: re-rank/common.yml
+      category: location
+
+  common_passport_generic:
+    code: 9022
+    description: Generic international passport number (6–9 alphanumeric chars)
+    category: identification
+    pii_type: government_id
+    severity: high
+    regex:
+      - source: regex/pii/common/passport.yml
+        pattern_id: generic_passport
+    keyword:
+      - source: keyword/identification.yml
+        category: passport
+        relevant_terms: [passport, passport number, travel document]
+        relevant_contexts: ["Passport:", "Passport Number:"]
+    rerank:
+      source: re-rank/common.yml
+      category: passport
+
+  common_uuid:
+    code: 9023
+    description: RFC 4122 UUID (versions 1–5)
+    category: tokens
+    pii_type: network
+    severity: low
+    regex:
+      - source: regex/pii/common/tokens.yml
+        pattern_id: uuid_01
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [uuid, guid, request id, trace id]
+        relevant_contexts: ["UUID:", "GUID:"]
+    rerank:
+      source: re-rank/common.yml
+      category: tokens

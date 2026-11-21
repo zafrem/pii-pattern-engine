@@ -1,7 +1,7 @@
 version: "2.0"
 region: Common / International
 region_code: COMM
-code_series: 9001-9013
+code_series: 9001-9023
 engine: re-rank/scoring.yml
 reference: reference/common.yml
 
@@ -319,5 +319,211 @@ entities:
       keyword_avg: 73
       context_bonus: 35
       regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  9014:
+    entity: common_crypto_btc
+    keyword_scores:
+      bitcoin: 80
+      btc: 75
+      wallet: 60
+      crypto address: 75
+      btc address: 85
+    context_bonus:
+      "BTC:": 35
+      "Bitcoin Address:": 40
+      "Wallet:": 25
+    regex_scores:
+      crypto_btc_p2pkh: 50
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  9015:
+    entity: common_crypto_eth
+    keyword_scores:
+      ethereum: 80
+      eth: 75
+      wallet: 60
+      erc20: 75
+      eth address: 85
+    context_bonus:
+      "ETH:": 35
+      "Ethereum Address:": 40
+      "Wallet:": 25
+    regex_scores:
+      crypto_eth_01: 50
+    sum_example:
+      keyword_hits: [80, 75]
+      keyword_avg: 77
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  9016:
+    entity: common_mac_address
+    keyword_scores:
+      mac: 60
+      mac address: 80
+      hardware address: 75
+      physical address: 70
+    context_bonus:
+      "MAC:": 30
+      "MAC Address:": 35
+    regex_scores:
+      mac_address_01: 45
+    sum_example:
+      keyword_hits: [60, 80]
+      keyword_avg: 70
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  9017:
+    entity: common_imei
+    keyword_scores:
+      imei: 85
+      device id: 65
+      serial number: 60
+    context_bonus:
+      "IMEI:": 35
+      "IMEI Number:": 40
+    regex_scores:
+      imei_01: 50
+    sum_example:
+      keyword_hits: [85, 65]
+      keyword_avg: 75
+      context_bonus: 35
+      regex_score: 50
+      final_score: 100
+      label: definite_pii
+
+  9018:
+    entity: common_swift_bic
+    keyword_scores:
+      swift: 80
+      bic: 80
+      swift code: 85
+      bic code: 85
+    context_bonus:
+      "SWIFT:": 35
+      "BIC:": 35
+      "BIC/SWIFT:": 35
+    regex_scores:
+      swift_bic: 40
+    sum_example:
+      keyword_hits: [80, 85]
+      keyword_avg: 82
+      context_bonus: 35
+      regex_score: 40
+      final_score: 100
+      label: definite_pii
+
+  9019:
+    entity: common_latitude
+    keyword_scores:
+      latitude: 80
+      lat: 65
+      coordinates: 65
+      gps: 60
+    context_bonus:
+      "Latitude:": 35
+      "Lat:": 25
+    regex_scores:
+      latitude_01: 35
+    sum_example:
+      keyword_hits: [80, 65]
+      keyword_avg: 72
+      context_bonus: 35
+      regex_score: 35
+      final_score: 100
+      label: definite_pii
+
+  9020:
+    entity: common_longitude
+    keyword_scores:
+      longitude: 80
+      lon: 65
+      lng: 65
+      coordinates: 65
+      gps: 60
+    context_bonus:
+      "Longitude:": 35
+      "Lon:": 25
+      "Lng:": 25
+    regex_scores:
+      longitude_01: 35
+    sum_example:
+      keyword_hits: [80, 65]
+      keyword_avg: 72
+      context_bonus: 35
+      regex_score: 35
+      final_score: 100
+      label: definite_pii
+
+  9021:
+    entity: common_coordinates_dms
+    keyword_scores:
+      coordinates: 75
+      gps: 70
+      dms: 75
+      latitude: 70
+      longitude: 70
+    context_bonus:
+      "Coordinates:": 35
+      "GPS:": 30
+    regex_scores:
+      coordinates_dms_01: 45
+    sum_example:
+      keyword_hits: [75, 70]
+      keyword_avg: 72
+      context_bonus: 35
+      regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  9022:
+    entity: common_passport_generic
+    keyword_scores:
+      passport: 75
+      passport number: 85
+      travel document: 70
+    context_bonus:
+      "Passport:": 30
+      "Passport Number:": 35
+    regex_scores:
+      generic_passport: 30
+    sum_example:
+      keyword_hits: [75, 85]
+      keyword_avg: 80
+      context_bonus: 35
+      regex_score: 30
+      final_score: 100
+      label: definite_pii
+
+  9023:
+    entity: common_uuid
+    keyword_scores:
+      uuid: 75
+      guid: 75
+      request id: 60
+      trace id: 60
+    context_bonus:
+      "UUID:": 30
+      "GUID:": 30
+    regex_scores:
+      uuid_01: 45
+    sum_example:
+      keyword_hits: [75, 75]
+      keyword_avg: 75
+      context_bonus: 30
+      regex_score: 45
       final_score: 100
       label: definite_pii

@@ -280,6 +280,7 @@ patterns:
   category: bank
   description: Korean Jeonbuk Bank account number (전북은행)
   pattern: '[0-9]{3}-[0-9]{2}-[0-9]{6}'
+  min_digit_run: 6
   mask: '***-**-******'
   examples:
     match:

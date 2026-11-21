@@ -12,7 +12,10 @@ import math
 import os
 import re
 import ipaddress
-import yaml
+try:
+    import yaml
+except ImportError:
+    yaml = None  # type: ignore
 from collections import Counter
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Union
@@ -388,7 +391,7 @@ def _get_no_words(lang: str) -> Set[str]:
     # Configuration is in pii-pattern-engine/keyword/no_words.yml
     config_path = _get_repo_root() / "keyword" / "no_words.yml"
 
-    if config_path.exists():
+    if config_path.exists() and yaml is not None:
         try:
             with open(config_path, encoding="utf-8") as f:
                 doc = yaml.safe_load(f)
@@ -3472,17 +3475,18 @@ def us_npi_valid(value: str) -> bool:
 def uk_nino_valid(value: str) -> bool:
     """
     Verify UK National Insurance Number (NINO).
-    Format: 2 letters, 6 digits, 1 letter.
+    Format: 2 letters, 6 digits, 1 letter (optional whitespace between groups).
     """
     import re
 
+    cleaned = re.sub(r"\s+", "", value).upper()
     # Standard NINO regex
     pattern = r"^[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z]\d{6}[A-D]$"
-    if not re.match(pattern, value.upper()):
+    if not re.match(pattern, cleaned):
         return False
 
     # Exclude certain prefixes
-    prefix = value[:2].upper()
+    prefix = cleaned[:2]
     if prefix in ("BG", "GB", "KN", "NK", "NT", "TN", "ZZ"):
         return False
 

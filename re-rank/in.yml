@@ -1,7 +1,7 @@
 version: "2.0"
 region: India
 region_code: IN
-code_series: 7001-7009
+code_series: 7001-7010
 engine: re-rank/scoring.yml
 reference: reference/in.yml
 
@@ -190,5 +190,26 @@ entities:
       keyword_avg: 82
       context_bonus: 40
       regex_score: 45
+      final_score: 100
+      label: definite_pii
+
+  7010:
+    entity: in_pincode
+    keyword_scores:
+      pin code: 75
+      pincode: 75
+      postal index number: 80
+      postal code: 70
+    context_bonus:
+      "PIN:": 25
+      "PIN Code:": 30
+      "Pincode:": 30
+    regex_scores:
+      pincode_01: 35
+    sum_example:
+      keyword_hits: [75, 75]
+      keyword_avg: 75
+      context_bonus: 30
+      regex_score: 35
       final_score: 100
       label: definite_pii

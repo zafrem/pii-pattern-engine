@@ -115,6 +115,8 @@ entities:
         pattern_id: mobile_01
       - source: regex/pii/kr/phone.yml
         pattern_id: mobile_02
+      - source: regex/pii/kr/phone.yml
+        pattern_id: mobile_hangul_spoken_01
     keyword:
       - source: keyword/contact.yml
         category: phone
@@ -194,31 +196,31 @@ entities:
         notes: IBK Industrial Bank
       - source: regex/pii/kr/banks.yml
         pattern_id: bank_account_07
-        notes: KDB Korea Development Bank
+        notes: SC First Bank (SC제일은행)
       - source: regex/pii/kr/banks.yml
         pattern_id: bank_account_08
-        notes: Busan Bank
+        notes: Citibank Korea (한국씨티은행)
       - source: regex/pii/kr/banks.yml
         pattern_id: bank_account_09
-        notes: Daegu Bank
+        notes: Busan Bank (부산은행)
       - source: regex/pii/kr/banks.yml
         pattern_id: bank_account_10
-        notes: Gwangju Bank
+        notes: Daegu Bank (대구은행)
       - source: regex/pii/kr/banks.yml
         pattern_id: bank_account_11
-        notes: Jeju Bank
+        notes: Gwangju Bank (광주은행)
       - source: regex/pii/kr/banks.yml
         pattern_id: bank_account_12
-        notes: Jeonbuk Bank
+        notes: Jeonbuk Bank (전북은행)
       - source: regex/pii/kr/banks.yml
         pattern_id: bank_account_13
-        notes: Kakao Bank
+        notes: Jeju Bank (제주은행)
       - source: regex/pii/kr/banks.yml
         pattern_id: bank_account_14
-        notes: K Bank
+        notes: Kakao Bank (카카오뱅크)
       - source: regex/pii/kr/banks.yml
         pattern_id: bank_account_15
-        notes: Toss Bank
+        notes: K Bank / Toss Bank (케이뱅크 / 토스뱅크)
     keyword:
       - source: keyword/financial.yml
         category: bank
@@ -299,12 +301,32 @@ entities:
     severity: medium
     regex:
       - source: regex/pii/kr/vehicle.yml
-        notes: No patterns defined yet
+        pattern_id: vehicle_registration_01
+        verification: kr_vehicle_registration_valid
     keyword:
       - source: keyword/identification.yml
         category: national_id
         relevant_terms: [차량번호, 차번호판, 번호판]
         relevant_contexts: ["차량번호:"]
     rerank:
-      source: re-rank/scoring.yml
-      category: kr_rrn
+      source: re-rank/kr.yml
+      category: vehicle
+
+  kr_zipcode:
+    code: 1014
+    description: Korean 5-digit postal code (우편번호)
+    category: address
+    pii_type: location
+    severity: low
+    regex:
+      - source: regex/pii/kr/other.yml
+        pattern_id: zipcode_01
+        verification: korean_zipcode_valid
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [우편번호, 우편, 주소, postal code, zipcode]
+        relevant_contexts: ["우편번호:", "Zipcode:"]
+    rerank:
+      source: re-rank/kr.yml
+      category: address

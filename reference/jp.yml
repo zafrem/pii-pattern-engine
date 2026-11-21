@@ -297,3 +297,41 @@ entities:
     rerank:
       source: re-rank/scoring.yml
       category: iban
+
+  jp_zipcode:
+    code: 2017
+    description: Japanese 7-digit postal code (郵便番号, XXX-XXXX)
+    category: address
+    pii_type: location
+    severity: low
+    regex:
+      - source: regex/pii/jp/other.yml
+        pattern_id: zipcode_01
+        verification: jp_zipcode_valid
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [郵便番号, 郵便, 〒, postal code, zipcode]
+        relevant_contexts: ["郵便番号:", "〒:"]
+    rerank:
+      source: re-rank/jp.yml
+      category: address
+
+  jp_corporate_number:
+    code: 2018
+    description: Japanese Corporate Number (法人番号, 13 digits)
+    category: business
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/pii/jp/business.yml
+        pattern_id: jp_corporate_number
+        verification: jp_corporate_number_valid
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [法人番号, 法人, corporate number]
+        relevant_contexts: ["法人番号:"]
+    rerank:
+      source: re-rank/jp.yml
+      category: business

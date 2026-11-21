@@ -156,6 +156,7 @@ patterns:
   category: passport
   description: Belgian passport number (2 letters + 6 digits)
   pattern: '[A-Z]{2}[0-9]{6}'
+  min_digit_run: 6
   mask: '********'
   examples:
     match:
@@ -203,6 +204,7 @@ patterns:
   category: passport
   description: Polish passport number (2 letters + 7 digits)
   pattern: '[A-Z]{2}[0-9]{7}'
+  min_digit_run: 7
   mask: '*********'
   examples:
     match:
@@ -274,6 +276,7 @@ patterns:
   category: passport
   description: Irish passport number (2 letters + 7 digits)
   pattern: '[A-Z]{2}[0-9]{7}'
+  min_digit_run: 7
   mask: '*********'
   examples:
     match:

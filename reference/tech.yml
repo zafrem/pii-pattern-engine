@@ -185,3 +185,292 @@ entities:
     rerank:
       source: re-rank/scoring.yml
       category: ip_address
+
+  tech_fcm_token:
+    code: 9511
+    description: Firebase Cloud Messaging registration token
+    category: secret
+    pii_type: credential
+    severity: medium
+    regex:
+      - source: regex/pii/common/tokens.yml
+        pattern_id: fcm_token_01
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [fcm, firebase, push token, fcm token]
+        relevant_contexts: ["FCM_TOKEN:", "FCM Token:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: token
+
+  tech_artifactory_token:
+    code: 9512
+    description: JFrog Artifactory token (AKC / cm prefix)
+    category: secret
+    pii_type: credential
+    severity: high
+    regex:
+      - source: regex/pii/common/tokens.yml
+        pattern_id: artifactory_token_01
+        verification: high_entropy_token
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [artifactory, jfrog, akc, artifactory token]
+        relevant_contexts: ["ARTIFACTORY_TOKEN:", "Artifactory Token:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: token
+
+  tech_mac_address:
+    code: 9513
+    description: Technical 48-bit MAC address identifier
+    category: identifiers
+    pii_type: network
+    severity: low
+    regex:
+      - source: regex/tech/identifiers.yml
+        pattern_id: mac_address
+    keyword:
+      - source: keyword/network.yml
+        category: mac_address
+        relevant_terms: [mac, mac address, hardware address]
+        relevant_contexts: ["MAC:", "MAC Address:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: identifiers
+
+  tech_uuid_guid:
+    code: 9514
+    description: Generic UUID / GUID identifier
+    category: identifiers
+    pii_type: network
+    severity: low
+    regex:
+      - source: regex/tech/identifiers.yml
+        pattern_id: uuid_guid
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [uuid, guid, identifier]
+        relevant_contexts: ["UUID:", "GUID:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: identifiers
+
+  tech_cve_identifier:
+    code: 9515
+    description: Common Vulnerabilities and Exposures (CVE) identifier
+    category: identifiers
+    pii_type: technical
+    severity: low
+    regex:
+      - source: regex/tech/identifiers.yml
+        pattern_id: cve_identifier
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [cve, vulnerability, advisory]
+        relevant_contexts: ["CVE:", "Advisory:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: identifiers
+
+  tech_us_patent:
+    code: 9516
+    description: United States Patent Number (US + 7–9 digits)
+    category: patent
+    pii_type: intellectual_property
+    severity: low
+    regex:
+      - source: regex/tech/patents.yml
+        pattern_id: us_patent_number
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [patent, us patent, uspto]
+        relevant_contexts: ["Patent:", "US Patent:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: patent
+
+  tech_pct_patent:
+    code: 9517
+    description: PCT (WO) international patent publication number
+    category: patent
+    pii_type: intellectual_property
+    severity: low
+    regex:
+      - source: regex/tech/patents.yml
+        pattern_id: pct_patent_number
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [pct, wipo, patent, international patent]
+        relevant_contexts: ["PCT:", "Patent:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: patent
+
+  tech_ep_patent:
+    code: 9518
+    description: European Patent (EP) publication number
+    category: patent
+    pii_type: intellectual_property
+    severity: low
+    regex:
+      - source: regex/tech/patents.yml
+        pattern_id: ep_patent_number
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [ep patent, european patent, epo, patent]
+        relevant_contexts: ["EP Patent:", "Patent:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: patent
+
+  tech_ipc_classification:
+    code: 9519
+    description: International Patent Classification (IPC) code
+    category: patent
+    pii_type: intellectual_property
+    severity: low
+    regex:
+      - source: regex/tech/patents.yml
+        pattern_id: ipc_classification_code
+    keyword:
+      - source: keyword/network.yml
+        category: url
+        relevant_terms: [ipc, patent classification, classification code]
+        relevant_contexts: ["IPC:", "Classification:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: patent
+
+  sox_gl_account:
+    code: 9520
+    description: SOX General Ledger (GL) account number
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/sox/financial_controls.yml
+        pattern_id: sox_gl_account
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [gl account, general ledger, ledger account, chart of accounts]
+        relevant_contexts: ["GL Account:", "General Ledger:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: sox
+
+  sox_revenue_transaction:
+    code: 9521
+    description: SOX revenue transaction reference (REV-XXXXXX)
+    category: financial
+    pii_type: organizational
+    severity: high
+    regex:
+      - source: regex/sox/financial_controls.yml
+        pattern_id: sox_revenue_transaction
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [revenue, rev, revenue transaction, transaction id]
+        relevant_contexts: ["Revenue Transaction:", "REV:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: sox
+
+  sox_internal_control_id:
+    code: 9522
+    description: SOX internal control identifier (IC-XXX-NNN)
+    category: control
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/sox/financial_controls.yml
+        pattern_id: sox_internal_control_id
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [internal control, sox control, control id]
+        relevant_contexts: ["Control ID:", "Internal Control:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: sox
+
+  sox_financial_period:
+    code: 9523
+    description: SOX financial reporting period (FY/Q1–Q4)
+    category: financial
+    pii_type: organizational
+    severity: low
+    regex:
+      - source: regex/sox/financial_controls.yml
+        pattern_id: sox_financial_period
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [fiscal year, financial period, quarter, reporting period]
+        relevant_contexts: ["Fiscal Period:", "Reporting Period:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: sox
+
+  sox_audit_log_id:
+    code: 9524
+    description: SOX audit log reference ID (AUD-YYYYMMDD-NNNN)
+    category: audit
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/sox/financial_controls.yml
+        pattern_id: sox_audit_log_id
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [audit log, audit id, audit trail, sox audit]
+        relevant_contexts: ["Audit ID:", "Audit Log:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: sox
+
+  sox_sec_cik:
+    code: 9525
+    description: SEC Central Index Key (CIK, 10-digit identifier)
+    category: financial
+    pii_type: organizational
+    severity: medium
+    regex:
+      - source: regex/sox/financial_controls.yml
+        pattern_id: sox_sec_cik
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [cik, central index key, sec cik, edgar]
+        relevant_contexts: ["CIK:", "SEC CIK:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: sox
+
+  sox_sec_file_number:
+    code: 9526
+    description: SEC registration / file number (NNN-NNNNN)
+    category: financial
+    pii_type: organizational
+    severity: low
+    regex:
+      - source: regex/sox/financial_controls.yml
+        pattern_id: sox_sec_file_number
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [sec file number, file number, registration number, edgar]
+        relevant_contexts: ["File Number:", "SEC File Number:"]
+    rerank:
+      source: re-rank/tech.yml
+      category: sox

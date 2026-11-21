@@ -174,3 +174,59 @@ entities:
     rerank:
       source: re-rank/scoring.yml
       category: ssn
+
+  us_zipcode:
+    code: 5010
+    description: US ZIP code (5 digits or ZIP+4)
+    category: address
+    pii_type: location
+    severity: low
+    regex:
+      - source: regex/pii/us/other.yml
+        pattern_id: zipcode_01
+        verification: us_zipcode_valid
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [zip, zip code, zipcode, postal code]
+        relevant_contexts: ["ZIP:", "ZIP Code:", "Postal Code:"]
+    rerank:
+      source: re-rank/us.yml
+      category: address
+
+  us_npi:
+    code: 5011
+    description: US National Provider Identifier (NPI, 10-digit healthcare provider ID)
+    category: identification
+    pii_type: medical
+    severity: high
+    regex:
+      - source: regex/pii/us/medical.yml
+        pattern_id: npi_id
+        verification: us_npi_valid
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [npi, national provider identifier, provider id]
+        relevant_contexts: ["NPI:", "Provider ID:"]
+    rerank:
+      source: re-rank/us.yml
+      category: medical
+
+  us_icd10:
+    code: 5012
+    description: ICD-10-CM medical diagnosis code
+    category: medical
+    pii_type: medical
+    severity: medium
+    regex:
+      - source: regex/pii/us/medical.yml
+        pattern_id: icd10_code
+    keyword:
+      - source: keyword/identification.yml
+        category: national_id
+        relevant_terms: [icd-10, icd10, diagnosis code, diagnosis]
+        relevant_contexts: ["ICD-10:", "Diagnosis Code:"]
+    rerank:
+      source: re-rank/us.yml
+      category: medical

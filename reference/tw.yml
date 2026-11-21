@@ -134,6 +134,10 @@ entities:
         pattern_id: business_id_01
         pattern: '[0-9]{8}'
         mask: '********'
+      - source: regex/pii/tw/business.yml
+        pattern_id: tw_ubn
+        verification: tw_ubn_valid
+        mask: 'UBN-********'
     keyword:
       - source: keyword/identification.yml
         category: national_id
@@ -295,3 +299,41 @@ entities:
     rerank:
       source: re-rank/scoring.yml
       category: iban
+
+  tw_zipcode:
+    code: 4017
+    description: Taiwan postal code (郵遞區號, 3 or 5 digits)
+    category: address
+    pii_type: location
+    severity: low
+    regex:
+      - source: regex/pii/tw/other.yml
+        pattern_id: zipcode_01
+        verification: tw_zipcode_valid
+    keyword:
+      - source: keyword/contact.yml
+        category: address
+        relevant_terms: [郵遞區號, 郵編, postal code, zipcode]
+        relevant_contexts: ["郵遞區號:", "Zipcode:"]
+    rerank:
+      source: re-rank/tw.yml
+      category: address
+
+  tw_bank_generic:
+    code: 4018
+    description: Generic Taiwan bank account number (3-digit bank code + 9–13 digit account)
+    category: financial
+    pii_type: financial
+    severity: critical
+    regex:
+      - source: regex/pii/tw/banks.yml
+        pattern_id: generic_taiwan_bank_account_01
+        verification: generic_number_not_timestamp
+    keyword:
+      - source: keyword/financial.yml
+        category: bank
+        relevant_terms: [銀行帳號, 帳號, 帳戶號碼, 匯款, bank account]
+        relevant_contexts: ["帳號:", "銀行帳號:"]
+    rerank:
+      source: re-rank/tw.yml
+      category: bank

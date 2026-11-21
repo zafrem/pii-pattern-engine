@@ -276,6 +276,7 @@ entities:
       "NI Number:": 35
     regex_scores:
       uk_nino_01: 50
+      uk_nino_02: 50
     sum_example:
       keyword_hits: [85, 90]
       keyword_avg: 87
@@ -430,7 +431,7 @@ entities:
     sum_example:
       keyword_hits: [85, 75]
       keyword_avg: 80
-      context_bonus: 35
+      context_bonus: 30
       regex_score: 45
       final_score: 100
       label: definite_pii

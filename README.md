@@ -5,12 +5,12 @@ A comprehensive collection of regex patterns, verification functions, and a re-r
 ## Overview
 
 PII Pattern Engine provides:
-- **Regex Patterns**: 204 patterns for PII detection across US, Korea, Japan, China, Taiwan, India, EU, Spain, France, and common international formats
-- **Re-Rank Scoring System**: Confidence scoring engine that combines keyword signals, field-label context, and regex evidence into a single 0–100 score
-- **Reference Registry**: Stable numeric codes (1001–9510) for all 153 PII entity types — safe for use in logs, configs, and APIs
-- **Verification Functions**: 55 checksum/validation functions, implemented identically in Python, Go, Java, and JavaScript (behavioral parity is verified against the shared pattern examples)
+- **Regex Patterns**: 211 patterns for PII detection across US, Korea, Japan, China, Taiwan, India, EU, Spain, France, and common international formats
+- **Re-Rank Scoring System**: Confidence scoring engine (`re-rank/rerank.py`) that combines keyword signals, field-label context, and verified regex evidence into a single 0–100 score
+- **Reference Registry**: Stable numeric codes (1001–9526) for all 189 PII entity types — safe for use in logs, configs, and APIs
+- **Verification Functions**: 62 checksum/validation functions, implemented identically in Python, Go, Java, and JavaScript (behavioral parity is verified against the shared pattern examples)
 - **Keyword Mappings**: Context-aware keywords in multiple languages for improved accuracy
-- **Comprehensive Tests**: 3,500+ automated tests ensuring accuracy and reliability
+- **Comprehensive Tests**: 3,800+ automated tests ensuring accuracy and reliability
 
 
 ---
@@ -42,20 +42,21 @@ pii-pattern-engine/
 │   └── tech/                    # Technical identifiers (patents, UUIDs, etc.)
 │
 ├── re-rank/                      # Confidence scoring engine (v2.0)
+│   ├── rerank.py                # Production ReRankScorer runtime module
 │   ├── scoring.yml              # Engine config: formula, thresholds, entity index
-│   ├── kr.yml                   # Korea entities (codes 1001–1013)
-│   ├── jp.yml                   # Japan entities (codes 2001–2016)
-│   ├── cn.yml                   # China entities (codes 3001–3012)
-│   ├── tw.yml                   # Taiwan entities (codes 4001–4016)
-│   ├── us.yml                   # United States entities (codes 5001–5009)
+│   ├── kr.yml                   # Korea entities (codes 1001–1014)
+│   ├── jp.yml                   # Japan entities (codes 2001–2018)
+│   ├── cn.yml                   # China entities (codes 3001–3013)
+│   ├── tw.yml                   # Taiwan entities (codes 4001–4018)
+│   ├── us.yml                   # United States entities (codes 5001–5012)
 │   ├── eu.yml                   # European Union entities (codes 6001–6054)
-│   ├── in.yml                   # India entities (codes 7001–7009)
+│   ├── in.yml                   # India entities (codes 7001–7010)
 │   ├── es_fr.yml                # Spain & France entities (codes 8001–8056)
-│   ├── common.yml               # Common/international entities (codes 9001–9013)
-│   └── tech.yml                 # Tech tokens & secrets (codes 9501–9510)
+│   ├── common.yml               # Common/international entities (codes 9001–9023)
+│   └── tech.yml                 # Tech tokens & secrets (codes 9501–9526)
 │
 ├── reference/                    # Stable numeric code registry
-│   ├── registry.yml             # Master flat code map (all 153 entities)
+│   ├── registry.yml             # Master flat code map (all 189 entities)
 │   ├── kr.yml                   # Korea entity reference
 │   ├── jp.yml                   # Japan entity reference
 │   ├── cn.yml                   # China entity reference
@@ -69,7 +70,7 @@ pii-pattern-engine/
 │
 ├── verification/                 # Validation functions (multi-language)
 │   ├── python/
-│   │   ├── verification.py      # 55 verification functions
+│   │   ├── verification.py      # 62 verification functions
 │   │   └── __init__.py
 │   ├── golang/
 │   │   ├── verification.go
@@ -177,32 +178,23 @@ See [examples/README.md](examples/README.md) and [INTEGRATION.md](INTEGRATION.md
 ### Using the Re-Rank Scorer
 
 ```python
-import re
-import yaml
-from pathlib import Path
-from collections import defaultdict
+import sys; sys.path.insert(0, "re-rank")
+from rerank import ReRankScorer
 
-# Load engine config and all entity definitions
-engine   = yaml.safe_load(Path('re-rank/scoring.yml').read_text(encoding='utf-8'))
-entities = {}
-for f in Path('re-rank').glob('*.yml'):
-    if f.name == 'scoring.yml':
-        continue
-    data = yaml.safe_load(f.read_text(encoding='utf-8'))
-    for code, cfg in data.get('entities', {}).items():
-        entities[int(code)] = cfg
+scorer = ReRankScorer()
 
 # Score a sentence against entity 9001 (common_email)
-sentence   = "Email: alice@company.org"
-entity     = entities[9001]
-s_lower    = sentence.lower()
+res = scorer.score("Email: alice@company.org", 9001)
+print(res["final_score"], res["label"], res["action"])
+# -> 100 definite_pii redact
 
-kw_hits    = [(kw, sc) for kw, sc in entity['keyword_scores'].items() if kw.lower() in s_lower]
-kw_avg     = sum(sc for _, sc in kw_hits) / len(kw_hits) if kw_hits else 0
-ctx_bonus  = max((b for c, b in entity['context_bonus'].items() if c.lower() in s_lower), default=0)
-# regex_score added after pattern matching ...
+# Or run end-to-end detection + confidence re-ranking via Detector:
+sys.path.insert(0, "examples")
+from detect import Detector
 
-# final_score = min(kw_avg + ctx_bonus + regex_score, 100)
+det = Detector()
+for r in det.detect_reranked("주민등록번호: 900101-1234568", min_score=60):
+    print(r.entity_code, r.entity, r.final_score, r.label, r.finding.text)
 ```
 
 See [re-rank/README.md](re-rank/README.md) for the full scoring guide and integration examples.
@@ -268,17 +260,17 @@ final_score = min(keyword_avg + context_bonus + regex_score, 100)
 
 | Region | File | Entity Codes | Count |
 |--------|------|-------------|-------|
-| Korea | `kr.yml` | 1001–1013 | 13 |
-| Japan | `jp.yml` | 2001–2016 | 16 |
-| China | `cn.yml` | 3001–3012 | 12 |
-| Taiwan | `tw.yml` | 4001–4016 | 16 |
-| United States | `us.yml` | 5001–5009 | 9 |
+| Korea | `kr.yml` | 1001–1014 | 14 |
+| Japan | `jp.yml` | 2001–2018 | 18 |
+| China | `cn.yml` | 3001–3013 | 13 |
+| Taiwan | `tw.yml` | 4001–4018 | 18 |
+| United States | `us.yml` | 5001–5012 | 12 |
 | European Union | `eu.yml` | 6001–6054 | 43 |
-| India | `in.yml` | 7001–7009 | 9 |
+| India | `in.yml` | 7001–7010 | 10 |
 | Spain & France | `es_fr.yml` | 8001–8056 | 12 |
-| Common / International | `common.yml` | 9001–9013 | 13 |
-| Tech / Tokens | `tech.yml` | 9501–9510 | 10 |
-| **Total** | | | **153** |
+| Common / International | `common.yml` | 9001–9023 | 23 |
+| Tech / Tokens | `tech.yml` | 9501–9526 | 26 |
+| **Total** | | | **189** |
 
 See [re-rank/README.md](re-rank/README.md) for the full scoring reference.
 
@@ -288,21 +280,21 @@ See [re-rank/README.md](re-rank/README.md) for the full scoring reference.
 
 | Region | Patterns | Key Types |
 |--------|----------|-----------|
-| **Korea** | 30 | RRN, alien reg., bank accounts, phone, vehicle, address |
+| **Korea** | 30 | RRN, alien reg., bank accounts, phone, vehicle, address, zipcode |
 | **EU** | 39 | National IDs, passports, VAT numbers (14 countries) |
-| **Common** | 25 | Email, IP, credit cards, URLs, dates, names, IBAN |
-| **Taiwan** | 20 | National IDs, bank accounts, phone, business |
-| **Japan** | 17 | My Number, bank accounts, phone, address |
+| **Common** | 32 | Email, IP, credit cards, URLs, dates, names, MAC, IMEI, BIC, coordinates |
+| **Taiwan** | 20 | National IDs, bank accounts, phone, business, zipcode |
+| **Japan** | 17 | My Number, bank accounts, phone, address, corporate number, zipcode |
 | **Hash/Tokens** | 10 | AWS keys, GitHub tokens, Stripe, Slack, JWT, private keys |
-| **China** | 12 | National IDs, bank accounts, phone |
-| **India** | 9 | Aadhaar, PAN, GST, voter ID, phone |
-| **US** | 10 | SSN, ITIN, passport, driver's license, phone |
+| **China** | 12 | National IDs, bank accounts, phone, USCC, zipcode |
+| **India** | 9 | Aadhaar, PAN, GST, voter ID, phone, pincode |
+| **US** | 10 | SSN, ITIN, EIN, NPI, passport, driver's license, phone, zipcode |
 | **Spain** | 7 | DNI, NIE, CIF, phone |
 | **France** | 6 | NIR, CNI, passport, phone |
 | **IBAN** | 5 | DE, FR, GB, IT + generic |
 | **SOX** | 7 | Financial control patterns |
 | **Tech** | 7 | Patents, UUIDs, identifiers |
-| **Total** | **204** | |
+| **Total** | **211** | |
 
 ### Data Types
 
@@ -314,7 +306,7 @@ See [re-rank/README.md](re-rank/README.md) for the full scoring reference.
 
 ## Reference Registry
 
-All 153 PII entity types have stable integer codes, safe for use in logs, pipelines, and APIs:
+All 189 PII entity types have stable integer codes, safe for use in logs, pipelines, and APIs:
 
 ```yaml
 # reference/registry.yml (excerpt)
@@ -331,7 +323,7 @@ Regional detail files (`reference/kr.yml`, `reference/eu.yml`, etc.) provide per
 
 ## Verification Functions
 
-55 functions for advanced validation beyond regex (available in Python, Go, Java, and JavaScript):
+62 functions for advanced validation beyond regex (available in Python, Go, Java, and JavaScript):
 
 ### Core
 

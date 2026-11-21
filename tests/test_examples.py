@@ -85,5 +85,18 @@ class TestPrefilterPrunes:
         assert any("credit" in k for k in candidates)
 
 
+class TestRerankedDetection:
+    def test_detect_reranked_scores_and_filters(self, det):
+        text = "Employee SSN: 123-45-6789, Email: alice@example.com"
+        scored = det.detect_reranked(text, min_score=60)
+        codes = {s.entity_code for s in scored}
+        assert 5002 in codes  # us_ssn
+        assert 9001 in codes  # common_email
+        for s in scored:
+            assert s.final_score >= 60
+            assert s.label in ("definite_pii", "high_confidence_pii", "probable_pii")
+
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-v"]))

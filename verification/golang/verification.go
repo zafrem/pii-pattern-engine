@@ -75,6 +75,13 @@ var (
 		"kr_pccc_valid":                   KrPcccValid,
 		"kr_vehicle_registration_valid":   KrVehicleRegistrationValid,
 		"us_address_valid":                UsAddressValid,
+		"uscc_valid":                      UsccValid,
+		"korean_zipcode_valid":            KoreanZipcodeValid,
+		"us_zipcode_valid":                UsZipcodeValid,
+		"jp_zipcode_valid":                JpZipcodeValid,
+		"cn_zipcode_valid":                CnZipcodeValid,
+		"tw_zipcode_valid":                TwZipcodeValid,
+		"in_pincode_valid":                InPincodeValid,
 	}
 
 	mu sync.RWMutex
@@ -395,7 +402,7 @@ func HighEntropyToken(value string) bool {
 		entropy -= p * math.Log2(p)
 	}
 
-	return entropy >= 4.5
+	return entropy >= 4.0
 }
 
 func NotTimestamp(value string) bool {
@@ -1185,7 +1192,16 @@ func KrAlienRegistrationValid(value string) bool {
 			break
 		}
 	}
-	return !allSame
+	if allSame {
+		return false
+	}
+	weights := []int{2, 3, 4, 5, 6, 7, 8, 9, 2, 3, 4, 5}
+	total := 0
+	for i, w := range weights {
+		total += int(s[i]-'0') * w
+	}
+	check := ((11 - (total % 11)) % 10 + 2) % 10
+	return int(s[12]-'0') == check
 }
 
 func JpMyNumberValid(value string) bool {
@@ -1246,11 +1262,7 @@ func KrCorporateRegistrationValid(value string) bool {
 	weights := []int{1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2}
 	total := 0
 	for i, w := range weights {
-		p := int(s[i]-'0') * w
-		if p > 9 {
-			p -= 9
-		}
-		total += p
+		total += int(s[i]-'0') * w
 	}
 	check := (10 - (total % 10)) % 10
 	return int(s[12]-'0') == check
@@ -1935,6 +1947,150 @@ func UsAddressValid(value string) bool {
 	}
 
 	return false
+}
+
+func UsccValid(value string) bool {
+	const alphabet = "0123456789ABCDEFGHJKLMNPQRTUWXY"
+	code := strings.ToUpper(strings.ReplaceAll(value, " ", ""))
+	if len(code) != 18 {
+		return false
+	}
+	for i := 0; i < 18; i++ {
+		if !strings.ContainsRune(alphabet, rune(code[i])) {
+			return false
+		}
+	}
+	total := 0
+	weight := 1
+	for i := 0; i < 17; i++ {
+		idx := strings.IndexByte(alphabet, code[i])
+		total += idx * weight
+		weight = (weight * 3) % 31
+	}
+	checkIdx := (31 - (total % 31)) % 31
+	return alphabet[checkIdx] == code[17]
+}
+
+func isSequentialDigits(s string) bool {
+	if len(s) < 2 {
+		return false
+	}
+	asc, desc := true, true
+	for i := 1; i < len(s); i++ {
+		if int(s[i]-'0') != int(s[i-1]-'0')+1 {
+			asc = false
+		}
+		if int(s[i]-'0') != int(s[i-1]-'0')-1 {
+			desc = false
+		}
+	}
+	return asc || desc
+}
+
+func isAllSameDigits(s string) bool {
+	if len(s) <= 1 {
+		return true
+	}
+	for i := 1; i < len(s); i++ {
+		if s[i] != s[0] {
+			return false
+		}
+	}
+	return true
+}
+
+func extractDigits(value string) string {
+	var b strings.Builder
+	for _, r := range value {
+		if unicode.IsDigit(r) {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
+
+func KoreanZipcodeValid(value string) bool {
+	s := extractDigits(value)
+	if len(s) != 5 {
+		return false
+	}
+	if s[0] < '0' || s[0] > '6' {
+		return false
+	}
+	if isSequentialDigits(s) || isAllSameDigits(s) {
+		return false
+	}
+	return true
+}
+
+func UsZipcodeValid(value string) bool {
+	s := extractDigits(value)
+	if len(s) != 5 && len(s) != 9 {
+		return false
+	}
+	base := s[:5]
+	if isSequentialDigits(base) || isAllSameDigits(base) {
+		return false
+	}
+	return true
+}
+
+func JpZipcodeValid(value string) bool {
+	s := extractDigits(value)
+	if len(s) != 7 {
+		return false
+	}
+	if isSequentialDigits(s) || isAllSameDigits(s) {
+		return false
+	}
+	prefix, _ := strconv.Atoi(s[:3])
+	if prefix == 0 || prefix >= 999 {
+		return false
+	}
+	return true
+}
+
+func CnZipcodeValid(value string) bool {
+	s := extractDigits(value)
+	if len(s) != 6 {
+		return false
+	}
+	if isSequentialDigits(s) || isAllSameDigits(s) {
+		return false
+	}
+	firstTwo, _ := strconv.Atoi(s[:2])
+	if firstTwo < 1 || firstTwo > 86 {
+		return false
+	}
+	return true
+}
+
+func TwZipcodeValid(value string) bool {
+	s := extractDigits(value)
+	if len(s) != 3 && len(s) != 5 {
+		return false
+	}
+	if isAllSameDigits(s) {
+		return false
+	}
+	if s[0] == '0' {
+		return false
+	}
+	return true
+}
+
+func InPincodeValid(value string) bool {
+	s := extractDigits(value)
+	if len(s) != 6 {
+		return false
+	}
+	if s[0] == '0' {
+		return false
+	}
+	if isSequentialDigits(s) || isAllSameDigits(s) {
+		return false
+	}
+	return true
 }
 
 // suppress unused import warning — fmt is kept for callers that may use it

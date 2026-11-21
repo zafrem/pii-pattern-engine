@@ -359,6 +359,9 @@ patterns:
   description: UK National Insurance Number (2 letters + 6 digits + letter)
   pattern: '[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][\t\n\f\r ]?[0-9]{2}[\t\n\f\r ]?[0-9]{2}[\t\n\f\r ]?[0-9]{2}[\t\n\f\r ]?[A-D]'
   min_digit_run: 2
+  flags:
+  - IGNORECASE
+  verification: uk_nino_valid
   mask: '**-**-**-**-*'
   examples:
     match:

@@ -33,6 +33,7 @@ kr_business_registration:     1010
 kr_corporate_registration:    1011
 kr_personal_customs_code:     1012
 kr_vehicle_registration:      1013
+kr_zipcode:                   1014
 
 # ── Japan (JP) ──────────────────────────────────────────────────────────────
 jp_name_kanji:                2001
@@ -51,6 +52,8 @@ jp_bank_mufg:                 2013
 jp_bank_resona:               2014
 jp_bank_seven:                2015
 jp_bank_rakuten:              2016
+jp_zipcode:                   2017
+jp_corporate_number:          2018
 
 # ── China (CN) ──────────────────────────────────────────────────────────────
 cn_name:                      3001
@@ -65,6 +68,7 @@ cn_bank_ccb:                  3009
 cn_bank_abc:                  3010
 cn_bank_boc:                  3011
 cn_bank_cmb:                  3012
+cn_zipcode:                   3013
 
 # ── Taiwan (TW) ─────────────────────────────────────────────────────────────
 tw_name:                      4001
@@ -83,6 +87,8 @@ tw_bank_taipei_fubon:         4013
 tw_bank_ctbc:                 4014
 tw_bank_esun:                 4015
 tw_bank_cooperative:          4016
+tw_zipcode:                   4017
+tw_bank_generic:              4018
 
 # ── United States (US) ──────────────────────────────────────────────────────
 us_name:                      5001
@@ -94,6 +100,9 @@ us_medicare:                  5006
 us_phone:                     5007
 us_address:                   5008
 us_ein:                       5009
+us_zipcode:                   5010
+us_npi:                       5011
+us_icd10:                     5012
 
 # ── European Union (EU) ─────────────────────────────────────────────────────
 eu_id_germany:                6001
@@ -150,6 +159,7 @@ in_phone_mobile:              7006
 in_phone_landline:            7007
 in_ifsc:                      7008
 in_gst:                       7009
+in_pincode:                   7010
 
 # ── Spain (ES) ──────────────────────────────────────────────────────────────
 es_dni:                       8001
@@ -181,8 +191,18 @@ common_credit_card_amex:      9010
 common_credit_card_discover:  9011
 common_credit_card_jcb:       9012
 common_credit_card_diners:    9013
+common_crypto_btc:            9014
+common_crypto_eth:            9015
+common_mac_address:           9016
+common_imei:                  9017
+common_swift_bic:             9018
+common_latitude:              9019
+common_longitude:             9020
+common_coordinates_dms:       9021
+common_passport_generic:      9022
+common_uuid:                  9023
 
-# ── Tech / Tokens (TECH) ────────────────────────────────────────────────────
+# ── Tech / Tokens / SOX (TECH) ──────────────────────────────────────────────
 tech_generic_token:           9501
 tech_aws_access_key:          9502
 tech_aws_secret_key:          9503
@@ -193,3 +213,19 @@ tech_slack_token:             9507
 tech_google_api_key:          9508
 tech_generic_api_key:         9509
 tech_private_key:             9510
+tech_fcm_token:               9511
+tech_artifactory_token:       9512
+tech_mac_address:             9513
+tech_uuid_guid:               9514
+tech_cve_identifier:          9515
+tech_us_patent:               9516
+tech_pct_patent:              9517
+tech_ep_patent:               9518
+tech_ipc_classification:      9519
+sox_gl_account:               9520
+sox_revenue_transaction:      9521
+sox_internal_control_id:      9522
+sox_financial_period:         9523
+sox_audit_log_id:             9524
+sox_sec_cik:                  9525
+sox_sec_file_number:          9526
